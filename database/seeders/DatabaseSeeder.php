@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Company;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -13,11 +14,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $company = Company::firstOrCreate(
+            ['email' => 'admin@paperwork.local'],
+            [
+                'name' => 'Paperwork Demo Company',
+                'phone' => '081234567890',
+                'address' => 'Makassar, Indonesia',
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@paperwork.local'],
+            [
+                'company_id' => $company->id,
+                'name' => 'Admin Paperwork',
+                'password' => 'password',
+                'role' => 'owner',
+                'is_verified' => true,
+                'email_verified_at' => now(),
+            ]
+        );
     }
 }
