@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class StoreInvoiceRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return $this->user()?->canManageCompany() ?? false;
+    }
+
+    public function rules(): array
+    {
+        $companyId = $this->user()->company_id;
+
+        return [
+            'client_id' => ['required', Rule::exists('clients', 'id')->where('company_id', $companyId)],
+            'number' => ['required', 'string', 'max:100'],
+            'issue_date' => ['required', 'date'],
+            'due_date' => ['nullable', 'date', 'after_or_equal:issue_date'],
+            'status' => ['nullable', Rule::in(['draft', 'sent', 'partial', 'paid', 'void'])],
+            'tax_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'pph_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'down_payment_amount' => ['nullable', 'numeric', 'min:0'],
+            'notes' => ['nullable', 'string'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.product_id' => ['nullable', Rule::exists('products', 'id')->where('company_id', $companyId)],
+            'items.*.description' => ['required', 'string', 'max:255'],
+            'items.*.quantity' => ['required', 'numeric', 'min:0.01'],
+            'items.*.unit_price' => ['required', 'numeric', 'min:0'],
+        ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator): void {
+            $subtotal = collect($this->input('items', []))->sum(function (array $item): float {
+                return (float) ($item['quantity'] ?? 0) * (float) ($item['unit_price'] ?? 0);
+            });
+            $taxRate = (float) $this->input('tax_rate', 0);
+            $grandTotal = $subtotal + ($subtotal * $taxRate / 100);
+            $dp = (float) $this->input('down_payment_amount', 0);
+
+            if ($dp > $grandTotal) {
+                $validator->errors()->add(
+                    'down_payment_amount',
+                    'DP tidak boleh melebihi total invoice.'
+                );
+            }
+        });
+    }
+}
