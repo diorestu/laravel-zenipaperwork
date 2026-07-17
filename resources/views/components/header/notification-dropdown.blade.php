@@ -1,4 +1,10 @@
 {{-- Notification Dropdown Component --}}
+@php
+    $notifications ??= collect();
+    $unreadCount ??= 0;
+    $hasUnread ??= false;
+@endphp
+
 <div class="relative" x-data="{
     dropdownOpen: false,
     notifying: {{ $hasUnread ? 'true' : 'false' }},
