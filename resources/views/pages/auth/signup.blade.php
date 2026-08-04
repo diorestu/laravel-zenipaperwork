@@ -17,7 +17,7 @@
                 <div class="grid w-full items-center gap-10 lg:grid-cols-[0.9fr_1fr]">
                     <div class="hidden max-w-md lg:block">
                         <p class="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
-                            New workspace
+                            Workspace baru
                         </p>
                         <h1 class="text-5xl font-semibold leading-[1.05] tracking-tight text-gray-950 dark:text-white">
                             Mulai dengan data perusahaan yang rapi.
@@ -96,7 +96,7 @@
 
                             <div class="grid gap-5 sm:grid-cols-2">
                                 <div>
-                                    <label for="password" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                                    <label for="password" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Kata Sandi</label>
                                     <input
                                         id="password"
                                         type="password"
@@ -117,7 +117,7 @@
                                         type="password"
                                         name="password_confirmation"
                                         autocomplete="new-password"
-                                        placeholder="Ulangi password"
+                                        placeholder="Ulangi kata sandi"
                                         class="h-11 w-full rounded-md border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-900 dark:border-white/10 dark:bg-transparent dark:text-white dark:focus:border-white"
                                     />
                                 </div>

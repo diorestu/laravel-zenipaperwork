@@ -146,6 +146,14 @@
             display: block;
             margin-bottom: 1px;
         }
+
+        .item-description-name {
+            font-weight: 700;
+        }
+
+        .item-line-total {
+            font-weight: 700;
+        }
         
         .totals-table {
             width: 240px;
@@ -173,6 +181,10 @@
             font-size: 14px;
             font-weight: 700;
             padding-top: 4px;
+        }
+
+        .totals-grand td {
+            font-weight: 700;
         }
         
         .notes-container {
@@ -279,17 +291,17 @@
         <tbody>
             @foreach ($quotation->items as $item)
                 @php
-                    $parts = array_filter(array_map('trim', explode('-', $item->description)));
+                    $parts = array_filter(array_map('trim', preg_split('/\s*(?=-)/', $item->description)));
                 @endphp
                 <tr>
                     <td class="item-description">
                         @foreach ($parts as $part)
-                            <span class="item-description-line">{{ $part }}</span>
+                            <span class="item-description-line {{ $loop->first ? 'item-description-name' : '' }}">{{ $part }}</span>
                         @endforeach
                     </td>
                     <td class="text-right">{{ number_format((float) $item->quantity, 2) }}</td>
                     <td class="text-right"><x-money :amount="$item->unit_price" /></td>
-                    <td class="text-right"><x-money :amount="$item->line_total" /></td>
+                    <td class="text-right item-line-total"><x-money :amount="$item->line_total" /></td>
                 </tr>
             @endforeach
         </tbody>
@@ -321,9 +333,9 @@
                             <td class="totals-val"><x-money :amount="$quotation->tax_total" /></td>
                         </tr>
                     @endif
-                    <tr class="totals-grand font-bold">
-                        <td class="totals-label font-bold">Total</td>
-                        <td class="totals-val font-bold"><x-money :amount="$quotation->total" /></td>
+                    <tr class="totals-grand">
+                        <td class="totals-label">Total</td>
+                        <td class="totals-val"><x-money :amount="$quotation->total" /></td>
                     </tr>
                 </table>
             </td>

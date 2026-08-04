@@ -21,8 +21,9 @@ class InvoiceService
         return DB::transaction(function () use ($user, $data): Invoice {
             $taxRate = (float) ($data['tax_rate'] ?? 0);
             $pphRate = (float) ($data['pph_rate'] ?? 0);
-            $downPayment = (float) ($data['down_payment_amount'] ?? 0);
             $totals = $this->calculator->totals($data['items'], $taxRate);
+            $terms = $this->normalizePaymentTerms($data['payment_terms'] ?? []);
+            $downPayment = (float) ($terms[0]['amount'] ?? ($data['down_payment_amount'] ?? 0));
             $pphAmount = round($totals['subtotal'] * ($pphRate / 100), 2);
 
             $invoice = Invoice::create([
@@ -45,8 +46,9 @@ class InvoiceService
             ]);
 
             $invoice->items()->createMany($totals['items']);
+            $this->syncPaymentTerms($invoice, $terms);
 
-            return $invoice->load(['client', 'items', 'payments', 'creditNotes', 'expenses']);
+            return $invoice->load(['client', 'items', 'payments', 'paymentTerms', 'creditNotes', 'expenses']);
         });
     }
 
@@ -55,8 +57,9 @@ class InvoiceService
         return DB::transaction(function () use ($invoice, $data): Invoice {
             $taxRate = (float) ($data['tax_rate'] ?? 0);
             $pphRate = (float) ($data['pph_rate'] ?? 0);
-            $downPayment = (float) ($data['down_payment_amount'] ?? 0);
             $totals = $this->calculator->totals($data['items'], $taxRate);
+            $terms = $this->normalizePaymentTerms($data['payment_terms'] ?? []);
+            $downPayment = (float) ($terms[0]['amount'] ?? ($data['down_payment_amount'] ?? 0));
             $pphAmount = round($totals['subtotal'] * ($pphRate / 100), 2);
 
             $invoice->update([
@@ -77,8 +80,9 @@ class InvoiceService
             ]);
             $invoice->items()->delete();
             $invoice->items()->createMany($totals['items']);
+            $this->syncPaymentTerms($invoice, $terms);
 
-            return $invoice->refresh()->load(['client', 'items', 'payments', 'creditNotes', 'expenses']);
+            return $invoice->refresh()->load(['client', 'items', 'payments', 'paymentTerms', 'creditNotes', 'expenses']);
         });
     }
 
@@ -118,8 +122,33 @@ class InvoiceService
             );
             $quotation->update(['status' => 'converted']);
 
-            return $invoice->load(['client', 'items', 'creditNotes', 'expenses']);
+            return $invoice->load(['client', 'items', 'paymentTerms', 'creditNotes', 'expenses']);
         });
+    }
+
+    private function normalizePaymentTerms(array $terms): array
+    {
+        return collect($terms)
+            ->filter(fn (array $term): bool => (float) ($term['amount'] ?? 0) > 0)
+            ->values()
+            ->map(fn (array $term, int $index): array => [
+                'term_number' => $index + 1,
+                'label' => $term['label'] ?: 'Termin '.($index + 1),
+                'amount' => (float) $term['amount'],
+                'due_date' => $term['due_date'] ?? null,
+            ])
+            ->all();
+    }
+
+    private function syncPaymentTerms(Invoice $invoice, array $terms): void
+    {
+        $invoice->paymentTerms()->delete();
+
+        if ($terms === []) {
+            return;
+        }
+
+        $invoice->paymentTerms()->createMany($terms);
     }
 
     public function recordPayment(Invoice $invoice, array $data): InvoicePayment

@@ -4,11 +4,11 @@
 <div class="space-y-6">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h1 class="text-xl font-semibold text-gray-900 dark:text-white/90">Clients</h1>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Kelola data client, kontak, dan aktivitas dokumen.</p>
+            <h1 class="text-xl font-semibold text-gray-900 dark:text-white/90">Klien</h1>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Kelola data klien, kontak, dan aktivitas dokumen.</p>
         </div>
         <button type="button" @click="$dispatch('open-modal', 'create-client')" class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
-            Create Client
+            Tambah Klien
         </button>
     </div>
 
@@ -37,7 +37,7 @@
         <div class="border-b border-gray-100 p-5 dark:border-gray-800">
             <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                    <h2 class="text-base font-semibold text-gray-900 dark:text-white/90">Data Client</h2>
+                    <h2 class="text-base font-semibold text-gray-900 dark:text-white/90">Data Klien</h2>
                 </div>
                 <div class="relative w-full sm:w-80">
                     <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 dark:text-gray-500">
@@ -49,7 +49,7 @@
                     <input
                         id="clients-table-search"
                         type="search"
-                        placeholder="Cari nama, perusahaan, email, phone"
+                        placeholder="Cari nama, perusahaan, email, telepon"
                         class="h-11 w-full rounded-lg border border-gray-300 bg-white pr-4 pl-11 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
                     >
                 </div>
@@ -66,17 +66,19 @@
                     {"data":"contact"},
                     {"data":"documents"},
                     {"data":"invoice_value"},
+                    {"data":"unpaid_value"},
                     {"data":"action","className":"dt-action-cell"}
                 ]'
                 data-page-length="10"
                 data-search-target="#clients-table-search">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Client</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Contact</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Documents</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Invoice Value</th>
-                        <th class="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Action</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Klien</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Kontak</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Dokumen</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Nilai Invoice</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Belum Terbayar</th>
+                        <th class="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-transparent"></tbody>
@@ -85,46 +87,46 @@
     </section>
 
     <x-ui.modal name="edit-client" class="max-w-2xl p-6">
-        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white/90">Edit Client</h2>
+        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white/90">Edit Klien</h2>
         <form method="POST" data-edit-form="edit-client" data-update-url="{{ route('clients.update', '__ID__') }}" class="space-y-4">
             @csrf
             @method('PUT')
             <input type="hidden" name="id">
-            <x-form.input name="name" label="Name" />
-            <x-form.input name="company_name" label="Company Name" />
+            <x-form.input name="name" label="Nama" />
+            <x-form.input name="company_name" label="Nama Perusahaan" />
             <x-form.input name="email" label="Email" type="email" />
-            <x-form.input name="phone" label="Phone" />
-            <x-form.input name="tax_number" label="Tax Number" />
+            <x-form.input name="phone" label="Telepon" />
+            <x-form.input name="tax_number" label="Nomor Pajak" />
             <label class="grid gap-2 sm:grid-cols-[30%_1fr] sm:items-start">
-                <span class="pt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Address</span>
+                <span class="pt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Alamat</span>
                 <span class="block">
                     <textarea name="address" rows="3" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-gray-500"></textarea>
                 </span>
             </label>
             <div class="flex justify-end">
-                <button class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">Save</button>
+                <button class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">Simpan</button>
             </div>
         </form>
     </x-ui.modal>
 
     <x-ui.modal name="create-client" :is-open="request('modal') === 'create'" class="max-w-2xl p-6">
-        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white/90">Tambah Client</h2>
+        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white/90">Tambah Klien</h2>
         <form method="POST" action="{{ route('clients.store') }}" class="mt-4 space-y-4">
             @csrf
-            <x-form.input name="name" label="Name" />
-            <x-form.input name="company_name" label="Company Name" />
+            <x-form.input name="name" label="Nama" />
+            <x-form.input name="company_name" label="Nama Perusahaan" />
             <x-form.input name="email" label="Email" type="email" />
-            <x-form.input name="phone" label="Phone" />
-            <x-form.input name="tax_number" label="Tax Number" />
+            <x-form.input name="phone" label="Telepon" />
+            <x-form.input name="tax_number" label="Nomor Pajak" />
             <label class="grid gap-2 sm:grid-cols-[30%_1fr] sm:items-start">
-                <span class="pt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Address</span>
+                <span class="pt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Alamat</span>
                 <span class="block">
                     <textarea name="address" rows="3" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-gray-500">{{ old('address') }}</textarea>
                     @error('address')<span class="mt-1 block text-xs text-error-600">{{ $message }}</span>@enderror
                 </span>
             </label>
             <div class="flex justify-end">
-                <button class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">Save</button>
+                <button class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">Simpan</button>
             </div>
         </form>
     </x-ui.modal>

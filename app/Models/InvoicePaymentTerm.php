@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class InvoicePayment extends Model
+class InvoicePaymentTerm extends Model
 {
-    protected $fillable = ['invoice_id', 'term_number', 'term_label', 'amount', 'paid_at', 'method', 'reference', 'proof_path', 'notes'];
+    protected $fillable = ['invoice_id', 'term_number', 'label', 'amount', 'due_date'];
 
     protected function casts(): array
     {
         return [
             'amount' => 'decimal:2',
-            'paid_at' => 'date',
+            'due_date' => 'date',
         ];
     }
 

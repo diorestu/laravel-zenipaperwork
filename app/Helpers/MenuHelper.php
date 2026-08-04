@@ -9,40 +9,40 @@ class MenuHelper
         return [
             [
                 'icon' => 'dashboard',
-                'name' => 'Dashboard',
+                'name' => 'Dasbor',
                 'path' => '/',
             ],
             [
                 'icon' => 'user-profile',
-                'name' => 'Clients',
+                'name' => 'Klien',
                 'path' => '/clients',
             ],
             [
                 'icon' => 'ecommerce',
-                'name' => 'Products',
+                'name' => 'Produk',
                 'path' => '/products',
             ],
             [
-                'name' => 'Documents',
+                'name' => 'Dokumen',
                 'icon' => 'forms',
                 'subItems' => [
-                    ['name' => 'Quotations', 'path' => '/quotations', 'pro' => false],
-                    ['name' => 'Invoices', 'path' => '/invoices', 'pro' => false],
+                    ['name' => 'Penawaran', 'path' => '/quotations', 'pro' => false],
+                    ['name' => 'Invoice', 'path' => '/invoices', 'pro' => false],
                 ],
             ],
             [
-                'name' => 'Settings',
+                'name' => 'Pengaturan',
                 'icon' => 'pages',
                 'subItems' => [
-                    ['name' => 'Company Profile', 'path' => '/settings/company', 'pro' => false],
-                    ['name' => 'Billing', 'path' => '/settings/billing', 'pro' => false],
-                    ['name' => 'Bank Accounts', 'path' => '/settings/bank-accounts', 'pro' => false],
-                    ['name' => 'Security', 'path' => '/settings/security', 'pro' => false],
+                    ['name' => 'Profil Perusahaan', 'path' => '/settings/company', 'pro' => false],
+                    ['name' => 'Tagihan', 'path' => '/settings/billing', 'pro' => false],
+                    ['name' => 'Rekening Bank', 'path' => '/settings/bank-accounts', 'pro' => false],
+                    ['name' => 'Keamanan', 'path' => '/settings/security', 'pro' => false],
                 ],
             ],
             [
                 'icon' => 'email',
-                'name' => 'Notifications',
+                'name' => 'Notifikasi',
                 'path' => '/notifications',
             ],
         ];
@@ -53,10 +53,10 @@ class MenuHelper
         $items = [
             [
                 'icon' => 'authentication',
-                'name' => 'Auth',
+                'name' => 'Autentikasi',
                 'subItems' => [
-                    ['name' => 'Login', 'path' => '/login', 'pro' => false],
-                    ['name' => 'Register', 'path' => '/register', 'pro' => false],
+                    ['name' => 'Masuk', 'path' => '/login', 'pro' => false],
+                    ['name' => 'Daftar', 'path' => '/register', 'pro' => false],
                 ],
             ],
         ];

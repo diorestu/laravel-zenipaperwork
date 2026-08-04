@@ -116,13 +116,15 @@
             margin-top: 3px;
         }
         
-        .items-table {
+        .items-table,
+        .terms-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 15px;
         }
         
-        .items-table th {
+        .items-table th,
+        .terms-table th {
             border-bottom: 1px solid #e5e7eb;
             padding: 4px 0;
             font-size: 10px;
@@ -131,10 +133,30 @@
             color: #9ca3af;
         }
         
-        .items-table td {
+        .items-table td,
+        .terms-table td {
             border-bottom: 1px solid #f3f4f6;
             padding: 4px 0;
             vertical-align: top;
+        }
+
+        .terms-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #111111;
+            margin: 4px 0 5px 0;
+        }
+
+        .term-label {
+            font-weight: 700;
+            color: #111111;
+        }
+
+        .term-note {
+            font-size: 10px;
+            color: #9ca3af;
         }
         
         .item-description {
@@ -145,6 +167,14 @@
         .item-description-line {
             display: block;
             margin-bottom: 1px;
+        }
+
+        .item-description-name {
+            font-weight: 700;
+        }
+
+        .item-line-total {
+            font-weight: 700;
         }
         
         .totals-table {
@@ -171,8 +201,13 @@
         .totals-grand {
             border-top: 1px solid #e5e7eb;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             padding-top: 4px;
+        }
+
+        .totals-grand td,
+        .totals-balance td {
+            font-weight: 700;
         }
 
         .totals-balance {
@@ -286,21 +321,46 @@
         <tbody>
             @foreach ($invoice->items as $item)
                 @php
-                    $parts = array_filter(array_map('trim', explode('-', $item->description)));
+                    $parts = array_filter(array_map('trim', preg_split('/\s*(?=-)/', $item->description)));
                 @endphp
                 <tr>
                     <td class="item-description">
                         @foreach ($parts as $part)
-                            <span class="item-description-line">{{ $part }}</span>
+                            <span class="item-description-line {{ $loop->first ? 'item-description-name' : '' }}">{{ $part }}</span>
                         @endforeach
                     </td>
                     <td class="text-right">{{ number_format((float) $item->quantity, 2) }}</td>
                     <td class="text-right"><x-money :amount="$item->unit_price" /></td>
-                    <td class="text-right"><x-money :amount="$item->line_total" /></td>
+                    <td class="text-right item-line-total"><x-money :amount="$item->line_total" /></td>
                 </tr>
             @endforeach
         </tbody>
     </table>
+
+    @if ($invoice->paymentTerms->isNotEmpty())
+        <div class="terms-title">Termin Pembayaran</div>
+        <table class="terms-table">
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Termin</th>
+                    <th style="text-align: left; width: 120px;">Jatuh Tempo</th>
+                    <th class="text-right" style="width: 130px;">Nominal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($invoice->paymentTerms as $term)
+                    <tr>
+                        <td>
+                            <div class="term-label">{{ $term->label }}</div>
+                            <div class="term-note">Termin {{ $term->term_number }}</div>
+                        </td>
+                        <td>{{ $term->due_date ? $term->due_date->format('d M Y') : '-' }}</td>
+                        <td class="text-right item-line-total"><x-money :amount="$term->amount" /></td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 
     <!-- Summary & Notes -->
     <table class="footer-table">
@@ -336,8 +396,8 @@
                     @endif
                     
                     <tr class="totals-grand">
-                        <td class="totals-label font-semibold">Total Tagihan</td>
-                        <td class="totals-val font-semibold"><x-money :amount="$invoice->total" /></td>
+                        <td class="totals-label">Total Tagihan</td>
+                        <td class="totals-val"><x-money :amount="$invoice->total" /></td>
                     </tr>
                     
                     <tr>
@@ -353,8 +413,8 @@
                     @endif
                     
                     <tr class="totals-balance">
-                        <td class="totals-label font-bold">Sisa Tagihan</td>
-                        <td class="totals-val font-bold"><x-money :amount="$invoice->balance_due" /></td>
+                        <td class="totals-label">Sisa Tagihan</td>
+                        <td class="totals-val"><x-money :amount="$invoice->balance_due" /></td>
                     </tr>
                 </table>
             </td>

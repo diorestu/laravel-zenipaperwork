@@ -19,28 +19,28 @@ class ProductController extends Controller
 
         $productStats = [
             [
-                'label' => 'Total Product',
+                'label' => 'Total Produk',
                 'value' => Product::forCompany($companyId)->count(),
-                'meta' => 'Semua product/service',
+                'meta' => 'Semua produk/layanan',
             ],
             [
-                'label' => 'Product Aktif',
+                'label' => 'Produk Aktif',
                 'value' => Product::forCompany($companyId)->where('is_active', true)->count(),
                 'meta' => 'Siap dipakai dokumen',
             ],
             [
                 'label' => 'Harga Rata-rata',
                 'value' => 'Rp '.number_format((float) Product::forCompany($companyId)->avg('price'), 0, ',', '.'),
-                'meta' => 'Average base price',
+                'meta' => 'Rata-rata harga dasar',
             ],
             [
-                'label' => 'Sudah Terpakai',
+                'label' => 'Sudah Dipakai',
                 'value' => Product::forCompany($companyId)
                     ->where(function ($query): void {
                         $query->whereHas('invoiceItems')->orWhereHas('quotationItems');
                     })
                     ->count(),
-                'meta' => 'Ada di invoice/quotation',
+                'meta' => 'Ada di invoice/penawaran',
             ],
         ];
 
@@ -75,8 +75,8 @@ class ProductController extends Controller
             'data' => $products->map(fn (Product $product) => [
                 'product' => view('products.partials.datatable-product', compact('product'))->render(),
                 'price' => '<p class="font-medium text-gray-900 dark:text-white/90">Rp '.number_format((float) $product->price, 0, ',', '.').'</p><p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">per '.e($product->unit).'</p>',
-                'usage' => '<div class="flex flex-wrap gap-2"><span class="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 dark:border-gray-700 dark:bg-white/5 dark:text-gray-300">'.$product->invoice_items_count.' invoice item</span><span class="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 dark:border-gray-700 dark:bg-white/5 dark:text-gray-300">'.$product->quotation_items_count.' quotation item</span></div>',
-                'status' => '<span class="inline-flex rounded-full border px-2 py-1 text-xs font-medium '.($product->is_active ? 'border-success-200 bg-success-50 text-success-700 dark:border-success-500/30 dark:bg-success-500/10 dark:text-success-400' : 'border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-white/5 dark:text-gray-400').'">'.($product->is_active ? 'Active' : 'Inactive').'</span>',
+                'usage' => '<div class="flex flex-wrap gap-2"><span class="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 dark:border-gray-700 dark:bg-white/5 dark:text-gray-300">'.$product->invoice_items_count.' item invoice</span><span class="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 dark:border-gray-700 dark:bg-white/5 dark:text-gray-300">'.$product->quotation_items_count.' item penawaran</span></div>',
+                'status' => '<span class="inline-flex rounded-full border px-2 py-1 text-xs font-medium '.($product->is_active ? 'border-success-200 bg-success-50 text-success-700 dark:border-success-500/30 dark:bg-success-500/10 dark:text-success-400' : 'border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-white/5 dark:text-gray-400').'">'.($product->is_active ? 'Aktif' : 'Nonaktif').'</span>',
                 'updated' => $product->updated_at?->format('d M Y'),
                 'action' => view('products.partials.datatable-actions', compact('product'))->render(),
             ]),
@@ -86,7 +86,7 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
         $product = Product::create($request->validated() + ['company_id' => $request->user()->company_id, 'is_active' => $request->boolean('is_active', true)]);
-        ActivityNotifier::record($request->user(), 'Product baru dibuat', $product->name.' ditambahkan ke katalog.');
+        ActivityNotifier::record($request->user(), 'Produk baru dibuat', $product->name.' ditambahkan ke katalog.');
 
         return back()->with('success', 'Produk tersimpan.');
     }

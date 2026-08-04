@@ -20,7 +20,7 @@
                         Selamat datang kembali
                     </h2>
                     <p class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
-                        Gunakan email dan password yang terdaftar.
+                        Gunakan email dan kata sandi yang terdaftar.
                     </p>
                 </div>
 
@@ -46,9 +46,9 @@
 
                     <div>
                         <div class="mb-1.5 flex items-center justify-between gap-3">
-                            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kata Sandi</label>
                             <a href="{{ route('password.request') }}" class="text-xs font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                                Lupa password?
+                                Lupa kata sandi?
                             </a>
                         </div>
                         <input
@@ -56,7 +56,7 @@
                             type="password"
                             name="password"
                             autocomplete="current-password"
-                            placeholder="Masukkan password"
+                            placeholder="Masukkan kata sandi"
                             class="h-11 w-full rounded-md border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-900 dark:border-white/10 dark:bg-transparent dark:text-white dark:focus:border-white"
                         />
                         @error('password')

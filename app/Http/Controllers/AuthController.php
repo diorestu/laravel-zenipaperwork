@@ -15,7 +15,7 @@ class AuthController extends Controller
 {
     public function loginForm()
     {
-        return view('pages.auth.signin', ['title' => 'Sign In']);
+        return view('pages.auth.signin', ['title' => 'Masuk']);
     }
 
     public function login(Request $request)
@@ -33,7 +33,7 @@ class AuthController extends Controller
 
     public function registerForm()
     {
-        return view('pages.auth.signup', ['title' => 'Sign Up']);
+        return view('pages.auth.signup', ['title' => 'Daftar']);
     }
 
     public function register(Request $request)
@@ -75,7 +75,7 @@ class AuthController extends Controller
         $request->validate(['email' => ['required', 'email']]);
         Password::sendResetLink($request->only('email'));
 
-        return back()->with('success', 'Link reset password dikirim jika email terdaftar.');
+        return back()->with('success', 'Link reset kata sandi dikirim jika email terdaftar.');
     }
 
     public function resetPassword(Request $request)
@@ -94,7 +94,7 @@ class AuthController extends Controller
         });
 
         return $status === Password::PASSWORD_RESET
-            ? redirect()->route('login')->with('success', 'Password diperbarui.')
+            ? redirect()->route('login')->with('success', 'Kata sandi diperbarui.')
             : back()->withErrors(['email' => __($status)]);
     }
 
@@ -111,6 +111,6 @@ class AuthController extends Controller
 
         $request->user()->sendEmailVerificationNotification();
 
-        return back()->with('success', 'Link verification dikirim.');
+        return back()->with('success', 'Link verifikasi dikirim.');
     }
 }

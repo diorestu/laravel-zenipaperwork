@@ -25,6 +25,13 @@ class BillingController extends Controller
     public function store(StoreBillingSubmissionRequest $request, PakasirPaymentGateway $pakasir)
     {
         $data = $request->validated();
+        $plan = collect($this->plans())->firstWhere('slug', $data['package']);
+        abort_unless($plan, 422);
+
+        $data['amount'] = $data['billing_period'] === 'yearly'
+            ? (int) round($plan['amount'] * 12 * 0.9)
+            : $plan['amount'];
+
         if ($request->hasFile('proof')) {
             $data['proof_path'] = $request->file('proof')->store('billing-proofs', 'public');
         }
@@ -47,10 +54,10 @@ class BillingController extends Controller
         }
 
         if ($submission->payment_method === 'manual_transfer') {
-            return redirect()->route('settings.billing')->with('success', 'Billing manual dikirim untuk konfirmasi.');
+            return redirect()->route('settings.billing')->with('success', 'Tagihan manual dikirim untuk konfirmasi.');
         }
 
-        return redirect()->route('settings.billing.show', $submission)->with('success', 'Payment dibuat.');
+        return redirect()->route('settings.billing.show', $submission)->with('success', 'Pembayaran dibuat.');
     }
 
     public function show(BillingSubmission $billingSubmission, PakasirPaymentGateway $pakasir)
@@ -82,9 +89,45 @@ class BillingController extends Controller
     private function plans(): array
     {
         return [
-            ['slug' => 'starter', 'name' => 'Starter', 'amount' => 49000],
-            ['slug' => 'business', 'name' => 'Business', 'amount' => 149000],
-            ['slug' => 'enterprise', 'name' => 'Enterprise', 'amount' => 499000],
+            [
+                'slug' => 'starter',
+                'name' => 'Starter',
+                'amount' => 25000,
+                'features' => [
+                    'Kelola hingga 100 klien',
+                    'Kelola hingga 100 produk atau layanan',
+                    'Buat hingga 50 invoice/quotation per bulan',
+                    'Unduh PDF invoice dan penawaran',
+                    'Riwayat pembayaran manual',
+                ],
+            ],
+            [
+                'slug' => 'business',
+                'name' => 'Business',
+                'amount' => 99000,
+                'features' => [
+                    'Kelola hingga 500 klien',
+                    'Kelola hingga 500 produk atau layanan',
+                    'Buat penawaran tanpa batas',
+                    'Buat hingga 500 invoice',
+                    'Pembayaran bertahap dan catatan termin',
+                    'Riwayat pembayaran dan status pelunasan',
+                    'Pengaturan rekening bank dan profil perusahaan',
+                ],
+            ],
+            [
+                'slug' => 'enterprise',
+                'name' => 'Enterprise',
+                'amount' => 299000,
+                'features' => [
+                    'Klien, produk, penawaran, dan invoice tanpa batas',
+                    'Semua fitur Business',
+                    'Prioritas dukungan operasional',
+                    'Pendampingan setup dokumen perusahaan',
+                    'Kebutuhan kapasitas dan workflow khusus',
+                    'Review konfigurasi billing dan pembayaran',
+                ],
+            ],
         ];
     }
 }

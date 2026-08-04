@@ -39,33 +39,33 @@ class DashboardController extends Controller
         return view('dashboard.index', [
             'stats' => [
                 [
-                    'label' => 'Total Invoices',
+                    'label' => 'Total Invoice',
                     'value' => $invoices->count(),
-                    'meta' => 'All documents',
+                    'meta' => 'Semua dokumen',
                     'href' => route('invoices.index'),
                 ],
                 [
-                    'label' => 'Issued Amount',
+                    'label' => 'Nilai Diterbitkan',
                     'value' => 'Rp '.number_format((float) $issuedAmount, 0, ',', '.'),
-                    'meta' => 'Invoice total',
+                    'meta' => 'Total invoice',
                     'href' => route('invoices.index'),
                 ],
                 [
-                    'label' => 'Collected Revenue',
+                    'label' => 'Pendapatan Tertagih',
                     'value' => 'Rp '.number_format((float) $revenue, 0, ',', '.'),
-                    'meta' => 'Recorded payments',
+                    'meta' => 'Pembayaran tercatat',
                     'href' => route('invoices.index'),
                 ],
                 [
-                    'label' => 'Outstanding',
+                    'label' => 'Piutang',
                     'value' => 'Rp '.number_format((float) $outstanding, 0, ',', '.'),
                     'meta' => 'Unpaid balance',
                     'href' => route('invoices.index'),
                 ],
                 [
-                    'label' => 'Overdue',
+                    'label' => 'Jatuh Tempo',
                     'value' => $overdueInvoices->count(),
-                    'meta' => 'Past due invoices',
+                    'meta' => 'Invoice melewati jatuh tempo',
                     'href' => route('invoices.index'),
                 ],
             ],

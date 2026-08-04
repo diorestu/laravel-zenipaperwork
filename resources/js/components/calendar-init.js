@@ -114,7 +114,7 @@ export function calendarInit() {
 
       // Update modal header
       if (getModalHeaderEl) {
-        getModalHeaderEl.textContent = "Add Event";
+        getModalHeaderEl.textContent = "Tambah Event";
       }
 
       // Show Add button, hide Update button
@@ -136,7 +136,7 @@ export function calendarInit() {
 
       // Update modal header
       if (getModalHeaderEl) {
-        getModalHeaderEl.textContent = "Add Event";
+        getModalHeaderEl.textContent = "Tambah Event";
       }
 
       // Show Add button, hide Update button
@@ -219,7 +219,7 @@ export function calendarInit() {
       displayEventTime: false, // Hide time display
       customButtons: {
         addEventButton: {
-          text: "Add Event +",
+          text: "Tambah Event +",
           click: calendarAddEvent,
         },
       },

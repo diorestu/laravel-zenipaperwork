@@ -15,6 +15,7 @@ class StoreBillingSubmissionRequest extends FormRequest
     {
         return [
             'package' => ['required', 'string', 'max:100'],
+            'billing_period' => ['required', 'string', 'in:monthly,yearly'],
             'amount' => ['required', 'numeric', 'min:1'],
             'payment_method' => ['required', 'string', 'max:100', 'in:qris,manual_transfer'],
             'proof' => ['nullable', 'file', 'max:4096'],

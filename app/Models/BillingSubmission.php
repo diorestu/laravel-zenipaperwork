@@ -14,6 +14,7 @@ class BillingSubmission extends Model
     protected $fillable = [
         'company_id',
         'package',
+        'billing_period',
         'amount',
         'payment_method',
         'payment_gateway',

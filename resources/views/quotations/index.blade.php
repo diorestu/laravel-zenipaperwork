@@ -5,11 +5,11 @@
     <!-- Header Section -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h1 class="text-xl font-semibold text-gray-900 dark:text-white/90">Quotations</h1>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Kelola penawaran harga harga barang/jasa kepada pelanggan.</p>
+            <h1 class="text-xl font-semibold text-gray-900 dark:text-white/90">Penawaran</h1>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Kelola penawaran harga barang/jasa kepada pelanggan.</p>
         </div>
         <button type="button" @click="$dispatch('open-modal', 'create-quotation')" class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
-            Create Quotation
+            Buat Penawaran
         </button>
     </div>
 
@@ -51,12 +51,12 @@
                 data-search-target="#quotations-table-search">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Number</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Client</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Nomor</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Klien</th>
                         <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Total</th>
                         <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Date</th>
-                        <th class="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Action</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Tanggal</th>
+                        <th class="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-transparent"></tbody>
@@ -67,14 +67,14 @@
     <!-- Edit Modal (Outside the Datatable, triggered conditionally via redirect) -->
     @if ($editQuotation)
         <x-ui.modal name="edit-quotation-{{ $editQuotation->id }}" :is-open="true" class="max-w-5xl p-6">
-            <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white/90">Edit Quotation</h2>
+            <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white/90">Edit Penawaran</h2>
             @include('quotations.form', ['quotation' => $editQuotation, 'action' => route('quotations.update', $editQuotation), 'method' => 'PUT'])
         </x-ui.modal>
     @endif
 
     <!-- Create Modal -->
     <x-ui.modal name="create-quotation" :is-open="request('modal') === 'create'" class="max-w-5xl p-6">
-        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white/90">Create Quotation</h2>
+        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white/90">Buat Penawaran</h2>
         @include('quotations.form', ['quotation' => null, 'action' => route('quotations.store'), 'method' => 'POST'])
     </x-ui.modal>
 </div>

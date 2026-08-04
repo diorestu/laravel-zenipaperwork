@@ -63,7 +63,7 @@
 
                     <section class="space-y-3">
                         <h2 class="text-xl font-semibold text-gray-950 dark:text-white">5. Layanan Berlangganan & Pembayaran</h2>
-                        <p>Beberapa fitur atau kapasitas tertentu di Paperwork memerlukan pembayaran paket berlangganan. Detail mengenai paket berlangganan, harga, dan metode pembayaran diatur di halaman tagihan (Billing). Semua biaya yang telah dibayarkan bersifat non-refundable (tidak dapat dikembalikan) kecuali diwajibkan oleh hukum.</p>
+                        <p>Beberapa fitur atau kapasitas tertentu di Paperwork memerlukan pembayaran paket berlangganan. Detail mengenai paket berlangganan, harga, dan metode pembayaran diatur di halaman tagihan. Semua biaya yang telah dibayarkan tidak dapat dikembalikan kecuali diwajibkan oleh hukum.</p>
                     </section>
 
                     <section class="space-y-3">

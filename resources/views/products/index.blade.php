@@ -4,11 +4,11 @@
 <div class="space-y-6">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h1 class="text-xl font-semibold text-gray-900 dark:text-white/90">Products</h1>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Kelola katalog product dan service untuk invoice serta quotation.</p>
+            <h1 class="text-xl font-semibold text-gray-900 dark:text-white/90">Produk</h1>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Kelola katalog produk dan layanan untuk invoice serta penawaran.</p>
         </div>
         <button type="button" @click="$dispatch('open-modal', 'create-product')" class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
-            Create Product
+            Tambah Produk
         </button>
     </div>
 
@@ -69,12 +69,12 @@
                 data-search-target="#products-table-search">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Product</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Price</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Usage</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Produk</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Harga</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Pemakaian</th>
                         <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Updated</th>
-                        <th class="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Action</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Diperbarui</th>
+                        <th class="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-transparent"></tbody>
@@ -83,16 +83,16 @@
     </section>
 
     <x-ui.modal name="edit-product" class="max-w-2xl p-6">
-        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white/90">Edit Product</h2>
+        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white/90">Edit Produk</h2>
         <form method="POST" data-edit-form="edit-product" data-update-url="{{ route('products.update', '__ID__') }}" class="space-y-4">
             @csrf
             @method('PUT')
             <input type="hidden" name="id">
-            <x-form.input name="name" label="Name" />
-            <x-form.input name="price" label="Price" type="number" />
-            <x-form.input name="unit" label="Unit" />
+            <x-form.input name="name" label="Nama" />
+            <x-form.input name="price" label="Harga" type="number" />
+            <x-form.input name="unit" label="Satuan" />
             <label class="grid gap-2 sm:grid-cols-[30%_1fr] sm:items-start">
-                <span class="pt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Description</span>
+                <span class="pt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Deskripsi</span>
                 <span class="block">
                     <textarea name="description" rows="3" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-gray-500"></textarea>
                 </span>
@@ -101,24 +101,24 @@
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Status</span>
                 <span class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                     <input type="checkbox" name="is_active" value="1" class="rounded border-gray-300">
-                    Active product
+                    Produk aktif
                 </span>
             </label>
             <div class="flex justify-end">
-                <button class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">Save</button>
+                <button class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">Simpan</button>
             </div>
         </form>
     </x-ui.modal>
 
     <x-ui.modal name="create-product" :is-open="request('modal') === 'create'" class="max-w-2xl p-6">
-        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white/90">Tambah Product</h2>
+        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white/90">Tambah Produk</h2>
         <form method="POST" action="{{ route('products.store') }}" class="mt-4 space-y-4">
             @csrf
-            <x-form.input name="name" label="Name" />
-            <x-form.input name="price" label="Price" type="number" />
-            <x-form.input name="unit" label="Unit" value="service" />
+            <x-form.input name="name" label="Nama" />
+            <x-form.input name="price" label="Harga" type="number" />
+            <x-form.input name="unit" label="Satuan" value="layanan" />
             <label class="grid gap-2 sm:grid-cols-[30%_1fr] sm:items-start">
-                <span class="pt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Description</span>
+                <span class="pt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Deskripsi</span>
                 <span class="block">
                     <textarea name="description" rows="3" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-gray-500">{{ old('description') }}</textarea>
                     @error('description')<span class="mt-1 block text-xs text-error-600">{{ $message }}</span>@enderror
@@ -128,11 +128,11 @@
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Status</span>
                 <span class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                     <input type="checkbox" name="is_active" value="1" checked class="rounded border-gray-300">
-                    Active product
+                    Produk aktif
                 </span>
             </label>
             <div class="flex justify-end">
-                <button class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">Save</button>
+                <button class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">Simpan</button>
             </div>
         </form>
     </x-ui.modal>

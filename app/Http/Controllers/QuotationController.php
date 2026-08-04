@@ -39,9 +39,9 @@ class QuotationController extends Controller
     public function store(StoreQuotationRequest $request, QuotationService $service)
     {
         $quotation = $service->create($request->user(), $request->validated());
-        ActivityNotifier::record($request->user(), 'Quotation baru dibuat', 'Quotation '.$quotation->number.' berhasil dibuat.');
+        ActivityNotifier::record($request->user(), 'Penawaran baru dibuat', 'Penawaran '.$quotation->number.' berhasil dibuat.');
 
-        return redirect()->route('quotations.show', $quotation)->with('success', 'Quotation dibuat.');
+        return redirect()->route('quotations.show', $quotation)->with('success', 'Penawaran dibuat.');
     }
 
     public function show(Quotation $quotation)
@@ -63,7 +63,7 @@ class QuotationController extends Controller
         $this->authorize('update', $quotation);
         $service->update($quotation, $request->validated());
 
-        return redirect()->route('quotations.show', $quotation)->with('success', 'Quotation diperbarui.');
+        return redirect()->route('quotations.show', $quotation)->with('success', 'Penawaran diperbarui.');
     }
 
     public function status(Request $request, Quotation $quotation, InvoiceService $invoiceService)
@@ -79,14 +79,14 @@ class QuotationController extends Controller
             }
 
             $invoice = $invoiceService->convertQuotation($quotation->load('items'), $invoiceNumber);
-            ActivityNotifier::record($request->user(), 'Invoice baru dibuat', 'Invoice '.$invoice->number.' dibuat dari quotation '.$quotation->number.'.');
+            ActivityNotifier::record($request->user(), 'Invoice baru dibuat', 'Invoice '.$invoice->number.' dibuat dari penawaran '.$quotation->number.'.');
 
-            return redirect()->route('invoices.show', $invoice)->with('success', 'Quotation disetujui dan otomatis dikonversi menjadi invoice.');
+            return redirect()->route('invoices.show', $invoice)->with('success', 'Penawaran disetujui dan otomatis dikonversi menjadi invoice.');
         }
 
         $quotation->update($data);
 
-        return back()->with('success', 'Status quotation diperbarui.');
+        return back()->with('success', 'Status penawaran diperbarui.');
     }
 
     public function convert(Request $request, Quotation $quotation, InvoiceService $service)
@@ -96,9 +96,9 @@ class QuotationController extends Controller
         abort_unless(in_array($quotation->status, ['approved', 'sent'], true), 422);
 
         $invoice = $service->convertQuotation($quotation->load('items'), $data['number']);
-        ActivityNotifier::record($request->user(), 'Invoice baru dibuat', 'Invoice '.$invoice->number.' dibuat dari quotation '.$quotation->number.'.');
+        ActivityNotifier::record($request->user(), 'Invoice baru dibuat', 'Invoice '.$invoice->number.' dibuat dari penawaran '.$quotation->number.'.');
 
-        return redirect()->route('invoices.show', $invoice)->with('success', 'Quotation dikonversi ke invoice.');
+        return redirect()->route('invoices.show', $invoice)->with('success', 'Penawaran dikonversi ke invoice.');
     }
 
     public function pdf(Quotation $quotation)
@@ -114,7 +114,7 @@ class QuotationController extends Controller
         $this->authorize('delete', $quotation);
         $quotation->delete();
 
-        return redirect()->route('quotations.index')->with('success', 'Quotation dihapus.');
+        return redirect()->route('quotations.index')->with('success', 'Penawaran dihapus.');
     }
 
     private function datatable(Request $request, int $companyId)

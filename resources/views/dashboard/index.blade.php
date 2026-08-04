@@ -4,17 +4,26 @@
 <div class="space-y-6">
     <section id="dashboard-stats-grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         @foreach ($stats as $stat)
-            <a href="{{ $stat['href'] }}" class="group rounded-lg border border-gray-200 bg-white p-4 shadow-theme-xs transition hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-theme-md">
+            @php
+                $statTheme = [
+                    'border-sky-100 bg-sky-50/80 text-sky-700 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-300',
+                    'border-violet-100 bg-violet-50/80 text-violet-700 dark:border-violet-500/20 dark:bg-violet-500/10 dark:text-violet-300',
+                    'border-emerald-100 bg-emerald-50/80 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300',
+                    'border-amber-100 bg-amber-50/80 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300',
+                    'border-rose-100 bg-rose-50/80 text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300',
+                ][$loop->index % 5];
+            @endphp
+            <a href="{{ $stat['href'] }}" class="group rounded-lg border p-4 shadow-theme-xs transition hover:-translate-y-0.5 hover:shadow-theme-md {{ $statTheme }}">
                 <div class="flex items-start justify-between gap-3">
-                    <p class="text-sm font-medium text-gray-500">{{ $stat['label'] }}</p>
-                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gray-50 text-gray-500 transition group-hover:bg-brand-50 group-hover:text-brand-600">
+                    <p class="text-sm font-medium text-current/75">{{ $stat['label'] }}</p>
+                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/70 text-current shadow-theme-xs transition group-hover:bg-white dark:bg-white/10">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="M7 17L17 7M17 7H9M17 7V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                     </span>
                 </div>
-                <p class="mt-3 text-xl font-semibold text-gray-950">{{ $stat['value'] }}</p>
-                <p class="mt-1 text-xs text-gray-500">{{ $stat['meta'] }}</p>
+                <p class="mt-3 text-xl font-semibold text-gray-950 dark:text-white/90">{{ $stat['value'] }}</p>
+                <p class="mt-1 text-xs text-current/65">{{ $stat['meta'] }}</p>
             </a>
         @endforeach
     </section>
@@ -23,10 +32,10 @@
         <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-theme-xs">
             <div class="flex items-start justify-between gap-3">
                 <div>
-                    <h2 class="text-base font-semibold text-gray-900">Invoice Trend</h2>
-                    <p class="mt-1 text-sm text-gray-500">Issued vs collected revenue</p>
+                    <h2 class="text-base font-semibold text-gray-900">Tren Invoice</h2>
+                    <p class="mt-1 text-sm text-gray-500">Nilai diterbitkan vs pembayaran diterima</p>
                 </div>
-                <span class="rounded-full border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-600">6 months</span>
+                <span class="rounded-full border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-600">6 bulan</span>
             </div>
             <div id="invoiceRevenueLineChart" class="mt-4 h-[320px]">
                 <canvas id="invoiceRevenueLineCanvas"></canvas>
@@ -36,10 +45,10 @@
         <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-theme-xs">
             <div class="flex items-start justify-between gap-3">
                 <div>
-                    <h2 class="text-base font-semibold text-gray-900">Invoice Status</h2>
-                    <p class="mt-1 text-sm text-gray-500">Current document distribution</p>
+                    <h2 class="text-base font-semibold text-gray-900">Status Invoice</h2>
+                    <p class="mt-1 text-sm text-gray-500">Distribusi dokumen saat ini</p>
                 </div>
-                <a href="{{ route('invoices.index') }}" class="text-sm font-medium text-brand-600 hover:text-brand-700">View invoices</a>
+                <a href="{{ route('invoices.index') }}" class="text-sm font-medium text-brand-600 hover:text-brand-700">Lihat invoice</a>
             </div>
             <div id="invoiceStatusBarChart" class="mt-4 h-[320px]">
                 <canvas id="invoiceStatusBarCanvas"></canvas>
@@ -48,7 +57,7 @@
     </section>
 
     <section class="rounded-lg border border-gray-200 bg-white p-5">
-        <h2 class="text-base font-semibold">Recent Activity</h2>
+        <h2 class="text-base font-semibold">Aktivitas Terbaru</h2>
         <div class="mt-4 divide-y divide-gray-100">
             @forelse ($recentInvoices as $invoice)
                 <a href="{{ route('invoices.show', $invoice) }}" class="flex justify-between py-3 text-sm">
@@ -80,7 +89,7 @@
                     labels: data.months,
                     datasets: [
                         {
-                            label: 'Issued',
+                            label: 'Diterbitkan',
                             data: data.issued,
                             borderColor: '#465FFF',
                             backgroundColor: 'rgba(70, 95, 255, 0.12)',
@@ -92,7 +101,7 @@
                             fill: true,
                         },
                         {
-                            label: 'Collected',
+                            label: 'Diterima',
                             data: data.collected,
                             borderColor: '#12B76A',
                             backgroundColor: 'rgba(18, 183, 106, 0.12)',
@@ -160,7 +169,7 @@
                     labels: data.statusLabels,
                     datasets: [
                         {
-                            label: 'Invoices',
+                            label: 'Invoice',
                             data: data.statusCounts,
                             backgroundColor: '#465FFF',
                             borderColor: '#465FFF',
@@ -186,7 +195,7 @@
                         },
                         tooltip: {
                             callbacks: {
-                                label: (context) => `${context.parsed.y} invoice${context.parsed.y === 1 ? '' : 's'}`,
+                                label: (context) => `${context.parsed.y} invoice`,
                             },
                         },
                     },

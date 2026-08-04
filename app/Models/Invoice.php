@@ -69,6 +69,11 @@ class Invoice extends Model
         return $this->hasMany(InvoicePayment::class);
     }
 
+    public function paymentTerms(): HasMany
+    {
+        return $this->hasMany(InvoicePaymentTerm::class)->orderBy('term_number');
+    }
+
     public function creditNotes(): HasMany
     {
         return $this->hasMany(CreditNote::class);

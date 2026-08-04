@@ -90,10 +90,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-ajax-datatable]').forEach((table) => {
         const columns = JSON.parse(table.dataset.columns || '[]');
         const searchInput = document.querySelector(table.dataset.searchTarget);
+        const filterInput = document.querySelector(table.dataset.filterTarget);
+        const filterParam = table.dataset.filterParam || 'filter';
         let debounceTimer;
 
         const dataTable = new DataTable(table, {
-            ajax: table.dataset.ajaxUrl,
+            ajax: {
+                url: table.dataset.ajaxUrl,
+                data: (data) => {
+                    if (filterInput && filterInput.value !== '') {
+                        data[filterParam] = filterInput.value;
+                    }
+                },
+            },
             columns,
             lengthChange: false,
             ordering: false,
@@ -107,10 +116,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 infoEmpty: 'Tidak ada data',
                 infoFiltered: '',
                 paginate: {
-                    first: '<span class="sr-only">First</span><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M11.6667 5L6.66675 10L11.6667 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 5L10 10L15 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    last: '<span class="sr-only">Last</span><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M8.33325 5L13.3333 10L8.33325 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 5L10 10L5 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    next: '<span class="sr-only">Next</span><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-                    previous: '<span class="sr-only">Previous</span><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12.5 5L7.5 10L12.5 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                    first: '<span class="sr-only">Pertama</span><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M11.6667 5L6.66675 10L11.6667 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 5L10 10L15 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                    last: '<span class="sr-only">Terakhir</span><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M8.33325 5L13.3333 10L8.33325 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 5L10 10L5 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                    next: '<span class="sr-only">Berikutnya</span><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                    previous: '<span class="sr-only">Sebelumnya</span><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12.5 5L7.5 10L12.5 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                 },
                 emptyTable: emptyDatatableState,
                 processing: 'Memuat data...',
@@ -121,6 +130,10 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput?.addEventListener('input', () => {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => dataTable.search(searchInput.value).draw(), 350);
+        });
+
+        filterInput?.addEventListener('change', () => {
+            dataTable.draw();
         });
     });
 

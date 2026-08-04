@@ -9,6 +9,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoiceExpenseController;
 use App\Http\Controllers\InvoicePaymentController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PakasirWebhookController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PublicInvoiceController;
 use App\Http\Controllers\QuotationController;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 Route::get('/public/invoices/{token}', [PublicInvoiceController::class, 'show'])->name('public.invoices.show');
+Route::post('/webhooks/pakasir', PakasirWebhookController::class)->name('webhooks.pakasir');
 Route::view('/privacy-policy', 'pages.privacy-policy')->name('privacy-policy');
 Route::view('/terms-of-service', 'pages.terms-of-service')->name('terms-of-service');
 
@@ -85,6 +87,8 @@ Route::middleware('auth')->group(function () {
         Route::middleware('role:super_admin')->prefix('super-admin')->name('super-admin.')->group(function () {
             Route::get('/', [SuperAdminController::class, 'index'])->name('index');
             Route::post('/billing-submissions/{billingSubmission}/confirm', [SuperAdminController::class, 'confirmBilling'])->name('billing.confirm');
+            Route::patch('/billing-submissions/{billingSubmission}/activate', [SuperAdminController::class, 'activateBilling'])->name('billing.activate');
+            Route::patch('/billing-submissions/{billingSubmission}/stop', [SuperAdminController::class, 'stopBilling'])->name('billing.stop');
         });
     });
 });

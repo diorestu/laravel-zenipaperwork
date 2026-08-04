@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="mb-4 flex flex-wrap items-center gap-2">
-    <a href="{{ route('invoices.pdf', $invoice) }}" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">Download PDF</a>
+    <a href="{{ route('invoices.pdf', $invoice) }}" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">Unduh PDF</a>
     
     <!-- Share Button (Dropdown/Popover via Alpine.js) -->
     <div x-data="{ open: false }" class="relative inline-block text-left" @click.outside="open = false">
@@ -73,7 +73,7 @@
     @if($invoice->status === 'draft')
         <form method="POST" action="{{ route('invoices.send', $invoice) }}">
             @csrf
-            <button class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white cursor-pointer">Send to Client</button>
+            <button class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white cursor-pointer">Kirim ke Klien</button>
         </form>
     @endif
 </div>
@@ -82,8 +82,6 @@
 <div class="grid gap-6 lg:grid-cols-[1fr_24rem] mt-6">
     <div class="space-y-6">
         <x-document.preview :document="$invoice" />
-        @include('invoices.partials.expenses', ['invoice' => $invoice])
-        @include('invoices.partials.credit-notes', ['invoice' => $invoice])
     </div>
     <aside class="space-y-4">
         <x-modal class="p-5">
@@ -138,12 +136,12 @@
 
                 @if((float) $invoice->credit_note_total > 0)
                     <div class="flex justify-between items-center py-1 border-t border-gray-50 dark:border-gray-800/40 text-brand-700 dark:text-brand-400">
-                        <span>Nota Kredit (Credit Note)</span>
+                        <span>Nota Kredit</span>
                         <span class="font-medium"><x-money :amount="$invoice->credit_note_total" /></span>
                     </div>
                 @endif
 
-                <!-- Balance Due (Highlight) -->
+                <!-- Balance Jatuh tempo (Highlight) -->
                 <div class="flex justify-between items-center py-2 border-t border-gray-200 pt-2 dark:border-gray-800">
                     <span class="font-medium text-gray-800 dark:text-gray-200">Sisa Tagihan (Piutang)</span>
                     <span class="font-bold text-sm 
@@ -172,9 +170,93 @@
                 @endif
             </div>
 
+            @if($invoice->paymentTerms->isNotEmpty())
+                <div class="mt-5 border-t border-gray-100 pt-4 dark:border-gray-800">
+                    <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-200">Jadwal Termin</h3>
+                    <div class="mt-3 space-y-2">
+                        @foreach($invoice->paymentTerms as $term)
+                            @php
+                                $paidForTerm = (float) $invoice->payments->where('term_number', $term->term_number)->sum('amount');
+                                $remainingForTerm = max((float) $term->amount - $paidForTerm, 0);
+                            @endphp
+                            <div class="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 dark:border-gray-800 dark:bg-white/[0.02]">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $term->label }}</p>
+                                        <p class="mt-0.5 text-[11px] text-gray-400">{{ $term->due_date ? 'Jatuh tempo '.$term->due_date->format('d M Y') : 'Tanpa jatuh tempo' }}</p>
+                                    </div>
+                                    <span class="text-xs font-semibold text-gray-900 dark:text-white"><x-money :amount="$term->amount" /></span>
+                                </div>
+                                <div class="mt-1 flex justify-between text-[11px] text-gray-400">
+                                    <span>Terbayar: <x-money :amount="$paidForTerm" /></span>
+                                    <span>Sisa: <x-money :amount="$remainingForTerm" /></span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            @if($invoice->payments->isNotEmpty())
+                <div class="mt-5 border-t border-gray-100 pt-4 dark:border-gray-800">
+                    <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-200">Riwayat Pembayaran</h3>
+                    <div class="mt-3 space-y-2">
+                        @foreach($invoice->payments->sortByDesc('paid_at') as $payment)
+                            <div class="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 dark:border-gray-800 dark:bg-white/[0.02]">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $payment->term_label ?: 'Pembayaran manual' }}</p>
+                                        <p class="mt-0.5 text-[11px] text-gray-400">{{ $payment->paid_at?->format('d M Y') }} · {{ str($payment->method)->headline() }}</p>
+                                    </div>
+                                    <span class="text-xs font-semibold text-success-600 dark:text-success-400"><x-money :amount="$payment->amount" /></span>
+                                </div>
+                                @if($payment->reference)
+                                    <p class="mt-1 text-[11px] text-gray-400">Ref: {{ $payment->reference }}</p>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
             <!-- Form Catat Pembayaran -->
             @if((float) $invoice->balance_due > 0)
-                <div x-data="{ showForm: false }" class="mt-6 border-t border-gray-100 pt-4 dark:border-gray-800">
+                @php
+                    $paymentTerms = $invoice->paymentTerms
+                        ->map(function ($term) use ($invoice): array {
+                            $paidForTerm = (float) $invoice->payments
+                                ->where('term_number', $term->term_number)
+                                ->sum('amount');
+                            $remaining = max((float) $term->amount - $paidForTerm, 0);
+
+                            return [
+                                'number' => $term->term_number,
+                                'label' => $term->label,
+                                'amount' => $remaining,
+                            ];
+                        })
+                        ->filter(fn (array $term): bool => $term['amount'] > 0)
+                        ->values();
+                @endphp
+                <div
+                    x-data="{
+                        showForm: false,
+                        terms: @js($paymentTerms->values()),
+                        selectedTerm: @js((string) ($paymentTerms->first()['number'] ?? '')),
+                        amount: @js((float) ($paymentTerms->first()['amount'] ?? $invoice->balance_due)),
+                        get hasTerms() {
+                            return this.terms.length > 0;
+                        },
+                        get selectedTermData() {
+                            return this.terms.find((term) => String(term.number) === String(this.selectedTerm));
+                        },
+                        syncTerm() {
+                            const term = this.selectedTermData;
+                            if (!term) return;
+                            this.amount = Number(term.amount).toFixed(2);
+                        }
+                    }"
+                    class="mt-6 border-t border-gray-100 pt-4 dark:border-gray-800">
                     <button @click="showForm = !showForm" type="button" class="flex w-full items-center justify-between text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 cursor-pointer">
                         <span>Catat Pembayaran Baru</span>
                         <svg class="h-4 w-4" x-show="!showForm" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -189,7 +271,40 @@
                           enctype="multipart/form-data"
                           style="display: none;">
                         @csrf
-                        <x-form.input name="amount" label="Jumlah Pembayaran" type="number" step="0.01" :value="$invoice->balance_due" />
+                        <template x-if="hasTerms">
+                            <label class="grid gap-2 sm:grid-cols-[30%_1fr] sm:items-start">
+                                <span class="pt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Termin</span>
+                                <span class="block">
+                                    <select
+                                        name="term_number"
+                                        x-model="selectedTerm"
+                                        @change="syncTerm()"
+                                        class="w-full appearance-none rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-sm text-gray-800 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-gray-500 bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20fill=%27none%27%20viewBox=%270%200%2024%2024%27%20stroke-width=%271.5%27%20stroke=%27%239ca3af%27%3E%3Cpath%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%20d=%27m19.5%208.25-7.5%207.5-7.5-7.5%27%20/%3E%3C/svg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.75rem_center] bg-no-repeat">
+                                        <template x-for="term in terms" :key="term.number">
+                                            <option :value="term.number" x-text="`${term.label} - Rp ${Number(term.amount).toLocaleString('id-ID')}`"></option>
+                                        </template>
+                                    </select>
+                                    <input type="hidden" name="term_label" :value="selectedTermData?.label || ''">
+                                    <span class="mt-1 block text-xs text-gray-500 dark:text-gray-400">Nominal otomatis mengikuti sisa termin yang dipilih.</span>
+                                    @error('term_number')<span class="mt-1 block text-xs text-error-600">{{ $message }}</span>@enderror
+                                </span>
+                            </label>
+                        </template>
+
+                        <label class="grid gap-2 sm:grid-cols-[30%_1fr] sm:items-start">
+                            <span class="pt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Jumlah Pembayaran</span>
+                            <span class="block">
+                                <input
+                                    name="amount"
+                                    type="number"
+                                    step="0.01"
+                                    x-model="amount"
+                                    :readonly="hasTerms"
+                                    placeholder="Jumlah Pembayaran"
+                                    class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:border-gray-900 focus:outline-none read-only:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-gray-500 dark:read-only:bg-white/[0.03]">
+                                @error('amount')<span class="mt-1 block text-xs text-error-600">{{ $message }}</span>@enderror
+                            </span>
+                        </label>
                         <x-form.input name="paid_at" label="Tanggal Pembayaran" type="date" :value="now()->toDateString()" />
                         
                         <x-form.select name="method" label="Metode Pembayaran">

@@ -27,7 +27,7 @@ class EnsureCompanyContext
 
         if (! $user->company_id) {
             $company = Company::create([
-                'name' => $user->name ? "{$user->name} Company" : 'My Company',
+                'name' => $user->name ? "Perusahaan {$user->name}" : 'Perusahaan Saya',
                 'email' => $user->email,
             ]);
 

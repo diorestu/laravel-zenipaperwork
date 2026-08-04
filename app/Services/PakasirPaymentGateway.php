@@ -46,7 +46,7 @@ class PakasirPaymentGateway
         }
 
         $response = Http::timeout((int) config('services.pakasir.timeout', 15))
-            ->post($baseUrl.'/transactiondetail', [
+            ->get($baseUrl.'/transactiondetail', [
                 'project' => $project,
                 'order_id' => $submission->payment_order_id,
                 'amount' => (int) $submission->amount,

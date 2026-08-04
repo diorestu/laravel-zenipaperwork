@@ -24,7 +24,7 @@ class InvoiceController extends Controller
 
         $editInvoice = null;
         if ($request->filled('edit')) {
-            $editInvoice = Invoice::forCompany($companyId)->with(['client', 'items'])->find($request->input('edit'));
+            $editInvoice = Invoice::forCompany($companyId)->with(['client', 'items', 'paymentTerms'])->find($request->input('edit'));
         }
 
         $now = now();
@@ -66,7 +66,7 @@ class InvoiceController extends Controller
             [
                 'label' => 'Pembayaran Masuk Bulan Ini',
                 'value' => 'Rp ' . number_format((float) $paymentsReceivedThisMonth, 0, ',', '.'),
-                'meta' => 'Cash flow masuk bulan ini',
+                'meta' => 'Arus kas masuk bulan ini',
             ],
             [
                 'label' => 'Piutang Aktif',
@@ -101,7 +101,7 @@ class InvoiceController extends Controller
         $this->authorize('view', $invoice);
 
         return view('invoices.show', [
-            'invoice' => $invoice->load(['company', 'client', 'items', 'payments', 'creditNotes', 'expenses']),
+            'invoice' => $invoice->load(['company', 'client', 'items', 'payments', 'paymentTerms', 'creditNotes', 'expenses']),
         ]);
     }
 
@@ -124,7 +124,7 @@ class InvoiceController extends Controller
     {
         $this->authorize('view', $invoice);
 
-        return Pdf::loadView('pdf.invoice', ['invoice' => $invoice->load(['company', 'client', 'items', 'payments', 'creditNotes', 'expenses'])])
+        return Pdf::loadView('pdf.invoice', ['invoice' => $invoice->load(['company', 'client', 'items', 'payments', 'paymentTerms', 'creditNotes', 'expenses'])])
             ->download($invoice->number.'.pdf');
     }
 
@@ -132,7 +132,7 @@ class InvoiceController extends Controller
     {
         $this->authorize('view', $invoice);
 
-        return Pdf::loadView('pdf.receipt', ['invoice' => $invoice->load(['company', 'client', 'payments'])])
+        return Pdf::loadView('pdf.receipt', ['invoice' => $invoice->load(['company', 'client', 'payments', 'paymentTerms'])])
             ->download($invoice->number.'-receipt.pdf');
     }
 
@@ -164,6 +164,7 @@ class InvoiceController extends Controller
     private function datatable(Request $request, int $companyId)
     {
         $search = trim((string) $request->input('search.value', ''));
+        $paymentStatus = (string) $request->input('payment_status', '');
         $start = max((int) $request->input('start', 0), 0);
         $length = max((int) $request->input('length', 10), 1);
         $baseQuery = Invoice::query()->forCompany($companyId);
@@ -177,8 +178,17 @@ class InvoiceController extends Controller
                         ->orWhereHas('client', function ($q) use ($search): void {
                             $q->where('name', 'like', "%{$search}%")
                               ->orWhere('company_name', 'like', "%{$search}%");
-                        });
+                    });
                 });
+            })
+            ->when(in_array($paymentStatus, ['unpaid', 'partial', 'paid', 'draft', 'void'], true), function ($query) use ($paymentStatus): void {
+                match ($paymentStatus) {
+                    'unpaid' => $query->whereIn('status', ['sent', 'overdue']),
+                    'partial' => $query->where('status', 'partial'),
+                    'paid' => $query->where('status', 'paid'),
+                    'draft' => $query->where('status', 'draft'),
+                    'void' => $query->where('status', 'void'),
+                };
             });
 
         $recordsFiltered = (clone $filteredQuery)->count();

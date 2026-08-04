@@ -13,7 +13,7 @@
             @php
                 $description = $item->description;
                 if ($isQuotation) {
-                    $parts = array_filter(array_map('trim', explode('-', $description)));
+                    $parts = array_filter(array_map('trim', preg_split('/\s*(?=-)/', $description)));
                     $descriptionHtml = implode('<br>', array_map('e', $parts));
                 } else {
                     $descriptionHtml = e($description);

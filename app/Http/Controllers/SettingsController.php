@@ -28,7 +28,7 @@ class SettingsController extends Controller
 
         $request->user()->company->update($data);
 
-        return redirect()->route('settings.company')->with('success', 'Company profile diperbarui.');
+        return redirect()->route('settings.company')->with('success', 'Profil perusahaan diperbarui.');
     }
 
     public function bankAccounts(Request $request)
@@ -71,7 +71,7 @@ class SettingsController extends Controller
             'is_active' => $request->boolean('is_active', true),
         ]);
 
-        return redirect()->route('settings.bank-accounts')->with('success', 'Bank account ditambahkan.');
+        return redirect()->route('settings.bank-accounts')->with('success', 'Rekening bank ditambahkan.');
     }
 
     public function updateBankAccount(StoreBankAccountRequest $request, BankAccount $bankAccount)
@@ -82,6 +82,6 @@ class SettingsController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
-        return redirect()->route('settings.bank-accounts')->with('success', 'Bank account diperbarui.');
+        return redirect()->route('settings.bank-accounts')->with('success', 'Rekening bank diperbarui.');
     }
 }
