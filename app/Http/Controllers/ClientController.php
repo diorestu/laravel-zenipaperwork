@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreClientRequest;
 use App\Models\Client;
 use App\Models\Invoice;
+use App\Support\ActivityNotifier;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
@@ -86,7 +87,8 @@ class ClientController extends Controller
 
     public function store(StoreClientRequest $request)
     {
-        Client::create($request->validated() + ['company_id' => $request->user()->company_id]);
+        $client = Client::create($request->validated() + ['company_id' => $request->user()->company_id]);
+        ActivityNotifier::record($request->user(), 'Client baru dibuat', $client->name.' ditambahkan sebagai client.');
 
         return back()->with('success', 'Client tersimpan.');
     }

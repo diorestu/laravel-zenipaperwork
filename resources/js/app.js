@@ -5,6 +5,7 @@ import Chart from 'chart.js/auto';
 import $ from 'jquery';
 import DataTable from 'datatables.net-dt';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
+import 'boxicons/css/boxicons.min.css';
 import { Notyf } from 'notyf';
 import 'notyf/notyf.min.css';
 

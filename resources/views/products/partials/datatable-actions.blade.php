@@ -7,10 +7,11 @@
         'unit' => $product->unit,
         'is_active' => $product->is_active,
     ];
+    $recordPayload = base64_encode(json_encode($record));
 @endphp
 
 <div class="flex items-center justify-center gap-1.5">
-    <button type="button" class="js-edit-record inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-50 hover:text-brand-600 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-brand-400" data-modal="edit-product" data-record='{{ e(json_encode($record), false) }}' aria-label="Edit product">
+    <button type="button" class="js-edit-record inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-50 hover:text-brand-600 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-brand-400" data-modal="edit-product" data-record-payload="{{ $recordPayload }}" aria-label="Edit product">
         <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path d="M11.05 4.05L15.95 8.95M3.75 16.25L7.42 15.52C7.62 15.48 7.8 15.38 7.94 15.23L16.83 6.34C17.48 5.69 17.48 4.64 16.83 3.99L16.01 3.17C15.36 2.52 14.31 2.52 13.66 3.17L4.77 12.06C4.62 12.2 4.52 12.38 4.48 12.58L3.75 16.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>

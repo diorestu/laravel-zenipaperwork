@@ -8,6 +8,7 @@ use App\Models\BankAccount;
 use App\Models\Invoice;
 use App\Models\Product;
 use App\Services\InvoiceService;
+use App\Support\ActivityNotifier;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -90,6 +91,7 @@ class InvoiceController extends Controller
     public function store(StoreInvoiceRequest $request, InvoiceService $service)
     {
         $invoice = $service->create($request->user(), $request->validated());
+        ActivityNotifier::record($request->user(), 'Invoice baru dibuat', 'Invoice '.$invoice->number.' berhasil dibuat.');
 
         return redirect()->route('invoices.show', $invoice)->with('success', 'Invoice dibuat.');
     }

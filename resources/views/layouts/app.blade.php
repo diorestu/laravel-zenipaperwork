@@ -9,7 +9,6 @@
     <title>{{ $title ?? 'Paperwork' }} | Paperwork</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
 
     <script>
         document.addEventListener('alpine:init', () => {

@@ -90,7 +90,7 @@
                 </li>
             @empty
                 <li class="py-24 text-center text-xs text-gray-400 flex flex-col items-center justify-center flex-grow">
-                    <i class="bx bx-bell-off text-3xl mb-3 text-gray-300 dark:text-gray-700"></i>
+                    <svg class="mb-3 h-8 w-8 text-gray-300 dark:text-gray-700" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9.5 19a2.5 2.5 0 0 0 5 0M6 8.5A6 6 0 0 1 17.2 5.5M18 9.5V12l2 3H9M4 4l16 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     <span>Tidak ada notifikasi baru.</span>
                 </li>
             @endforelse

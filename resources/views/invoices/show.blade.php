@@ -7,9 +7,9 @@
     <!-- Share Button (Dropdown/Popover via Alpine.js) -->
     <div x-data="{ open: false }" class="relative inline-block text-left" @click.outside="open = false">
         <button @click="open = !open" type="button" class="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 cursor-pointer">
-            <i class="bx bx-share-alt text-gray-500 dark:text-gray-400 text-base"></i>
+            <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8.5 13.5 15.5 17.5M15.5 6.5 8.5 10.5M18 8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM6 14.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM18 20.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <span>Bagikan</span>
-            <i class="bx bx-chevron-down text-gray-400 text-sm"></i>
+            <svg class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         
         <div x-show="open" 
@@ -28,7 +28,7 @@
                     window.toast('success', 'Tautan disalin ke clipboard!');
                     open = false;
                 " class="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 cursor-pointer" role="menuitem">
-                    <i class="bx bx-link text-gray-400 text-base mr-1"></i>
+                    <svg class="mr-1 h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10.5 13.5a4 4 0 0 0 5.66 0l2.34-2.34a4 4 0 0 0-5.66-5.66l-1.05 1.05M13.5 10.5a4 4 0 0 0-5.66 0L5.5 12.84a4 4 0 0 0 5.66 5.66l1.05-1.05" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     Salin Tautan
                 </button>
                 
@@ -37,7 +37,7 @@
                    target="_blank"
                    @click="open = false"
                    class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem">
-                    <i class="bx bx-link-external text-gray-400 text-base mr-1"></i>
+                    <svg class="mr-1 h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8M19 14v3.5A1.5 1.5 0 0 1 17.5 19h-11A1.5 1.5 0 0 1 5 17.5v-11A1.5 1.5 0 0 1 6.5 5H10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     Buka Tautan Publik
                 </a>
                 
@@ -46,7 +46,7 @@
                    target="_blank" 
                    @click="open = false"
                    class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem">
-                    <i class="bx bxl-whatsapp text-success-600 text-base mr-1"></i>
+                    <svg class="mr-1 h-4 w-4 text-success-600" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.6 18.4A8.5 8.5 0 1 1 8.1 20L4 21l1.6-2.6Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.2 8.8c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.5 1.1c.1.3.1.5-.1.7l-.4.5c.6 1.1 1.5 2 2.6 2.6l.5-.4c.2-.2.5-.2.7-.1l1.1.5c.3.1.4.3.4.6v.4c0 .4-.1.6-.4.8-.4.3-1 .5-1.7.4-2.8-.4-5.4-3-5.8-5.8-.1-.7.1-1.3.4-1.7Z" fill="currentColor"/></svg>
                     WhatsApp
                 </a>
                 
@@ -54,7 +54,7 @@
                 <a href="mailto:?subject={{ rawurlencode('Invoice Tagihan ' . $invoice->number) }}&body={{ rawurlencode('Halo, berikut adalah tagihan Invoice Anda dari ' . $invoice->company->name . ' dengan nomor ' . $invoice->number . '. Silakan akses melalui tautan berikut: ' . route('public.invoices.show', $invoice->public_token)) }}" 
                    @click="open = false"
                    class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem">
-                    <i class="bx bx-envelope text-blue-600 text-base mr-1"></i>
+                    <svg class="mr-1 h-4 w-4 text-blue-600" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.5 6h13A1.5 1.5 0 0 1 20 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5v-9A1.5 1.5 0 0 1 5.5 6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m5 7 7 6 7-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     Email
                 </a>
                 
@@ -63,7 +63,7 @@
                    target="_blank" 
                    @click="open = false"
                    class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem">
-                    <i class="bx bxl-telegram text-sky-500 text-base mr-1"></i>
+                    <svg class="mr-1 h-4 w-4 text-sky-500" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 5 4 11.5l5.8 2.1M20 5l-3 14-7.2-5.4M20 5 9.8 13.6M9.8 13.6 9 18l2.7-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     Telegram
                 </a>
             </div>
@@ -89,7 +89,7 @@
         <x-modal class="p-5">
             <!-- Header -->
             <div class="flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                <i class="bx bx-receipt text-brand-600 dark:text-brand-400 text-lg"></i>
+                <svg class="h-5 w-5 text-brand-600 dark:text-brand-400" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3h10v18l-2-1.2-2 1.2-2-1.2-2 1.2-2-1.2-2 1.2V5a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 8h6M9 12h6M9 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
                 <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Buku Kas & Catatan Pembayaran</h2>
             </div>
 
@@ -177,8 +177,8 @@
                 <div x-data="{ showForm: false }" class="mt-6 border-t border-gray-100 pt-4 dark:border-gray-800">
                     <button @click="showForm = !showForm" type="button" class="flex w-full items-center justify-between text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 cursor-pointer">
                         <span>Catat Pembayaran Baru</span>
-                        <i class="bx bx-plus text-xs" x-show="!showForm"></i>
-                        <i class="bx bx-minus text-xs" x-show="showForm" style="display: none;"></i>
+                        <svg class="h-4 w-4" x-show="!showForm" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        <svg class="h-4 w-4" x-show="showForm" style="display: none;" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </button>
 
                     <form x-show="showForm" 
@@ -209,7 +209,7 @@
                 </div>
             @else
                 <div class="mt-5 border-t border-gray-100 pt-3 dark:border-gray-800 text-center text-xs text-success-600 dark:text-success-400 font-semibold flex items-center justify-center gap-1.5">
-                    <i class="bx bx-check-circle text-base"></i>
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     Tagihan Telah Lunas Sepenuhnya
                 </div>
             @endif

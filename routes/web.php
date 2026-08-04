@@ -45,45 +45,47 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('dashboard')->with('success', 'Email terverifikasi.');
     })->middleware('signed')->name('verification.verify');
 
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::middleware('company.context')->group(function () {
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::resource('clients', ClientController::class)->only(['index', 'store', 'update', 'destroy']);
-    Route::resource('products', ProductController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::resource('clients', ClientController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::resource('products', ProductController::class)->only(['index', 'store', 'update', 'destroy']);
 
-    Route::resource('quotations', QuotationController::class);
-    Route::patch('/quotations/{quotation}/status', [QuotationController::class, 'status'])->name('quotations.status');
-    Route::post('/quotations/{quotation}/convert', [QuotationController::class, 'convert'])->name('quotations.convert');
-    Route::get('/quotations/{quotation}/pdf', [QuotationController::class, 'pdf'])->name('quotations.pdf');
+        Route::resource('quotations', QuotationController::class);
+        Route::patch('/quotations/{quotation}/status', [QuotationController::class, 'status'])->name('quotations.status');
+        Route::post('/quotations/{quotation}/convert', [QuotationController::class, 'convert'])->name('quotations.convert');
+        Route::get('/quotations/{quotation}/pdf', [QuotationController::class, 'pdf'])->name('quotations.pdf');
 
-    Route::resource('invoices', InvoiceController::class);
-    Route::patch('/invoices/{invoice}/status', [InvoiceController::class, 'status'])->name('invoices.status');
-    Route::post('/invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
-    Route::post('/invoices/{invoice}/payments', [InvoicePaymentController::class, 'store'])->name('invoices.payments.store');
-    Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
-    Route::get('/invoices/{invoice}/receipt', [InvoiceController::class, 'receipt'])->name('invoices.receipt');
-    Route::post('/invoices/{invoice}/expenses', [InvoiceExpenseController::class, 'store'])->name('invoices.expenses.store');
-    Route::delete('/invoices/{invoice}/expenses/{expense}', [InvoiceExpenseController::class, 'destroy'])->name('invoices.expenses.destroy');
-    Route::post('/invoices/{invoice}/credit-notes', [CreditNoteController::class, 'store'])->name('invoices.credit-notes.store');
-    Route::get('/credit-notes/{creditNote}', [CreditNoteController::class, 'show'])->name('credit-notes.show');
-    Route::patch('/credit-notes/{creditNote}/void', [CreditNoteController::class, 'void'])->name('credit-notes.void');
-    Route::get('/credit-notes/{creditNote}/pdf', [CreditNoteController::class, 'pdf'])->name('credit-notes.pdf');
+        Route::resource('invoices', InvoiceController::class);
+        Route::patch('/invoices/{invoice}/status', [InvoiceController::class, 'status'])->name('invoices.status');
+        Route::post('/invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
+        Route::post('/invoices/{invoice}/payments', [InvoicePaymentController::class, 'store'])->name('invoices.payments.store');
+        Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
+        Route::get('/invoices/{invoice}/receipt', [InvoiceController::class, 'receipt'])->name('invoices.receipt');
+        Route::post('/invoices/{invoice}/expenses', [InvoiceExpenseController::class, 'store'])->name('invoices.expenses.store');
+        Route::delete('/invoices/{invoice}/expenses/{expense}', [InvoiceExpenseController::class, 'destroy'])->name('invoices.expenses.destroy');
+        Route::post('/invoices/{invoice}/credit-notes', [CreditNoteController::class, 'store'])->name('invoices.credit-notes.store');
+        Route::get('/credit-notes/{creditNote}', [CreditNoteController::class, 'show'])->name('credit-notes.show');
+        Route::patch('/credit-notes/{creditNote}/void', [CreditNoteController::class, 'void'])->name('credit-notes.void');
+        Route::get('/credit-notes/{creditNote}/pdf', [CreditNoteController::class, 'pdf'])->name('credit-notes.pdf');
 
-    Route::get('/settings/company', [SettingsController::class, 'company'])->name('settings.company');
-    Route::put('/settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
-    Route::get('/settings/billing', [BillingController::class, 'index'])->name('settings.billing');
-    Route::get('/settings/billing/{billingSubmission}', [BillingController::class, 'show'])->name('settings.billing.show');
-    Route::post('/billing', [BillingController::class, 'store'])->name('billing.store');
-    Route::view('/settings/security', 'settings.security')->name('settings.security');
-    Route::get('/settings/bank-accounts', [SettingsController::class, 'bankAccounts'])->name('settings.bank-accounts');
-    Route::post('/settings/bank-accounts', [SettingsController::class, 'storeBankAccount'])->name('settings.bank-accounts.store');
-    Route::put('/settings/bank-accounts/{bankAccount}', [SettingsController::class, 'updateBankAccount'])->name('settings.bank-accounts.update');
+        Route::get('/settings/company', [SettingsController::class, 'company'])->name('settings.company');
+        Route::put('/settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
+        Route::get('/settings/billing', [BillingController::class, 'index'])->name('settings.billing');
+        Route::get('/settings/billing/{billingSubmission}', [BillingController::class, 'show'])->name('settings.billing.show');
+        Route::post('/billing', [BillingController::class, 'store'])->name('billing.store');
+        Route::view('/settings/security', 'settings.security')->name('settings.security');
+        Route::get('/settings/bank-accounts', [SettingsController::class, 'bankAccounts'])->name('settings.bank-accounts');
+        Route::post('/settings/bank-accounts', [SettingsController::class, 'storeBankAccount'])->name('settings.bank-accounts.store');
+        Route::put('/settings/bank-accounts/{bankAccount}', [SettingsController::class, 'updateBankAccount'])->name('settings.bank-accounts.update');
 
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
 
-    Route::middleware('role:super_admin')->prefix('super-admin')->name('super-admin.')->group(function () {
-        Route::get('/', [SuperAdminController::class, 'index'])->name('index');
-        Route::post('/billing-submissions/{billingSubmission}/confirm', [SuperAdminController::class, 'confirmBilling'])->name('billing.confirm');
+        Route::middleware('role:super_admin')->prefix('super-admin')->name('super-admin.')->group(function () {
+            Route::get('/', [SuperAdminController::class, 'index'])->name('index');
+            Route::post('/billing-submissions/{billingSubmission}/confirm', [SuperAdminController::class, 'confirmBilling'])->name('billing.confirm');
+        });
     });
 });
 

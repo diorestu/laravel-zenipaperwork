@@ -24,6 +24,7 @@
         "@popperjs/core": "^2.11.8",
         "alpinejs": "^3.14.9",
         "apexcharts": "^5.3.5",
+        "boxicons": "^2.1.4",
         "chart.js": "^4.5.1",
         "datatables.net": "^2.3.8",
         "datatables.net-dt": "^2.3.8",

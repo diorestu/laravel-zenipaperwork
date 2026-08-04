@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Quotation;
 use App\Services\InvoiceService;
 use App\Services\QuotationService;
+use App\Support\ActivityNotifier;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -38,6 +39,7 @@ class QuotationController extends Controller
     public function store(StoreQuotationRequest $request, QuotationService $service)
     {
         $quotation = $service->create($request->user(), $request->validated());
+        ActivityNotifier::record($request->user(), 'Quotation baru dibuat', 'Quotation '.$quotation->number.' berhasil dibuat.');
 
         return redirect()->route('quotations.show', $quotation)->with('success', 'Quotation dibuat.');
     }
@@ -77,6 +79,7 @@ class QuotationController extends Controller
             }
 
             $invoice = $invoiceService->convertQuotation($quotation->load('items'), $invoiceNumber);
+            ActivityNotifier::record($request->user(), 'Invoice baru dibuat', 'Invoice '.$invoice->number.' dibuat dari quotation '.$quotation->number.'.');
 
             return redirect()->route('invoices.show', $invoice)->with('success', 'Quotation disetujui dan otomatis dikonversi menjadi invoice.');
         }
@@ -93,6 +96,7 @@ class QuotationController extends Controller
         abort_unless(in_array($quotation->status, ['approved', 'sent'], true), 422);
 
         $invoice = $service->convertQuotation($quotation->load('items'), $data['number']);
+        ActivityNotifier::record($request->user(), 'Invoice baru dibuat', 'Invoice '.$invoice->number.' dibuat dari quotation '.$quotation->number.'.');
 
         return redirect()->route('invoices.show', $invoice)->with('success', 'Quotation dikonversi ke invoice.');
     }

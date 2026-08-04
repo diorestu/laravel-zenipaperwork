@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProductRequest;
 use App\Models\Product;
+use App\Support\ActivityNotifier;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -84,7 +85,8 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-        Product::create($request->validated() + ['company_id' => $request->user()->company_id, 'is_active' => $request->boolean('is_active', true)]);
+        $product = Product::create($request->validated() + ['company_id' => $request->user()->company_id, 'is_active' => $request->boolean('is_active', true)]);
+        ActivityNotifier::record($request->user(), 'Product baru dibuat', $product->name.' ditambahkan ke katalog.');
 
         return back()->with('success', 'Produk tersimpan.');
     }
