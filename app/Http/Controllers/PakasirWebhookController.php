@@ -18,7 +18,12 @@ class PakasirWebhookController extends Controller
         $amount = (int) $request->input('amount');
         $status = strtolower((string) $request->input('status'));
 
-        if ($project !== '' && ! hash_equals($project, (string) $request->input('project'))) {
+        if ($project === '') {
+            Log::error('Webhook Pakasir gagal diproses karena konfigurasi services.pakasir.project belum diatur.');
+            return response()->json(['message' => 'Server misconfiguration.'], 500);
+        }
+
+        if (! hash_equals($project, (string) $request->input('project'))) {
             Log::warning('Webhook Pakasir ditolak karena project tidak sesuai.', ['payload' => $payload]);
 
             return response()->json(['message' => 'Project tidak valid.'], 422);
@@ -33,6 +38,11 @@ class PakasirWebhookController extends Controller
             Log::warning('Webhook Pakasir tidak menemukan billing submission.', ['payload' => $payload]);
 
             return response()->json(['message' => 'Transaksi tidak ditemukan.'], 404);
+        }
+
+        // Return early if already processed to prevent duplicate processing and API hits
+        if ($submission->status === 'confirmed') {
+            return response()->json(['message' => 'Billing sudah diaktifkan sebelumnya.']);
         }
 
         if ((int) $submission->amount !== $amount) {
@@ -73,6 +83,14 @@ class PakasirWebhookController extends Controller
             'payment_number' => data_get($detailPayload, 'payment_number') ?? $submission->payment_number,
             'payment_url' => data_get($detailPayload, 'payment_url') ?? $submission->payment_url,
             'payment_payload' => $combinedPayload,
+        ]);
+
+        // Update company active plan & expiry
+        $company = $submission->company;
+        $endsAt = $submission->billing_period === 'yearly' ? now()->addYear() : now()->addMonth();
+        $company->update([
+            'active_plan' => $submission->package,
+            'subscription_ends_at' => $endsAt,
         ]);
 
         return response()->json(['message' => 'Billing berhasil diaktifkan.']);

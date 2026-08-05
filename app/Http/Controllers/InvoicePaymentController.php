@@ -26,6 +26,10 @@ class InvoicePaymentController extends Controller
 
         $service->recordPayment($invoice, $data);
 
+        if ($request->boolean('from_mobile') || str_contains($request->header('referer', ''), '/mobile')) {
+            return redirect()->route('mobile.invoices.show', $invoice)->with('success', 'Pembayaran berhasil dicatat.');
+        }
+
         return redirect()->route('invoices.show', $invoice)->with('success', 'Pembayaran tercatat.');
     }
 }

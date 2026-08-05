@@ -3,7 +3,12 @@
 @section('content')
 <div class="space-y-6">
     <div class="flex items-center justify-between">
-        <h1 class="text-lg font-semibold text-gray-900 dark:text-white/90">Tagihan</h1>
+        <h1 class="text-lg font-semibold text-gray-900 dark:text-white/90">Tagihan & Langganan</h1>
+        @if (request()->has('from_mobile') || str_contains(request()->header('referer', ''), '/mobile'))
+            <a href="{{ route('mobile.app') }}" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-theme-xs hover:bg-brand-600">
+                ← Kembali ke Mobile App
+            </a>
+        @endif
     </div>
 
     @if ($onTrial)

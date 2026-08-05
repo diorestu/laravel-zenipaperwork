@@ -13,6 +13,7 @@ class CompanyFactory extends Factory
             'email' => fake()->companyEmail(),
             'phone' => fake()->phoneNumber(),
             'address' => fake()->address(),
+            'trial_ends_at' => now()->addDays(30),
         ];
     }
 }

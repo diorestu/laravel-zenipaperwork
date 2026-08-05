@@ -93,6 +93,10 @@ class InvoiceController extends Controller
         $invoice = $service->create($request->user(), $request->validated());
         ActivityNotifier::record($request->user(), 'Invoice baru dibuat', 'Invoice '.$invoice->number.' berhasil dibuat.');
 
+        if ($request->boolean('from_mobile') || str_contains($request->header('referer', ''), '/mobile')) {
+            return redirect()->route('mobile.invoices.show', $invoice)->with('success', 'Invoice '.$invoice->number.' berhasil dibuat.');
+        }
+
         return redirect()->route('invoices.show', $invoice)->with('success', 'Invoice dibuat.');
     }
 
@@ -103,6 +107,16 @@ class InvoiceController extends Controller
         return view('invoices.show', [
             'invoice' => $invoice->load(['company', 'client', 'items', 'payments', 'paymentTerms', 'creditNotes', 'expenses']),
         ]);
+    }
+
+    public function mobileShow(Request $request, Invoice $invoice)
+    {
+        $this->authorize('view', $invoice);
+
+        $invoice->load(['company', 'client', 'items', 'payments', 'paymentTerms', 'creditNotes', 'expenses']);
+        $bankAccounts = \App\Models\BankAccount::forCompany($request->user()->company_id)->where('is_active', true)->get();
+
+        return view('mobile.invoices-show', compact('invoice', 'bankAccounts'));
     }
 
     public function edit(Invoice $invoice)

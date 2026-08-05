@@ -98,26 +98,7 @@ class ClientController extends Controller
             ->forCompany($companyId)
             ->whereIn('client_id', $clientIds)
             ->whereNotIn('status', ['draft', 'paid', 'void'])
-            ->leftJoinSub(
-                DB::table('invoice_payments')
-                    ->select('invoice_id', DB::raw('SUM(amount) as paid_total'))
-                    ->groupBy('invoice_id'),
-                'payment_totals',
-                'payment_totals.invoice_id',
-                '=',
-                'invoices.id'
-            )
-            ->leftJoinSub(
-                DB::table('credit_notes')
-                    ->select('invoice_id', DB::raw('SUM(amount) as credit_total'))
-                    ->where('status', 'applied')
-                    ->groupBy('invoice_id'),
-                'credit_totals',
-                'credit_totals.invoice_id',
-                '=',
-                'invoices.id'
-            )
-            ->select('client_id', DB::raw('SUM(GREATEST(invoices.total - COALESCE(payment_totals.paid_total, 0) - COALESCE(credit_totals.credit_total, 0), 0)) as unpaid_total'))
+            ->select('client_id', DB::raw('SUM(balance_due) as unpaid_total'))
             ->groupBy('client_id')
             ->pluck('unpaid_total', 'client_id')
             ->map(fn ($value): float => (float) $value)
@@ -128,6 +109,10 @@ class ClientController extends Controller
     {
         $client = Client::create($request->validated() + ['company_id' => $request->user()->company_id]);
         ActivityNotifier::record($request->user(), 'Klien baru dibuat', $client->name.' ditambahkan sebagai klien.');
+
+        if ($request->boolean('from_mobile') || str_contains($request->header('referer', ''), '/mobile')) {
+            return redirect()->route('mobile.app')->with('success', 'Klien tersimpan.');
+        }
 
         return back()->with('success', 'Klien tersimpan.');
     }

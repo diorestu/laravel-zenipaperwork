@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoiceExpenseController;
 use App\Http\Controllers\InvoicePaymentController;
+use App\Http\Controllers\MobileWorkspaceController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PakasirWebhookController;
 use App\Http\Controllers\ProductController;
@@ -23,6 +24,7 @@ Route::get('/public/invoices/{token}', [PublicInvoiceController::class, 'show'])
 Route::post('/webhooks/pakasir', PakasirWebhookController::class)->name('webhooks.pakasir');
 Route::view('/privacy-policy', 'pages.privacy-policy')->name('privacy-policy');
 Route::view('/terms-of-service', 'pages.terms-of-service')->name('terms-of-service');
+Route::view('/mobile', 'pwa.install')->name('pwa.install');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
@@ -50,8 +52,9 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('dashboard')->with('success', 'Email terverifikasi.');
     })->middleware('signed')->name('verification.verify');
 
-    Route::middleware('company.context')->group(function () {
+    Route::middleware(['company.context', 'subscription.active', 'redirect.mobile'])->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/mobile/app', [MobileWorkspaceController::class, 'index'])->name('mobile.app');
 
         Route::resource('clients', ClientController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::resource('products', ProductController::class)->only(['index', 'store', 'update', 'destroy']);
@@ -81,6 +84,9 @@ Route::middleware('auth')->group(function () {
         Route::put('/settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
         Route::get('/settings/billing', [BillingController::class, 'index'])->name('settings.billing');
         Route::get('/settings/billing/{billingSubmission}', [BillingController::class, 'show'])->name('settings.billing.show');
+        Route::get('/mobile/invoices/{invoice}', [InvoiceController::class, 'mobileShow'])->name('mobile.invoices.show');
+        Route::get('/mobile/billing', [BillingController::class, 'mobileIndex'])->name('mobile.billing');
+        Route::get('/mobile/billing/{billingSubmission}', [BillingController::class, 'mobileShow'])->name('mobile.billing.show');
         Route::post('/billing', [BillingController::class, 'store'])->name('billing.store');
         Route::view('/settings/security', 'settings.security')->name('settings.security');
         Route::get('/settings/bank-accounts', [SettingsController::class, 'bankAccounts'])->name('settings.bank-accounts');

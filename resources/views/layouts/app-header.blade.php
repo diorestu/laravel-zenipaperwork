@@ -112,6 +112,12 @@
                     </svg>
                 </button>
 
+                <!-- Mobile App Mode Switcher -->
+                <a href="{{ route('mobile.app') }}" title="Buka Mode Aplikasi Mobile" class="flex h-9 items-center gap-1.5 rounded-full border border-brand-200 bg-brand-50 px-3 text-xs font-semibold text-brand-700 transition hover:bg-brand-100 dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-300">
+                    <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-5 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm5-4H7V5h10v11z"/></svg>
+                    <span class="hidden sm:inline">Mode Mobile</span>
+                </a>
+
                 <!-- Notification Dropdown -->
                 <x-header.notification-dropdown />
             </div>

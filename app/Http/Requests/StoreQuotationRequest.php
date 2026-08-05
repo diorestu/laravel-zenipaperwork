@@ -31,4 +31,16 @@ class StoreQuotationRequest extends FormRequest
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
         ];
     }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator): void {
+            if ($this->isMethod('post')) {
+                $company = $this->user()?->company;
+                if ($company && $company->hasReachedQuotationLimit()) {
+                    $validator->errors()->add('limit', 'Limit jumlah penawaran untuk paket Anda telah tercapai. Silakan upgrade paket Anda.');
+                }
+            }
+        });
+    }
 }

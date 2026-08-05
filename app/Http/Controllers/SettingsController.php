@@ -71,6 +71,10 @@ class SettingsController extends Controller
             'is_active' => $request->boolean('is_active', true),
         ]);
 
+        if ($request->boolean('from_mobile') || str_contains($request->header('referer', ''), '/mobile')) {
+            return redirect()->route('mobile.app')->with('success', 'Rekening bank ditambahkan.');
+        }
+
         return redirect()->route('settings.bank-accounts')->with('success', 'Rekening bank ditambahkan.');
     }
 

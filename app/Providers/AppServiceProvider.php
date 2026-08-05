@@ -8,6 +8,7 @@ use App\Models\BillingSubmission;
 use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Quotation;
+use App\Models\CreditNote;
 use App\Policies\CompanyOwnedPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -33,5 +34,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Product::class, CompanyOwnedPolicy::class);
         Gate::policy(Invoice::class, CompanyOwnedPolicy::class);
         Gate::policy(Quotation::class, CompanyOwnedPolicy::class);
+        Gate::policy(CreditNote::class, CompanyOwnedPolicy::class);
     }
 }

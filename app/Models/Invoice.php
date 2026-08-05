@@ -20,7 +20,7 @@ class Invoice extends Model
         'issue_date', 'due_date', 'sent_at', 'last_reminder_at', 'status',
         'subtotal', 'tax_rate', 'tax_total', 'pph_rate', 'pph_amount',
         'total', 'down_payment_amount', 'expense_total', 'profit_total',
-        'notes',
+        'amount_paid', 'credit_note_total', 'balance_due', 'notes',
     ];
 
     protected function casts(): array
@@ -39,6 +39,9 @@ class Invoice extends Model
             'down_payment_amount' => 'decimal:2',
             'expense_total' => 'decimal:2',
             'profit_total' => 'decimal:2',
+            'amount_paid' => 'decimal:2',
+            'credit_note_total' => 'decimal:2',
+            'balance_due' => 'decimal:2',
         ];
     }
 
@@ -47,6 +50,31 @@ class Invoice extends Model
         static::creating(function (Invoice $invoice): void {
             $invoice->public_token ??= Str::random(40);
         });
+
+        static::saved(function (Invoice $invoice): void {
+            $invoice->recalculateTotals();
+        });
+    }
+
+    public function recalculateTotals(): void
+    {
+        $paid = (float) $this->payments()->sum('amount');
+        $credit = (float) $this->creditNotes()->where('status', 'applied')->sum('amount');
+        $total = (float) $this->total;
+        $balanceDue = max($total - $paid - $credit, 0);
+
+        $newStatus = match (true) {
+            $paid + $credit >= $total && $total > 0 => 'paid',
+            $paid > 0 || $credit > 0 => 'partial',
+            default => $this->status,
+        };
+
+        $this->updateQuietly([
+            'amount_paid' => $paid,
+            'credit_note_total' => $credit,
+            'balance_due' => $balanceDue,
+            'status' => $newStatus,
+        ]);
     }
 
     public function client(): BelongsTo
@@ -86,12 +114,12 @@ class Invoice extends Model
 
     public function getAmountPaidAttribute(): string
     {
-        return number_format((float) $this->payments()->sum('amount'), 2, '.', '');
+        return number_format((float) ($this->attributes['amount_paid'] ?? 0), 2, '.', '');
     }
 
     public function getCreditNoteTotalAttribute(): string
     {
-        return number_format((float) $this->creditNotes()->where('status', 'applied')->sum('amount'), 2, '.', '');
+        return number_format((float) ($this->attributes['credit_note_total'] ?? 0), 2, '.', '');
     }
 
     public function getDownPaymentPaidAttribute(): string
@@ -112,11 +140,7 @@ class Invoice extends Model
 
     public function getBalanceDueAttribute(): string
     {
-        $paid = (float) $this->amount_paid;
-        $creditNote = (float) $this->credit_note_total;
-        $total = (float) $this->total;
-
-        return number_format(max($total - $paid - $creditNote, 0), 2, '.', '');
+        return number_format((float) ($this->attributes['balance_due'] ?? 0), 2, '.', '');
     }
 
     public function getIsOverdueAttribute(): bool

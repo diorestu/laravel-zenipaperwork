@@ -21,4 +21,16 @@ class StoreProductRequest extends FormRequest
             'is_active' => ['nullable', 'boolean'],
         ];
     }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator): void {
+            if ($this->isMethod('post')) {
+                $company = $this->user()?->company;
+                if ($company && $company->hasReachedProductLimit()) {
+                    $validator->errors()->add('limit', 'Limit jumlah produk untuk paket Anda telah tercapai. Silakan upgrade paket Anda.');
+                }
+            }
+        });
+    }
 }

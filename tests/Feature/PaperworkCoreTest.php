@@ -160,14 +160,14 @@ it('enforces company scope and super admin permissions', function () {
 it('renders TailAdmin auth pages with Paperwork form actions', function () {
     $this->get(route('signin'))
         ->assertOk()
-        ->assertSee('Sign In')
+        ->assertSee('Masuk')
         ->assertSee('name="email"', false)
         ->assertSee('name="password"', false)
         ->assertSee('action="'.route('login.store').'"', false);
 
     $this->get(route('signup'))
         ->assertOk()
-        ->assertSee('Sign Up')
+        ->assertSee('Daftar')
         ->assertSee('name="company_name"', false)
         ->assertSee('name="name"', false)
         ->assertSee('name="password_confirmation"', false)
@@ -184,22 +184,22 @@ it('renders create and edit forms inside modals on index pages', function () {
     $this->actingAs($user)->get(route('clients.index', ['modal' => 'create']))
         ->assertOk()
         ->assertSee('open-modal', false)
-        ->assertSee('Tambah Client')
+        ->assertSee('Tambah Klien')
         ->assertSee('edit-client');
 
     $this->actingAs($user)->get(route('products.index', ['modal' => 'create']))
         ->assertOk()
-        ->assertSee('Tambah Product')
+        ->assertSee('Tambah Produk')
         ->assertSee('edit-product');
 
     $this->actingAs($user)->get(route('invoices.index', ['modal' => 'create', 'edit' => $invoice->id]))
         ->assertOk()
-        ->assertSee('Create Invoice')
+        ->assertSee('Buat Invoice')
         ->assertSee('edit-invoice-'.$invoice->id);
 
     $this->actingAs($user)->get(route('quotations.index', ['modal' => 'create', 'edit' => $quotation->id]))
         ->assertOk()
-        ->assertSee('Create Quotation')
+        ->assertSee('Buat Penawaran')
         ->assertSee('edit-quotation-'.$quotation->id);
 });
 
@@ -216,11 +216,11 @@ it('renders client stats and searchable datatable', function () {
 
     $this->actingAs($user)->get(route('clients.index'))
         ->assertOk()
-        ->assertSee('Total Client')
-        ->assertSee('Client Aktif')
+        ->assertSee('Total Klien')
+        ->assertSee('Klien Aktif')
         ->assertSee('Nilai Invoice')
-        ->assertSee('Client Baru')
-        ->assertSee('Data Client');
+        ->assertSee('Klien Baru')
+        ->assertSee('Data Klien');
 
     $response = $this->actingAs($user)->get(route('clients.index', ['datatable' => 1]))
         ->assertOk();
@@ -228,7 +228,7 @@ it('renders client stats and searchable datatable', function () {
     expect($data)->toHaveCount(2);
     expect($data[0]['client'])->toContain('Nusa Legal');
     expect($data[0]['documents'])->toContain('1 invoice');
-    expect($data[0]['documents'])->toContain('1 quotation');
+    expect($data[0]['documents'])->toContain('1 penawaran');
     expect($data[0]['invoice_value'])->toContain('Rp 250.000');
 
     $responseSearch = $this->actingAs($user)->get(route('clients.index', ['datatable' => 1, 'search' => ['value' => 'finance@nusa.test']]))
@@ -285,8 +285,8 @@ it('keeps company profile focused on company identity fields', function () {
 
     $this->actingAs($user)->get(route('settings.company'))
         ->assertOk()
-        ->assertSee('Company Logo')
-        ->assertSee('PIC Name')
+        ->assertSee('Logo Perusahaan')
+        ->assertSee('Nama PIC')
         ->assertDontSee('Bank Name')
         ->assertDontSee('Bank Account Number');
 
@@ -331,9 +331,9 @@ it('lists company bank accounts in a filterable table', function () {
     $this->actingAs($user)->get(route('settings.bank-accounts', ['bank' => 'BCA', 'status' => 'active']))
         ->assertOk()
         ->assertSee('Bank')
-        ->assertSee('Account Name')
-        ->assertSee('Account Number')
-        ->assertSee('Currency')
+        ->assertSee('Nama Rekening')
+        ->assertSee('Nomor Rekening')
+        ->assertSee('Mata Uang')
         ->assertSee('Status')
         ->assertSee('BCA')
         ->assertDontSee('Paperwork Reserve');
@@ -370,11 +370,11 @@ it('renders dashboard invoice stats and interactive chart datasets', function ()
     $this->actingAs($user)->get(route('dashboard'))
         ->assertOk()
         ->assertSee('dashboard-stats-grid', false)
-        ->assertSee('Total Invoices')
-        ->assertSee('Issued Amount')
-        ->assertSee('Collected Revenue')
-        ->assertSee('Outstanding')
-        ->assertSee('Overdue')
+        ->assertSee('Total Invoice')
+        ->assertSee('Nilai Diterbitkan')
+        ->assertSee('Pendapatan Tertagih')
+        ->assertSee('Piutang')
+        ->assertSee('Jatuh Tempo')
         ->assertSee('invoiceRevenueLineChart', false)
         ->assertSee('invoiceRevenueLineCanvas', false)
         ->assertSee('invoiceStatusBarChart', false)

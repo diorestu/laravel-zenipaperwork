@@ -29,12 +29,27 @@ class SuperAdminController extends Controller
 
         $billingSubmission->update(['status' => 'confirmed']);
 
+        // Update company active plan & expiry
+        $company = $billingSubmission->company;
+        $endsAt = $billingSubmission->billing_period === 'yearly' ? now()->addYear() : now()->addMonth();
+
+        $company->update([
+            'active_plan' => $billingSubmission->package,
+            'subscription_ends_at' => $endsAt,
+        ]);
+
         return back()->with('success', 'Billing user berhasil diaktifkan.');
     }
 
     public function stopBilling(BillingSubmission $billingSubmission)
     {
         $billingSubmission->update(['status' => 'stopped']);
+
+        // Clear company active plan & expiry
+        $billingSubmission->company->update([
+            'active_plan' => null,
+            'subscription_ends_at' => null,
+        ]);
 
         return back()->with('success', 'Billing user berhasil dihentikan.');
     }

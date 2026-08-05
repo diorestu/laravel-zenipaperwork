@@ -66,4 +66,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return in_array($this->role, ['owner', 'admin', 'super_admin'], true);
     }
+
+    public function deviceTokens(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(UserDeviceToken::class);
+    }
 }

@@ -88,6 +88,10 @@ class ProductController extends Controller
         $product = Product::create($request->validated() + ['company_id' => $request->user()->company_id, 'is_active' => $request->boolean('is_active', true)]);
         ActivityNotifier::record($request->user(), 'Produk baru dibuat', $product->name.' ditambahkan ke katalog.');
 
+        if ($request->boolean('from_mobile') || str_contains($request->header('referer', ''), '/mobile')) {
+            return redirect()->route('mobile.app')->with('success', 'Produk tersimpan.');
+        }
+
         return back()->with('success', 'Produk tersimpan.');
     }
 

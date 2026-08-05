@@ -69,6 +69,37 @@ class QuotationController extends Controller
         return response()->json(['message' => 'Penawaran dihapus.']);
     }
 
+    public function convert(Request $request, Quotation $quotation, \App\Services\InvoiceService $service)
+    {
+        $this->authorize('update', $quotation);
+        $data = $request->validate(['number' => ['required', 'string', 'max:100']]);
+        abort_unless(in_array($quotation->status, ['approved', 'sent'], true), 422);
+
+        $company = $request->user()->company;
+        if ($company && $company->hasReachedInvoiceLimit()) {
+            return response()->json([
+                'message' => 'Limit jumlah invoice untuk paket Anda telah tercapai. Silakan upgrade paket Anda.',
+            ], 422);
+        }
+
+        $invoice = $service->convertQuotation($quotation->load('items'), $data['number']);
+        ActivityNotifier::record($request->user(), 'Invoice baru dibuat', 'Invoice '.$invoice->number.' dibuat dari penawaran '.$quotation->number.'.');
+
+        return response()->json([
+            'message' => 'Penawaran berhasil dikonversi ke invoice.',
+            'invoice' => new \App\Http\Resources\InvoiceResource($invoice),
+        ]);
+    }
+
+    public function pdf(Quotation $quotation)
+    {
+        $this->authorize('view', $quotation);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.quotation', ['quotation' => $quotation->load(['company', 'client', 'items'])]);
+
+        return $pdf->download($quotation->number.'.pdf');
+    }
+
     private function perPage(Request $request): int
     {
         return min(max((int) $request->query('per_page', 15), 1), 100);

@@ -22,4 +22,16 @@ class StoreClientRequest extends FormRequest
             'tax_number' => ['nullable', 'string', 'max:100'],
         ];
     }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator): void {
+            if ($this->isMethod('post')) {
+                $company = $this->user()?->company;
+                if ($company && $company->hasReachedClientLimit()) {
+                    $validator->errors()->add('limit', 'Limit jumlah klien untuk paket Anda telah tercapai. Silakan upgrade paket Anda.');
+                }
+            }
+        });
+    }
 }

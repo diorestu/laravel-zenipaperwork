@@ -4,9 +4,16 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#111111">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Paperwork">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/paperwork-logo.png') }}">
 
     <title>{{ $title ?? 'Paperwork' }} | Paperwork</title>
+
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -140,6 +147,8 @@
             </div>
         </div>
     </div>
+
+    <x-pwa-install />
 </body>
 
 @stack('scripts')

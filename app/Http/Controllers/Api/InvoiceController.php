@@ -8,6 +8,7 @@ use App\Http\Resources\InvoiceResource;
 use App\Models\Invoice;
 use App\Services\InvoiceService;
 use App\Support\ActivityNotifier;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -75,6 +76,82 @@ class InvoiceController extends Controller
         $invoice->delete();
 
         return response()->json(['message' => 'Invoice dihapus.']);
+    }
+
+    public function recordPayment(\App\Http\Requests\StoreInvoicePaymentRequest $request, Invoice $invoice, InvoiceService $service): JsonResponse
+    {
+        $this->authorize('update', $invoice);
+        $data = $request->validated();
+
+        if ($request->hasFile('proof')) {
+            $data['proof_path'] = $request->file('proof')->store('payment-proofs', 'public');
+        }
+        unset($data['proof']);
+
+        if ($invoice->paymentTerms()->exists() && isset($data['term_number'])) {
+            $term = $invoice->paymentTerms()->where('term_number', (int) $data['term_number'])->first();
+            $data['term_label'] = $term?->label;
+        } else {
+            unset($data['term_number'], $data['term_label']);
+        }
+
+        $service->recordPayment($invoice, $data);
+
+        return response()->json([
+            'message' => 'Pembayaran berhasil dicatat.',
+            'invoice' => new InvoiceResource($invoice->refresh()->load(['client', 'items', 'payments', 'paymentTerms'])),
+        ]);
+    }
+
+    public function recordExpense(\App\Http\Requests\StoreInvoiceExpenseRequest $request, Invoice $invoice, InvoiceService $service): JsonResponse
+    {
+        $this->authorize('update', $invoice);
+        $data = $request->validated();
+        $data['company_id'] = $invoice->company_id;
+
+        $service->recordExpense($invoice, $data);
+
+        return response()->json([
+            'message' => 'Biaya berhasil dicatat.',
+            'invoice' => new InvoiceResource($invoice->refresh()->load(['client', 'items', 'payments', 'paymentTerms', 'expenses'])),
+        ]);
+    }
+
+    public function deleteExpense(Invoice $invoice, \App\Models\InvoiceExpense $expense, InvoiceService $service): JsonResponse
+    {
+        $this->authorize('update', $invoice);
+        abort_unless($expense->invoice_id === $invoice->id, 404);
+
+        $service->deleteExpense($expense);
+
+        return response()->json([
+            'message' => 'Biaya berhasil dihapus.',
+            'invoice' => new InvoiceResource($invoice->refresh()->load(['client', 'items', 'payments', 'paymentTerms', 'expenses'])),
+        ]);
+    }
+
+    public function send(Invoice $invoice, InvoiceService $service): JsonResponse
+    {
+        $this->authorize('update', $invoice);
+        $service->markAsSent($invoice);
+
+        if ($invoice->client?->email) {
+            \App\Jobs\SendInvoiceEmail::dispatch($invoice);
+        }
+
+        return response()->json([
+            'message' => 'Invoice berhasil dikirim.',
+            'invoice' => new InvoiceResource($invoice->refresh()),
+        ]);
+    }
+
+    public function pdf(Invoice $invoice)
+    {
+        $this->authorize('view', $invoice);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.invoice', ['invoice' => $invoice->load(['company', 'client', 'items', 'payments', 'paymentTerms', 'creditNotes', 'expenses'])]);
+
+        return $pdf->download($invoice->number.'.pdf');
     }
 
     private function perPage(Request $request): int

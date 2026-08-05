@@ -14,6 +14,7 @@
         "dedoc/scramble": "^0.13.38",
         "endroid/qr-code": "^6.1",
         "fadhila36/pakasir-sdk": "^2.0",
+        "jenssegers/agent": "^2.6",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.3",
         "laravel/socialite": "^5.29",

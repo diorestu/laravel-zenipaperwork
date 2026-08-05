@@ -20,7 +20,9 @@
             <h1 class="text-lg font-semibold text-gray-900 dark:text-white/90">Pembayaran QRIS</h1>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ str($submission->package)->headline() }}</p>
         </div>
-        <a href="{{ route('settings.billing') }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-white/[0.03]">Kembali</a>
+        <a href="{{ request()->has('from_mobile') || str_contains(request()->header('referer', ''), '/mobile') ? route('mobile.app') : route('settings.billing') }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-white/[0.03]">
+            ← {{ request()->has('from_mobile') || str_contains(request()->header('referer', ''), '/mobile') ? 'Kembali ke Mobile App' : 'Kembali' }}
+        </a>
     </div>
 
     <section class="grid gap-6 lg:grid-cols-[1fr_22rem]">

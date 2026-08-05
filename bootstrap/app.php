@@ -19,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureRole::class,
             'company.context' => \App\Http\Middleware\EnsureCompanyContext::class,
+            'subscription.active' => \App\Http\Middleware\EnsureSubscriptionActive::class,
+            'redirect.mobile' => \App\Http\Middleware\RedirectIfMobile::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

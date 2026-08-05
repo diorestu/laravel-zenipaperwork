@@ -31,6 +31,9 @@ class CreditNote extends Model
         static::creating(function (CreditNote $note): void {
             $note->number ??= static::generateNumber($note->company_id);
         });
+
+        static::saved(fn (CreditNote $note) => $note->invoice?->recalculateTotals());
+        static::deleted(fn (CreditNote $note) => $note->invoice?->recalculateTotals());
     }
 
     public static function generateNumber(int $companyId): string

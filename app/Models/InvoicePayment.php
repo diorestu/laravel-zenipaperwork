@@ -17,6 +17,12 @@ class InvoicePayment extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::saved(fn (InvoicePayment $payment) => $payment->invoice?->recalculateTotals());
+        static::deleted(fn (InvoicePayment $payment) => $payment->invoice?->recalculateTotals());
+    }
+
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);

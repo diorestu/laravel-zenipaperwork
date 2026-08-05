@@ -41,6 +41,10 @@ class QuotationController extends Controller
         $quotation = $service->create($request->user(), $request->validated());
         ActivityNotifier::record($request->user(), 'Penawaran baru dibuat', 'Penawaran '.$quotation->number.' berhasil dibuat.');
 
+        if ($request->boolean('from_mobile') || str_contains($request->header('referer', ''), '/mobile')) {
+            return redirect()->route('mobile.app')->with('success', 'Penawaran '.$quotation->number.' berhasil dibuat.');
+        }
+
         return redirect()->route('quotations.show', $quotation)->with('success', 'Penawaran dibuat.');
     }
 
@@ -94,6 +98,11 @@ class QuotationController extends Controller
         $this->authorize('update', $quotation);
         $data = $request->validate(['number' => ['required', 'string', 'max:100']]);
         abort_unless(in_array($quotation->status, ['approved', 'sent'], true), 422);
+
+        $company = $request->user()->company;
+        if ($company && $company->hasReachedInvoiceLimit()) {
+            return back()->withErrors(['limit' => 'Limit jumlah invoice untuk paket Anda telah tercapai. Silakan upgrade paket Anda.']);
+        }
 
         $invoice = $service->convertQuotation($quotation->load('items'), $data['number']);
         ActivityNotifier::record($request->user(), 'Invoice baru dibuat', 'Invoice '.$invoice->number.' dibuat dari penawaran '.$quotation->number.'.');
