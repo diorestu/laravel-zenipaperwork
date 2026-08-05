@@ -19,9 +19,15 @@
     <header class="sticky top-0 z-40 border-b border-gray-200/80 bg-white/95 px-4 py-4 backdrop-blur-md dark:border-gray-800/80 dark:bg-gray-900/95">
         <div class="mx-auto flex max-w-md items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-900 shadow-theme-xs p-1">
-                    <img src="{{ asset('images/logo/sq_white.png') }}" alt="Logo App" class="h-full w-full object-contain">
-                </div>
+                @if(auth()->user()->company?->logo_path)
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-theme-xs">
+                        <img src="{{ asset('storage/' . auth()->user()->company->logo_path) }}" alt="{{ auth()->user()->company->name }}" class="h-full w-full object-cover">
+                    </div>
+                @else
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-base font-extrabold text-white shadow-theme-xs">
+                        {{ strtoupper(substr(auth()->user()->company?->name ?? 'P', 0, 1)) }}
+                    </div>
+                @endif
                 <div class="flex flex-col">
                     <h1 class="text-base font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
                         {{ auth()->user()->company?->name ?? 'Paperwork' }}
@@ -53,25 +59,50 @@
                 <div class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-black/10 blur-xl pointer-events-none"></div>
 
                 <div class="relative z-10">
-                    <div class="flex items-center justify-between text-xs font-medium text-white/80">
-                        <span>Total Penjualan Bulan Ini</span>
-                        <span class="rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-xs">
-                            {{ now()->format('F Y') }}
-                        </span>
+                    <!-- Period Filter Row -->
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <span class="text-xs font-medium text-white/80">Total Penjualan</span>
+                        <div class="flex items-center gap-1.5">
+                            <select x-model="filterMonth" @change="fetchStats()"
+                                class="appearance-none rounded-lg bg-white/20 px-2 py-1 text-[11px] font-semibold text-white backdrop-blur-xs border border-white/20 outline-none cursor-pointer"
+                                style="-webkit-appearance: none;">
+                                <option value="1" class="text-gray-900">Januari</option>
+                                <option value="2" class="text-gray-900">Februari</option>
+                                <option value="3" class="text-gray-900">Maret</option>
+                                <option value="4" class="text-gray-900">April</option>
+                                <option value="5" class="text-gray-900">Mei</option>
+                                <option value="6" class="text-gray-900">Juni</option>
+                                <option value="7" class="text-gray-900">Juli</option>
+                                <option value="8" class="text-gray-900">Agustus</option>
+                                <option value="9" class="text-gray-900">September</option>
+                                <option value="10" class="text-gray-900">Oktober</option>
+                                <option value="11" class="text-gray-900">November</option>
+                                <option value="12" class="text-gray-900">Desember</option>
+                            </select>
+                            <select x-model="filterYear" @change="fetchStats()"
+                                class="appearance-none rounded-lg bg-white/20 px-2 py-1 text-[11px] font-semibold text-white backdrop-blur-xs border border-white/20 outline-none cursor-pointer"
+                                style="-webkit-appearance: none;">
+                                @for ($y = now()->year; $y >= now()->year - 3; $y--)
+                                    <option value="{{ $y }}" class="text-gray-900">{{ $y }}</option>
+                                @endfor
+                            </select>
+                        </div>
                     </div>
-                    <div class="mt-2 text-2xl font-bold tracking-tight text-white">
-                        Rp {{ number_format($stats['revenue_this_month'], 0, ',', '.') }}
+
+                    <!-- Revenue Display -->
+                    <div class="text-2xl font-bold tracking-tight text-white transition-opacity duration-300" :class="{ 'opacity-40': statsLoading }">
+                        <span x-text="statsData.revenue_formatted">Rp {{ number_format($stats['revenue_this_month'], 0, ',', '.') }}</span>
                     </div>
 
                     <!-- Inner Quick Stats Bar -->
-                    <div class="mt-4 grid grid-cols-2 gap-2 border-t border-white/15 pt-3.5 text-xs">
+                    <div class="mt-4 grid grid-cols-2 gap-2 border-t border-white/15 pt-3.5 text-xs transition-opacity duration-300" :class="{ 'opacity-40': statsLoading }">
                         <div class="flex flex-col">
                             <span class="text-[11px] text-white/75">Piutang Aktif</span>
-                            <span class="font-semibold text-white">Rp {{ number_format($stats['unpaid_balance'], 0, ',', '.') }}</span>
+                            <span class="font-semibold text-white" x-text="statsData.unpaid_balance_formatted">Rp {{ number_format($stats['unpaid_balance'], 0, ',', '.') }}</span>
                         </div>
                         <div class="flex flex-col border-l border-white/15 pl-3">
                             <span class="text-[11px] text-white/75">Overdue / Jatuh Tempo</span>
-                            <span class="font-semibold text-amber-200">{{ $stats['overdue_count'] }} Invoice</span>
+                            <span class="font-semibold text-amber-200" x-text="statsData.overdue_count + ' Invoice'">{{ $stats['overdue_count'] }} Invoice</span>
                         </div>
                     </div>
                 </div>
@@ -83,25 +114,25 @@
                 <div class="mt-3.5 grid grid-cols-4 gap-2 text-center">
                     <button @click="openCreateInvoiceModal()" class="group flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
                         <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 shadow-theme-xs dark:bg-brand-500/10 dark:text-brand-400">
-                            <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 2H6c-1.1 0-2 .9-2 2v16l3-2 3 2 3-2 3 2 3-2V4c0-1.1-.9-2-2-2zm0 15.5-1.5-1-3 2-3-2-3 2-1.5-1V4h12v13.5zM8 7h8v2H8V7zm0 4h8v2H8v-2z"/></svg>
+                            <x-heroicon-o-document-text class="h-5 w-5" />
                         </div>
                         <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">Invoice</span>
                     </button>
                     <button @click="openCreateQuotationModal()" class="group flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
                         <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 text-violet-600 shadow-theme-xs dark:bg-violet-500/10 dark:text-violet-400">
-                            <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z"/></svg>
+                            <x-heroicon-o-document-plus class="h-5 w-5" />
                         </div>
                         <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">Penawaran</span>
                     </button>
                     <button @click="openCreateClientModal()" class="group flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
                         <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shadow-theme-xs dark:bg-emerald-500/10 dark:text-emerald-400">
-                            <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0-6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 8c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zm-6 4c.22-.72 3.31-2 6-2 2.69 0 5.77 1.28 6 2H9zM6 9H4v2h2v2h2v-2h2V9H8V7H6v2z"/></svg>
+                            <x-heroicon-o-user-plus class="h-5 w-5" />
                         </div>
                         <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">Klien</span>
                     </button>
                     <button @click="openCreateProductModal()" class="group flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
                         <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-600 shadow-theme-xs dark:bg-amber-500/10 dark:text-amber-400">
-                            <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h2v2h2V8h6v2h2V8h2v12z"/></svg>
+                            <x-heroicon-o-archive-box class="h-5 w-5" />
                         </div>
                         <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">Produk</span>
                     </button>
@@ -127,7 +158,8 @@
                             <div class="flex flex-col items-end gap-1.5">
                                 <x-status-badge :status="$invoice->status" />
                                 <a href="https://wa.me/?text={{ urlencode('Halo '.$invoice->client?->name.', berikut link invoice Anda: '.route('public.invoices.show', $invoice->public_token)) }}" target="_blank" class="inline-flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 hover:bg-emerald-100 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400">
-                                    <svg class="h-3 w-3 fill-emerald-600 dark:fill-emerald-400" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.81 9.81 0 0 0 12.04 2zm.01 16.67c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c.02 4.54-3.67 8.23-8.22 8.23z"/></svg> WA Link
+                                    <x-heroicon-o-share class="h-3 w-3" />
+                                    WA Link
                                 </a>
                             </div>
                         </div>
@@ -781,7 +813,7 @@
                             <h4 class="mt-0.5 text-sm font-bold text-gray-900 dark:text-white">{{ auth()->user()->company?->name ?? 'Paperwork' }}</h4>
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ auth()->user()->name }} ({{ auth()->user()->email }})</p>
                         </div>
-                        <a href="{{ route('settings.company') }}" class="rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        <a href="{{ route('mobile.profile') }}" class="rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                             Edit Profil
                         </a>
                     </div>
@@ -887,6 +919,11 @@
                         <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 3H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h7v2H8v2h8v-2h-3v-2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 12H4V5h16v10z"/></svg>
                     </a>
 
+                    <a href="{{ route('mobile.profile') }}" class="flex h-10 w-full items-center justify-between rounded-xl border border-gray-200 bg-white px-4 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
+                        <span>Edit Profil Perusahaan</span>
+                        <x-heroicon-o-user-circle class="h-4 w-4" />
+                    </a>
+
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="flex h-10 w-full items-center justify-between rounded-xl border border-rose-200 bg-rose-50 px-4 text-xs font-semibold text-rose-700 shadow-theme-xs hover:bg-rose-100 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-400">
@@ -902,25 +939,29 @@
     <nav class="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white/95 px-3 py-2 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/95">
         <div class="mx-auto flex max-w-md items-center justify-around">
             <button @click="activeTab = 'home'" :class="{'text-brand-600 dark:text-brand-400 font-bold': activeTab === 'home', 'text-gray-400 dark:text-gray-500': activeTab !== 'home'}" class="flex flex-col items-center gap-1 text-[11px]">
-                <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <x-heroicon-s-home x-show="activeTab === 'home'" class="h-5 w-5" />
+                <x-heroicon-o-home x-show="activeTab !== 'home'" class="h-5 w-5" />
                 <span>Home</span>
             </button>
             <button @click="activeTab = 'invoices'" :class="{'text-brand-600 dark:text-brand-400 font-bold': activeTab === 'invoices', 'text-gray-400 dark:text-gray-500': activeTab !== 'invoices'}" class="flex flex-col items-center gap-1 text-[11px]">
-                <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM9 17H7v-2h2v2zm0-4H7v-2h2v2zm0-4H7V7h2v2zm8 8h-6v-2h6v2zm0-4h-6v-2h6v2zm0-4h-6V7h6v2z"/></svg>
+                <x-heroicon-s-document-text x-show="activeTab === 'invoices'" class="h-5 w-5" />
+                <x-heroicon-o-document-text x-show="activeTab !== 'invoices'" class="h-5 w-5" />
                 <span>Invoice</span>
             </button>
 
             <!-- Floating Action Button -->
-            <button @click="openCreateInvoiceModal()" class="-mt-6 flex h-12 w-12 items-center justify-center rounded-full bg-brand-500 text-xl font-bold text-white shadow-theme-md transition hover:bg-brand-600 active:scale-95">
-                +
+            <button @click="openCreateInvoiceModal()" class="-mt-6 flex h-12 w-12 items-center justify-center rounded-full bg-brand-500 text-white shadow-theme-md transition hover:bg-brand-600 active:scale-95">
+                <x-heroicon-o-plus class="h-6 w-6" />
             </button>
 
             <button @click="activeTab = 'clients'" :class="{'text-brand-600 dark:text-brand-400 font-bold': activeTab === 'clients', 'text-gray-400 dark:text-gray-500': activeTab !== 'clients'}" class="flex flex-col items-center gap-1 text-[11px]">
-                <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                <x-heroicon-s-user-group x-show="activeTab === 'clients'" class="h-5 w-5" />
+                <x-heroicon-o-user-group x-show="activeTab !== 'clients'" class="h-5 w-5" />
                 <span>Klien</span>
             </button>
             <button @click="activeTab = 'products'" :class="{'text-brand-600 dark:text-brand-400 font-bold': activeTab === 'products', 'text-gray-400 dark:text-gray-500': activeTab !== 'products'}" class="flex flex-col items-center gap-1 text-[11px]">
-                <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3z"/></svg>
+                <x-heroicon-s-archive-box x-show="activeTab === 'products'" class="h-5 w-5" />
+                <x-heroicon-o-archive-box x-show="activeTab !== 'products'" class="h-5 w-5" />
                 <span>Produk</span>
             </button>
         </div>
@@ -1045,6 +1086,33 @@ function mobileAppWorkspace() {
         showClientModal: false,
         showProductModal: false,
         showSettingsModal: false,
+
+        // Period filter state
+        filterMonth: String(new Date().getMonth() + 1),
+        filterYear: String(new Date().getFullYear()),
+        statsLoading: false,
+        statsData: {
+            revenue_formatted: 'Rp {{ number_format($stats["revenue_this_month"], 0, ",", ".") }}',
+            unpaid_balance_formatted: 'Rp {{ number_format($stats["unpaid_balance"], 0, ",", ".") }}',
+            overdue_count: {{ $stats['overdue_count'] }},
+        },
+
+        async fetchStats() {
+            this.statsLoading = true;
+            try {
+                const url = `{{ route('mobile.stats') }}?month=${this.filterMonth}&year=${this.filterYear}`;
+                const res = await fetch(url, {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (res.ok) {
+                    this.statsData = await res.json();
+                }
+            } catch (e) {
+                console.error('Failed to fetch stats:', e);
+            } finally {
+                this.statsLoading = false;
+            }
+        },
 
         openCreateInvoiceModal() {
             this.showInvoiceModal = true;

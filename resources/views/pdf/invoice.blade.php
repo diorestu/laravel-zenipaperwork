@@ -367,10 +367,25 @@
         <tr>
             <!-- Notes -->
             <td>
-                @if ($invoice->notes)
+                @php
+                    $notes = trim((string) $invoice->notes);
+                    $bankAccounts = $invoice->company?->bankAccounts ?? collect();
+
+                    if ($bankAccounts->isNotEmpty()) {
+                        $notes .= ($notes !== '' ? "\n\n" : '') . "Pembayaran dapat ditransfer melalui rekening berikut:\n";
+
+                        foreach ($bankAccounts as $account) {
+                            $notes .= "- {$account->bank_name} a/n {$account->account_name} ({$account->account_number})\n";
+                        }
+
+                        $notes = trim($notes);
+                    }
+                @endphp
+
+                @if ($notes !== '')
                     <div class="notes-container">
                         <div class="notes-title">Catatan</div>
-                        <div class="notes-content">{!! nl2br(e($invoice->notes)) !!}</div>
+                        <div class="notes-content">{!! nl2br(e($notes)) !!}</div>
                     </div>
                 @endif
             </td>

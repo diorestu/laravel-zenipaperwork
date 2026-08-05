@@ -15,6 +15,11 @@ class SettingsController extends Controller
         return view('settings.company', ['company' => auth()->user()->company]);
     }
 
+    public function mobileCompany()
+    {
+        return view('mobile.profile', ['company' => auth()->user()->company]);
+    }
+
     public function updateCompany(UpdateCompanyProfileRequest $request)
     {
         $data = $request->validated();
@@ -27,6 +32,10 @@ class SettingsController extends Controller
         unset($data['logo']);
 
         $request->user()->company->update($data);
+
+        if ($request->boolean('from_mobile') || str_contains($request->header('referer', ''), '/mobile')) {
+            return redirect()->route('mobile.profile')->with('success', 'Profil perusahaan diperbarui.');
+        }
 
         return redirect()->route('settings.company')->with('success', 'Profil perusahaan diperbarui.');
     }

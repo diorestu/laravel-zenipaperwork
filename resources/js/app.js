@@ -61,18 +61,6 @@ Alpine.start();
 
 // Initialize components on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-toast-payload]').forEach((payload) => {
-        try {
-            JSON.parse(payload.textContent || '[]').forEach((toast) => {
-                if (toast?.message) {
-                    window.toast(toast.type, toast.message);
-                }
-            });
-        } catch {
-            // Ignore malformed toast payloads.
-        }
-    });
-
     window.addEventListener('app:toast', (event) => {
         if (event.detail?.message) {
             window.toast(event.detail.type, event.detail.message);

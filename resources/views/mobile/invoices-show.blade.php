@@ -6,7 +6,7 @@
     <header class="sticky top-0 z-40 border-b border-gray-200/80 bg-white/95 px-4 py-4 backdrop-blur-md dark:border-gray-800/80 dark:bg-gray-900/95">
         <div class="mx-auto flex max-w-md items-center justify-between">
             <a href="{{ route('mobile.app') }}" aria-label="Kembali" class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
-                <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                <x-heroicon-o-chevron-left class="h-5 w-5" />
             </a>
             <div class="text-center">
                 <h1 class="text-xs font-bold text-gray-900 dark:text-white">{{ $invoice->number }}</h1>
@@ -21,22 +21,16 @@
     <!-- Main Content Container -->
     <main class="mx-auto max-w-md space-y-4 px-4 pt-4">
 
-        <!-- Notification Banner -->
-        @if(session('success'))
-            <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-xs text-emerald-800 shadow-theme-xs dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
-                ✓ {{ session('success') }}
-            </div>
-        @endif
 
-        <!-- Quick Action Buttons (Cetak PDF & Catat Bayar) -->
+        <!-- Quick Action Buttons (Unduh PDF & Catat Bayar) -->
         <div class="grid grid-cols-2 gap-2.5 text-center">
             <a href="{{ route('invoices.pdf', $invoice) }}" class="flex items-center justify-center gap-2 rounded-xl border border-sky-200 bg-sky-50 py-2.5 px-3 text-sky-700 shadow-theme-xs transition hover:bg-sky-100 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300 active:scale-95">
-                <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5c0 .83-.67 1.5-1.5 1.5H7v2H5.5V8H8c.83 0 1.5.67 1.5 1.5v2zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V8H13c.83 0 1.5.67 1.5 1.5v4zm4-3.5h-2.5v1.5H18V13h-2v2H14.5V8H18.5v1.5z"/></svg>
-                <span class="text-xs font-bold">Cetak PDF</span>
+                <x-heroicon-o-arrow-down-tray class="h-4 w-4" />
+                <span class="text-xs font-bold">Unduh PDF</span>
             </a>
 
             <button @click="showPaymentModal = true" class="flex items-center justify-center gap-2 rounded-xl border border-brand-200 bg-brand-50 py-2.5 px-3 text-brand-700 shadow-theme-xs transition hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-400 active:scale-95">
-                <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                <x-heroicon-o-wallet class="h-4 w-4" />
                 <span class="text-xs font-bold">+ Catat Bayar</span>
             </button>
         </div>
@@ -166,15 +160,13 @@
     <!-- STICKY BOTTOM ACTION BAR (BOXICONS SVG) -->
     <div class="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200/80 bg-white/95 px-4 py-3 backdrop-blur-md dark:border-gray-800/80 dark:bg-gray-900/95">
         <div class="mx-auto flex max-w-md items-center gap-3">
-            <!-- Button Bagikan WA (Boxicons bx-share-alt) -->
             <a href="https://wa.me/?text={{ urlencode('Halo '.$invoice->client?->name.', berikut link invoice Anda ('.$invoice->number.'): '.route('public.invoices.show', $invoice->public_token)) }}" target="_blank" class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white shadow-theme-xs transition hover:bg-emerald-700 active:scale-[0.98]">
-                <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L7.05 9.81C6.5 9.31 5.79 9 5 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+                <x-heroicon-o-share class="h-5 w-5" />
                 <span>Bagikan WA</span>
             </a>
 
-            <!-- Button Ubah Status (Boxicons bx-edit) -->
             <button @click="showStatusModal = true" class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-amber-500 px-4 py-3 text-xs font-bold text-white shadow-theme-xs transition hover:bg-amber-600 active:scale-[0.98]">
-                <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24"><path d="m16 2.012 3 3L7.012 17H4v-3.012L16 2.012zm4.414-.414a2 2 0 0 0-2.828 0L16 3.184l3 3 1.586-1.586a2 2 0 0 0 0-2.828zM3 19h18v2H3v-2z"/></svg>
+                <x-heroicon-o-pencil-square class="h-5 w-5" />
                 <span>Ubah Status</span>
             </button>
         </div>
@@ -204,7 +196,9 @@
         >
             <div class="flex shrink-0 items-center justify-between border-b border-gray-100 bg-white px-5 py-4 dark:border-gray-800 dark:bg-gray-900">
                 <h3 class="text-base font-semibold text-gray-900 dark:text-white">Ubah Status Invoice</h3>
-                <button @click="showStatusModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">✕</button>
+                <button @click="showStatusModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" aria-label="Tutup modal">
+                    <x-heroicon-o-x-mark class="h-6 w-6" />
+                </button>
             </div>
 
             <form method="POST" action="{{ route('invoices.status', $invoice) }}" class="flex flex-1 flex-col overflow-hidden">
@@ -258,7 +252,9 @@
         >
             <div class="flex shrink-0 items-center justify-between border-b border-gray-100 bg-white px-5 py-4 dark:border-gray-800 dark:bg-gray-900">
                 <h3 class="text-base font-semibold text-gray-900 dark:text-white">Catat Pembayaran Invoice</h3>
-                <button @click="showPaymentModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">✕</button>
+                <button @click="showPaymentModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" aria-label="Tutup modal">
+                    <x-heroicon-o-x-mark class="h-6 w-6" />
+                </button>
             </div>
 
             <form method="POST" action="{{ route('invoices.payments.store', $invoice) }}" enctype="multipart/form-data" class="flex flex-1 flex-col overflow-hidden">

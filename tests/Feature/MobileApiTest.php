@@ -155,7 +155,7 @@ it('renders mobile workspace UI page for authenticated users', function () {
     $this->actingAs($user)
         ->get(route('mobile.app'))
         ->assertOk()
-        ->assertSee('Penjualan Bulan Ini')
+        ->assertSee('Total Penjualan')
         ->assertSee('Buat Invoice Baru')
         ->assertSee('Daftar Klien');
 });

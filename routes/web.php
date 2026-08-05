@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['company.context', 'subscription.active', 'redirect.mobile'])->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/mobile/app', [MobileWorkspaceController::class, 'index'])->name('mobile.app');
+        Route::get('/mobile/stats', [MobileWorkspaceController::class, 'stats'])->name('mobile.stats');
 
         Route::resource('clients', ClientController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::resource('products', ProductController::class)->only(['index', 'store', 'update', 'destroy']);
@@ -82,6 +83,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/settings/company', [SettingsController::class, 'company'])->name('settings.company');
         Route::put('/settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
+        Route::get('/mobile/profile', [SettingsController::class, 'mobileCompany'])->name('mobile.profile');
         Route::get('/settings/billing', [BillingController::class, 'index'])->name('settings.billing');
         Route::get('/settings/billing/{billingSubmission}', [BillingController::class, 'show'])->name('settings.billing.show');
         Route::get('/mobile/invoices/{invoice}', [InvoiceController::class, 'mobileShow'])->name('mobile.invoices.show');
