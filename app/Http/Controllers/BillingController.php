@@ -56,12 +56,14 @@ class BillingController extends Controller
 
         if ($submission->payment_method === 'qris') {
             $submission->update(['payment_order_id' => 'BILL-'.$submission->id]);
-            $payload = $pakasir->createQris($submission->refresh());
-            $submission->update([
-                'payment_number' => $payload['payment_number'] ?? $payload['number'] ?? null,
-                'payment_url' => $payload['payment_url'] ?? $payload['checkout_url'] ?? $payload['url'] ?? null,
-                'payment_payload' => $payload,
-            ]);
+            $payload = rescue(fn () => $pakasir->createQris($submission->refresh()), [], false);
+            if (! empty($payload)) {
+                $submission->update([
+                    'payment_number' => $payload['payment_number'] ?? $payload['number'] ?? null,
+                    'payment_url' => $payload['payment_url'] ?? $payload['checkout_url'] ?? $payload['url'] ?? null,
+                    'payment_payload' => $payload,
+                ]);
+            }
         }
 
         $isMobile = $request->boolean('from_mobile') || str_contains($request->header('referer', ''), '/mobile');
@@ -126,7 +128,7 @@ class BillingController extends Controller
 
         $paymentNumber = (string) ($submission->payment_number ?? data_get($submission->payment_payload, 'payment.payment_number'));
         $paymentQrCode = $paymentNumber !== ''
-            ? (new Builder)->build(data: $paymentNumber, size: 320, margin: 16)->getDataUri()
+            ? rescue(fn () => (new Builder)->build(data: $paymentNumber, size: 320, margin: 16)->getDataUri(), null, false)
             : null;
 
         return view('settings.billing-show', compact('submission', 'paymentQrCode'));
@@ -152,7 +154,7 @@ class BillingController extends Controller
 
         $paymentNumber = (string) ($submission->payment_number ?? data_get($submission->payment_payload, 'payment.payment_number'));
         $paymentQrCode = $paymentNumber !== ''
-            ? (new Builder)->build(data: $paymentNumber, size: 320, margin: 16)->getDataUri()
+            ? rescue(fn () => (new Builder)->build(data: $paymentNumber, size: 320, margin: 16)->getDataUri(), null, false)
             : null;
 
         return view('mobile.billing-show', compact('submission', 'paymentQrCode'));

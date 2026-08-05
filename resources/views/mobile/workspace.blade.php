@@ -19,8 +19,8 @@
     <header class="sticky top-0 z-40 border-b border-gray-200/80 bg-white/95 px-4 py-4 backdrop-blur-md dark:border-gray-800/80 dark:bg-gray-900/95">
         <div class="mx-auto flex max-w-md items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-base font-extrabold text-white shadow-theme-xs">
-                    {{ strtoupper(substr(auth()->user()->company?->name ?? 'P', 0, 1)) }}
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-900 shadow-theme-xs p-1">
+                    <img src="{{ asset('images/logo/sq_white.png') }}" alt="Logo App" class="h-full w-full object-contain">
                 </div>
                 <div class="flex flex-col">
                     <h1 class="text-base font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
@@ -77,33 +77,33 @@
                 </div>
             </div>
 
-            <!-- Quick Actions Grid -->
+            <!-- Quick Access Grid -->
             <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
-                <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Tindakan Cepat</h2>
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Quick Access</h2>
                 <div class="mt-3.5 grid grid-cols-4 gap-2 text-center">
                     <button @click="openCreateInvoiceModal()" class="group flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
                         <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 shadow-theme-xs dark:bg-brand-500/10 dark:text-brand-400">
                             <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 2H6c-1.1 0-2 .9-2 2v16l3-2 3 2 3-2 3 2 3-2V4c0-1.1-.9-2-2-2zm0 15.5-1.5-1-3 2-3-2-3 2-1.5-1V4h12v13.5zM8 7h8v2H8V7zm0 4h8v2H8v-2z"/></svg>
                         </div>
-                        <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">+ Invoice</span>
+                        <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">Invoice</span>
                     </button>
                     <button @click="openCreateQuotationModal()" class="group flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
                         <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 text-violet-600 shadow-theme-xs dark:bg-violet-500/10 dark:text-violet-400">
                             <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z"/></svg>
                         </div>
-                        <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">+ Penawaran</span>
+                        <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">Penawaran</span>
                     </button>
                     <button @click="openCreateClientModal()" class="group flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
                         <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shadow-theme-xs dark:bg-emerald-500/10 dark:text-emerald-400">
                             <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0-6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 8c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zm-6 4c.22-.72 3.31-2 6-2 2.69 0 5.77 1.28 6 2H9zM6 9H4v2h2v2h2v-2h2V9H8V7H6v2z"/></svg>
                         </div>
-                        <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">+ Klien</span>
+                        <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">Klien</span>
                     </button>
                     <button @click="openCreateProductModal()" class="group flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
                         <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-600 shadow-theme-xs dark:bg-amber-500/10 dark:text-amber-400">
                             <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h2v2h2V8h6v2h2V8h2v12z"/></svg>
                         </div>
-                        <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">+ Produk</span>
+                        <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">Produk</span>
                     </button>
                 </div>
             </div>
