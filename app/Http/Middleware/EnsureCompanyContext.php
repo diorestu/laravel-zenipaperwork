@@ -29,6 +29,7 @@ class EnsureCompanyContext
             $company = Company::create([
                 'name' => $user->name ? "Perusahaan {$user->name}" : 'Perusahaan Saya',
                 'email' => $user->email,
+                'trial_ends_at' => now()->addDays(30),
             ]);
 
             $user->forceFill(['company_id' => $company->id])->save();

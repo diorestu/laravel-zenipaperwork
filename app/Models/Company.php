@@ -23,7 +23,20 @@ class Company extends Model
         'bank_name',
         'bank_account_name',
         'bank_account_number',
+        'trial_ends_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'trial_ends_at' => 'datetime',
+        ];
+    }
+
+    public function onTrial(): bool
+    {
+        return $this->trial_ends_at !== null && $this->trial_ends_at->isFuture();
+    }
 
     public function users(): HasMany
     {

@@ -121,6 +121,7 @@ it('accepts manual billing submissions with proof files', function () {
 
     $this->actingAs($user)->post(route('billing.store'), [
         'package' => 'business',
+        'billing_period' => 'monthly',
         'amount' => 149000,
         'payment_method' => 'manual_transfer',
         'proof' => UploadedFile::fake()->image('proof.jpg'),
@@ -263,6 +264,7 @@ it('renders billing pricing cards and creates a Pakasir payment detail page', fu
 
     $this->actingAs($user)->post(route('billing.store'), [
         'package' => 'business',
+        'billing_period' => 'monthly',
         'amount' => 149000,
         'payment_method' => 'qris',
     ])->assertRedirect();

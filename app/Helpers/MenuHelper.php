@@ -23,6 +23,11 @@ class MenuHelper
                 'path' => '/products',
             ],
             [
+                'icon' => 'calendar',
+                'name' => 'Kalender',
+                'path' => '/calendar',
+            ],
+            [
                 'name' => 'Dokumen',
                 'icon' => 'forms',
                 'subItems' => [

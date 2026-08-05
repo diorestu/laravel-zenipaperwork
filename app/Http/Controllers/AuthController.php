@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -31,6 +32,55 @@ class AuthController extends Controller
         return back()->withErrors(['email' => 'Email atau password tidak valid.'])->onlyInput('email');
     }
 
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback(Request $request)
+    {
+        $googleUser = Socialite::driver('google')->stateless()->user();
+        $email = (string) $googleUser->getEmail();
+
+        if ($email === '') {
+            return redirect()->route('login')->withErrors(['email' => 'Akun Google tidak memiliki email yang valid.']);
+        }
+
+        $user = User::where('google_id', $googleUser->getId())
+            ->orWhere('email', $email)
+            ->first();
+
+        if (! $user) {
+            $company = Company::create([
+                'name' => $googleUser->getName() ? 'Perusahaan '.$googleUser->getName() : 'Perusahaan Saya',
+                'email' => $email,
+                'trial_ends_at' => now()->addDays(30),
+            ]);
+
+            $user = User::create([
+                'company_id' => $company->id,
+                'name' => $googleUser->getName() ?: Str::before($email, '@'),
+                'email' => $email,
+                'google_id' => $googleUser->getId(),
+                'password' => Hash::make(Str::random(40)),
+                'role' => 'owner',
+                'email_verified_at' => now(),
+                'is_verified' => true,
+            ]);
+        } else {
+            $user->forceFill([
+                'google_id' => $user->google_id ?: $googleUser->getId(),
+                'email_verified_at' => $user->email_verified_at ?: now(),
+                'is_verified' => true,
+            ])->save();
+        }
+
+        Auth::login($user, true);
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('dashboard'));
+    }
+
     public function registerForm()
     {
         return view('pages.auth.signup', ['title' => 'Daftar']);
@@ -45,7 +95,11 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', PasswordRule::defaults()],
         ]);
 
-        $company = Company::create(['name' => $data['company_name'], 'email' => $data['email']]);
+        $company = Company::create([
+            'name' => $data['company_name'],
+            'email' => $data['email'],
+            'trial_ends_at' => now()->addDays(30),
+        ]);
         $user = User::create([
             'company_id' => $company->id,
             'name' => $data['name'],

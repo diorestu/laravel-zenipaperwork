@@ -6,6 +6,28 @@
         <h1 class="text-lg font-semibold text-gray-900 dark:text-white/90">Tagihan</h1>
     </div>
 
+    @if ($onTrial)
+        <!-- Banner Uji Coba Gratis -->
+        <div class="relative overflow-hidden rounded-2xl border-l-4 border-brand-500 border-y border-r border-gray-200 bg-linear-to-r from-brand-500/5 to-indigo-500/5 p-5 shadow-theme-xs dark:border-gray-800 dark:from-brand-500/10 dark:to-indigo-500/10">
+            <div class="flex items-start gap-4">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white shadow-theme-xs">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold text-gray-900 dark:text-white">Masa Uji Coba Gratis 30 Hari Aktif</h2>
+                    <p class="mt-1 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                        Anda sedang menikmati akses uji coba gratis fitur paket <strong class="text-brand-600 dark:text-brand-400">Business</strong>. 
+                        Masa uji coba gratis Anda akan berakhir pada <strong class="text-gray-800 dark:text-white">{{ $trialEndsAt->locale('id')->translatedFormat('d F Y') }}</strong> 
+                        (<span class="font-semibold text-brand-600 dark:text-brand-400">{{ $trialDaysRemaining }} hari lagi</span>). 
+                        Anda dapat memilih dan meningkatkan paket langganan Anda kapan saja di bawah ini.
+                    </p>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div x-data="{ billingPeriod: 'monthly' }" class="space-y-6">
     <div class="flex justify-end">
         <div class="inline-flex rounded-lg border border-gray-200 bg-white p-1 shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03]">
@@ -22,11 +44,13 @@
     <section class="grid gap-4 lg:grid-cols-3">
         @foreach ($plans as $plan)
             @php($isActive = $activePlan === $plan['slug'])
+            @php($isTrialActive = $onTrial && $plan['slug'] === 'business' && !$activePlan)
+            @php($isHighlighted = $isActive || $isTrialActive)
             @php($yearlyAmount = (int) round($plan['amount'] * 12 * 0.9))
             <article @class([
                 'flex h-full flex-col rounded-lg border bg-white p-5 shadow-theme-xs dark:bg-white/[0.03]',
-                'border-brand-500 ring-2 ring-brand-500/15 dark:border-brand-400 dark:ring-brand-400/20' => $isActive,
-                'border-gray-200 dark:border-gray-800' => ! $isActive,
+                'border-brand-500 ring-2 ring-brand-500/15 dark:border-brand-400 dark:ring-brand-400/20' => $isHighlighted,
+                'border-gray-200 dark:border-gray-800' => ! $isHighlighted,
             ])>
                 <div class="flex items-start justify-between gap-3">
                     <div>
@@ -44,6 +68,8 @@
                         <span class="rounded-full border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-600 dark:border-gray-700 dark:text-gray-300" x-text="billingPeriod === 'monthly' ? 'Bulanan' : 'Tahunan'">Bulanan</span>
                         @if ($isActive)
                             <span class="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">Paket Aktif</span>
+                        @elseif ($isTrialActive)
+                            <span class="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300 animate-pulse">Uji Coba Aktif</span>
                         @endif
                     </div>
                 </div>

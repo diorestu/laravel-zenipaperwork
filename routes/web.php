@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CreditNoteController;
 use App\Http\Controllers\DashboardController;
@@ -27,6 +28,8 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
     Route::get('/signin', [AuthController::class, 'loginForm'])->name('signin');
     Route::post('/login', [AuthController::class, 'login'])->name('login.store');
+    Route::get('/auth/google/redirect', [AuthController::class, 'redirectToGoogle'])->name('auth.google.redirect');
+    Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
     Route::get('/register', [AuthController::class, 'registerForm'])->name('register');
     Route::get('/signup', [AuthController::class, 'registerForm'])->name('signup');
     Route::post('/register', [AuthController::class, 'register'])->name('register.store');
@@ -57,6 +60,9 @@ Route::middleware('auth')->group(function () {
         Route::patch('/quotations/{quotation}/status', [QuotationController::class, 'status'])->name('quotations.status');
         Route::post('/quotations/{quotation}/convert', [QuotationController::class, 'convert'])->name('quotations.convert');
         Route::get('/quotations/{quotation}/pdf', [QuotationController::class, 'pdf'])->name('quotations.pdf');
+
+        Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
+        Route::post('/calendar/sync', [CalendarController::class, 'sync'])->name('calendar.sync');
 
         Route::resource('invoices', InvoiceController::class);
         Route::patch('/invoices/{invoice}/status', [InvoiceController::class, 'status'])->name('invoices.status');
@@ -93,7 +99,6 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-Route::redirect('/calendar', '/')->name('calendar');
 Route::redirect('/profile', '/settings/company')->name('profile');
 Route::redirect('/form-elements', '/invoices/create')->name('form-elements');
 Route::redirect('/basic-tables', '/invoices')->name('basic-tables');
