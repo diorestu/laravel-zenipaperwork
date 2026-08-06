@@ -33,6 +33,31 @@
         </div>
     @endif
 
+    @php
+        $pendingSubmission = $submissions->where('status', 'pending')->first();
+        $planLevels = ['starter' => 1, 'business' => 2, 'enterprise' => 3];
+        $currentLevel = ($activePlan && isset($planLevels[$activePlan])) ? $planLevels[$activePlan] : 0;
+    @endphp
+
+    @if ($pendingSubmission)
+        <!-- Banner Pending Submission -->
+        <div class="rounded-2xl border border-amber-200 bg-amber-50/80 p-4 text-amber-900 shadow-xs dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
+            <div class="flex items-center gap-3">
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="text-xs">
+                    <p class="font-bold text-amber-950 dark:text-amber-200 text-sm">Pengajuan Billing Sedang Diproses Admin</p>
+                    <p class="mt-0.5 text-amber-800 dark:text-amber-300">
+                        Pengajuan paket <strong class="uppercase">{{ $pendingSubmission->package }}</strong> (<x-money :amount="$pendingSubmission->amount" />) pada {{ $pendingSubmission->created_at->format('d M Y H:i') }} sedang menunggu verifikasi admin. Anda tidak dapat membuat pengajuan baru sampai transaksi selesai.
+                    </p>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div x-data="{ billingPeriod: 'monthly' }" class="space-y-6">
     <div class="flex justify-end">
         <div class="inline-flex rounded-lg border border-gray-200 bg-white p-1 shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03]">
@@ -52,6 +77,8 @@
             @php($isTrialActive = $onTrial && $plan['slug'] === 'business' && !$activePlan)
             @php($isHighlighted = $isActive || $isTrialActive)
             @php($yearlyAmount = (int) round($plan['amount'] * 12 * 0.9))
+            @php($targetLevel = $planLevels[$plan['slug']] ?? 0)
+            @php($canUpgrade = ($currentLevel === 0) || ($targetLevel > $currentLevel))
             <article @class([
                 'flex h-full flex-col rounded-lg border bg-white p-5 shadow-theme-xs dark:bg-white/[0.03]',
                 'border-brand-500 ring-2 ring-brand-500/15 dark:border-brand-400 dark:ring-brand-400/20' => $isHighlighted,
@@ -95,9 +122,23 @@
                     </ul>
                 </div>
 
-                <button type="button" @click="$dispatch('open-modal', 'confirm-payment-{{ $plan['slug'] }}')" class="mt-auto w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs transition hover:border-brand-500 hover:bg-brand-500 hover:text-white dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-200 dark:hover:border-brand-500 dark:hover:bg-brand-500 dark:hover:text-white">
-                    Pilih Paket
-                </button>
+                @if ($isActive)
+                    <button type="button" disabled class="mt-auto w-full rounded-lg border border-brand-200 bg-brand-50 px-4 py-2.5 text-sm font-semibold text-brand-700 cursor-not-allowed dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-300">
+                        Paket Aktif Saat Ini
+                    </button>
+                @elseif ($pendingSubmission)
+                    <button type="button" disabled class="mt-auto w-full rounded-lg border border-gray-200 bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-400 cursor-not-allowed dark:border-gray-800 dark:bg-gray-800/50 dark:text-gray-500">
+                        Pengajuan Diproses
+                    </button>
+                @elseif (!$canUpgrade)
+                    <button type="button" disabled class="mt-auto w-full rounded-lg border border-gray-200 bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-400 cursor-not-allowed dark:border-gray-800 dark:bg-gray-800/50 dark:text-gray-500">
+                        Hanya Untuk Upgrade
+                    </button>
+                @else
+                    <button type="button" @click="$dispatch('open-modal', 'confirm-payment-{{ $plan['slug'] }}')" class="mt-auto w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs transition hover:border-brand-500 hover:bg-brand-500 hover:text-white dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-200 dark:hover:border-brand-500 dark:hover:bg-brand-500 dark:hover:text-white">
+                        Upgrade Paket Ini
+                    </button>
+                @endif
             </article>
 
             <x-ui.modal name="confirm-payment-{{ $plan['slug'] }}" class="max-w-lg p-6">

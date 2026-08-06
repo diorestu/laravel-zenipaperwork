@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Company;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -30,6 +29,18 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Admin Paperwork',
                 'password' => 'password',
                 'role' => 'owner',
+                'is_verified' => true,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'superadmin@paperwork.local'],
+            [
+                'company_id' => null,
+                'name' => 'Super Admin',
+                'password' => 'password',
+                'role' => 'super_admin',
                 'is_verified' => true,
                 'email_verified_at' => now(),
             ]

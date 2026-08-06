@@ -265,9 +265,30 @@
             color: #334155;
             line-height: 1.4;
         }
+
+        .watermark {
+            position: fixed;
+            top: 38%;
+            left: 5%;
+            width: 90%;
+            text-align: center;
+            opacity: 0.12;
+            font-size: 46px;
+            font-weight: 800;
+            color: #000000;
+            transform: rotate(-30deg);
+            transform-origin: 50% 50%;
+            z-index: -1000;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
+    @if ($invoice->company?->onTrial() || $invoice->company?->getActivePlanSlug() === 'trial')
+        <div class="watermark">PAPERWORK TRIAL</div>
+    @endif
+
     <!-- Top Header: Logo & Company Info vs Doc Title & Metadata -->
     <table class="header-table">
         <tr>

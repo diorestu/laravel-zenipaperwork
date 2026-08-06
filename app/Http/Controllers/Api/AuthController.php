@@ -28,7 +28,7 @@ class AuthController extends Controller
             $company = Company::create([
                 'name' => $data['company_name'],
                 'email' => $data['email'],
-                'trial_ends_at' => now()->addDays(30),
+                'trial_ends_at' => now()->addDays(14),
             ]);
 
             $user = User::create([

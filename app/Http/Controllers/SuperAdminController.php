@@ -3,16 +3,155 @@
 namespace App\Http\Controllers;
 
 use App\Models\BillingSubmission;
+use App\Models\Company;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class SuperAdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('super-admin.index', [
-            'users' => User::latest()->limit(20)->get(),
-            'billingSubmissions' => BillingSubmission::with('company')->latest()->limit(50)->get(),
+        $totalUsers = User::where('role', '!=', 'super_admin')->count();
+        $totalCompanies = Company::count();
+        $confirmedSubmissions = BillingSubmission::where('status', 'confirmed')->get();
+        $pendingSubmissions = BillingSubmission::where('status', 'pending')->get();
+        $totalRevenue = $confirmedSubmissions->sum('amount');
+
+        $activeSubscriptions = Company::whereNotNull('active_plan')->count();
+
+        $stats = [
+            'total_users' => $totalUsers,
+            'total_companies' => $totalCompanies,
+            'active_subscriptions' => $activeSubscriptions,
+            'pending_submissions' => $pendingSubmissions->count(),
+            'total_revenue' => $totalRevenue,
+        ];
+
+        $latestUsers = User::with('company')->where('role', '!=', 'super_admin')->latest()->take(8)->get();
+
+        $submissionsQuery = BillingSubmission::with('company')->latest();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $submissionsQuery->whereHas('company', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $submissionsQuery->where('status', $request->input('status'));
+        }
+
+        $recentSubmissions = $submissionsQuery->paginate(10)->withQueryString();
+
+        return view('super-admin.index', compact('stats', 'latestUsers', 'recentSubmissions'));
+    }
+
+    public function users(Request $request)
+    {
+        $query = User::with('company')
+            ->where('role', '!=', 'super_admin')
+            ->latest();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhereHas('company', function ($cq) use ($search) {
+                      $cq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('role')) {
+            $query->where('role', $request->input('role'));
+        }
+
+        $users = $query->paginate(15)->withQueryString();
+
+        $stats = [
+            'total' => User::where('role', '!=', 'super_admin')->count(),
+            'verified' => User::where('role', '!=', 'super_admin')->where('is_verified', true)->count(),
+            'owners' => User::where('role', 'owner')->count(),
+            'admins' => User::where('role', 'admin')->count(),
+        ];
+
+        return view('super-admin.users', compact('users', 'stats'));
+    }
+
+    public function reports(Request $request)
+    {
+        $query = BillingSubmission::with('company')->latest();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('package')) {
+            $query->where('package', $request->input('package'));
+        }
+
+        $submissions = $query->paginate(20)->withQueryString();
+
+        $confirmed = BillingSubmission::where('status', 'confirmed')->get();
+        $totalRevenue = $confirmed->sum('amount');
+        $monthlyRevenue = BillingSubmission::where('status', 'confirmed')
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('amount');
+
+        $packageDistribution = [
+            'starter' => Company::where('active_plan', 'starter')->count(),
+            'business' => Company::where('active_plan', 'business')->count(),
+            'enterprise' => Company::where('active_plan', 'enterprise')->count(),
+        ];
+
+        return view('super-admin.reports', compact('submissions', 'totalRevenue', 'monthlyRevenue', 'packageDistribution'));
+    }
+
+    public function grantBypass(Request $request, User $user)
+    {
+        $data = $request->validate([
+            'active_plan' => ['required', 'in:starter,business,enterprise'],
+            'subscription_ends_at' => ['required', 'date', 'after:today'],
         ]);
+
+        $company = $user->company;
+        if (! $company) {
+            return back()->with('error', 'Pengguna belum memiliki perusahaan terhubung.');
+        }
+
+        $endsAt = \Carbon\Carbon::parse($data['subscription_ends_at'])->endOfDay();
+
+        $company->update([
+            'active_plan' => $data['active_plan'],
+            'subscription_ends_at' => $endsAt,
+        ]);
+
+        BillingSubmission::create([
+            'company_id' => $company->id,
+            'package' => $data['active_plan'],
+            'billing_period' => 'custom_bypass',
+            'amount' => 0,
+            'payment_method' => 'admin_whitelist',
+            'status' => 'confirmed',
+        ]);
+
+        return back()->with('success', "Akses Whitelist paket ".str($data['active_plan'])->headline()." berhasil diberikan ke {$user->name} ({$company->name}) hingga ".$endsAt->format('d M Y').'.');
+    }
+
+    public function revokeBypass(User $user)
+    {
+        $company = $user->company;
+        if ($company) {
+            $company->update([
+                'active_plan' => null,
+                'subscription_ends_at' => null,
+            ]);
+        }
+
+        return back()->with('success', "Akses Whitelist untuk {$user->name} berhasil dicabut.");
     }
 
     public function confirmBilling(BillingSubmission $billingSubmission)
@@ -29,7 +168,6 @@ class SuperAdminController extends Controller
 
         $billingSubmission->update(['status' => 'confirmed']);
 
-        // Update company active plan & expiry
         $company = $billingSubmission->company;
         $endsAt = $billingSubmission->billing_period === 'yearly' ? now()->addYear() : now()->addMonth();
 
@@ -45,12 +183,37 @@ class SuperAdminController extends Controller
     {
         $billingSubmission->update(['status' => 'stopped']);
 
-        // Clear company active plan & expiry
         $billingSubmission->company->update([
             'active_plan' => null,
             'subscription_ends_at' => null,
         ]);
 
         return back()->with('success', 'Billing user berhasil dihentikan.');
+    }
+
+    public function destroyUser(User $user)
+    {
+        if ($user->isSuperAdmin() || $user->id === auth()->id()) {
+            return back()->with('error', 'Akun Super Admin tidak dapat dihapus.');
+        }
+
+        $userName = $user->name;
+        $company = $user->company;
+
+        $user->delete();
+
+        if ($company && $company->users()->count() === 0) {
+            $company->delete();
+        }
+
+        return back()->with('success', "Pengguna {$userName} berhasil dihapus dari sistem.");
+    }
+
+    public function destroyBilling(BillingSubmission $billingSubmission)
+    {
+        $id = $billingSubmission->id;
+        $billingSubmission->delete();
+
+        return back()->with('success', "Pengajuan billing #{$id} berhasil dihapus.");
     }
 }

@@ -12,6 +12,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        if (auth()->user()?->isSuperAdmin()) {
+            return redirect()->route('super-admin.index');
+        }
+
         $companyId = auth()->user()->company_id;
         $invoiceIds = Invoice::forCompany($companyId)->pluck('id');
         $invoices = Invoice::with('payments')->forCompany($companyId)->get();

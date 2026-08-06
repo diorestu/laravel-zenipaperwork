@@ -38,6 +38,47 @@ class BillingController extends Controller
     public function store(StoreBillingSubmissionRequest $request, PakasirPaymentGateway $pakasir)
     {
         $data = $request->validated();
+        $company = $request->user()->company;
+
+        if (! $company) {
+            return back()->with('error', 'Perusahaan Anda belum dikonfigurasi.');
+        }
+
+        $isMobile = $request->boolean('from_mobile') || str_contains($request->header('referer', ''), '/mobile');
+
+        // Check 1: Prevent duplicate pending submissions
+        $pendingSubmission = BillingSubmission::forCompany($company->id)
+            ->where('status', 'pending')
+            ->first();
+
+        if ($pendingSubmission) {
+            $msg = 'Anda masih memiliki pengajuan billing yang sedang diproses (Paket '.str($pendingSubmission->package)->headline().'). Harap tunggu konfirmasi admin terlebih dahulu.';
+            if ($isMobile) {
+                return redirect()->route('mobile.billing')->with('error', $msg);
+            }
+
+            return redirect()->route('settings.billing')->with('error', $msg);
+        }
+
+        // Check 2: Prevent submissions for same or lower plans unless upgrading or on trial
+        $currentPlanSlug = $company->getActivePlanSlug();
+        $levels = ['starter' => 1, 'business' => 2, 'enterprise' => 3];
+        $newPlanSlug = $data['package'];
+
+        if ($currentPlanSlug && $currentPlanSlug !== 'trial') {
+            $currentLevel = $levels[$currentPlanSlug] ?? 0;
+            $newLevel = $levels[$newPlanSlug] ?? 0;
+
+            if ($newLevel <= $currentLevel) {
+                $msg = 'Anda saat ini sudah menggunakan paket '.str($currentPlanSlug)->headline().'. Pengajuan billing hanya diperbolehkan untuk upgrade ke paket layanan yang lebih tinggi.';
+                if ($isMobile) {
+                    return redirect()->route('mobile.billing')->with('error', $msg);
+                }
+
+                return redirect()->route('settings.billing')->with('error', $msg);
+            }
+        }
+
         $plan = BillingPlans::find($data['package']);
         abort_unless($plan, 422);
 
@@ -49,7 +90,7 @@ class BillingController extends Controller
         unset($data['proof']);
 
         $submission = BillingSubmission::create($data + [
-            'company_id' => $request->user()->company_id,
+            'company_id' => $company->id,
             'payment_gateway' => $data['payment_method'] === 'qris' ? 'pakasir' : null,
             'status' => 'pending',
         ]);

@@ -101,9 +101,15 @@ Route::middleware('auth')->group(function () {
 
         Route::middleware('role:super_admin')->prefix('super-admin')->name('super-admin.')->group(function () {
             Route::get('/', [SuperAdminController::class, 'index'])->name('index');
+            Route::get('/users', [SuperAdminController::class, 'users'])->name('users');
+            Route::post('/users/{user}/grant-bypass', [SuperAdminController::class, 'grantBypass'])->name('users.grant-bypass');
+            Route::post('/users/{user}/revoke-bypass', [SuperAdminController::class, 'revokeBypass'])->name('users.revoke-bypass');
+            Route::delete('/users/{user}', [SuperAdminController::class, 'destroyUser'])->name('users.destroy');
+            Route::get('/reports', [SuperAdminController::class, 'reports'])->name('reports');
             Route::post('/billing-submissions/{billingSubmission}/confirm', [SuperAdminController::class, 'confirmBilling'])->name('billing.confirm');
             Route::patch('/billing-submissions/{billingSubmission}/activate', [SuperAdminController::class, 'activateBilling'])->name('billing.activate');
             Route::patch('/billing-submissions/{billingSubmission}/stop', [SuperAdminController::class, 'stopBilling'])->name('billing.stop');
+            Route::delete('/billing-submissions/{billingSubmission}', [SuperAdminController::class, 'destroyBilling'])->name('billing.destroy');
         });
     });
 });

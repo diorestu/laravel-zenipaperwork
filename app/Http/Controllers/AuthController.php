@@ -58,7 +58,7 @@ class AuthController extends Controller
             $company = Company::create([
                 'name' => $googleUser->getName() ? 'Perusahaan '.$googleUser->getName() : 'Perusahaan Saya',
                 'email' => $email,
-                'trial_ends_at' => now()->addDays(30),
+                'trial_ends_at' => now()->addDays(14),
             ]);
 
             $user = User::create([
@@ -102,7 +102,7 @@ class AuthController extends Controller
         $company = Company::create([
             'name' => $data['company_name'],
             'email' => $data['email'],
-            'trial_ends_at' => now()->addDays(30),
+            'trial_ends_at' => now()->addDays(14),
         ]);
         $user = User::create([
             'company_id' => $company->id,

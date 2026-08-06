@@ -79,6 +79,31 @@ class MenuHelper
 
     public static function getMenuGroups()
     {
+        if (auth()->user()?->isSuperAdmin()) {
+            return [
+                [
+                    'title' => 'Super Admin',
+                    'items' => [
+                        [
+                            'icon' => 'dashboard',
+                            'name' => 'Dashboard',
+                            'path' => '/super-admin',
+                        ],
+                        [
+                            'icon' => 'user-profile',
+                            'name' => 'Data Pengguna Aktif',
+                            'path' => '/super-admin/users',
+                        ],
+                        [
+                            'icon' => 'charts',
+                            'name' => 'Laporan',
+                            'path' => '/super-admin/reports',
+                        ],
+                    ]
+                ],
+            ];
+        }
+
         return [
             [
                 'title' => 'Menu',

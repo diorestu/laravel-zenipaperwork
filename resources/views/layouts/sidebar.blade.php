@@ -240,13 +240,15 @@
     </div>
 
     <!-- Sidebar Widget -->
-    <div
-        x-data
-        x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-        x-transition
-        class="sticky bottom-0 shrink-0 bg-white pt-3 dark:bg-gray-900">
-        @include('layouts.sidebar-widget')
-    </div>
+    @unless (auth()->user()?->isSuperAdmin())
+        <div
+            x-data
+            x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
+            x-transition
+            class="sticky bottom-0 shrink-0 bg-white pt-3 dark:bg-gray-900">
+            @include('layouts.sidebar-widget')
+        </div>
+    @endunless
 </aside>
 
 <!-- Mobile Overlay -->
