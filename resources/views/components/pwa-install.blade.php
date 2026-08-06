@@ -2,60 +2,62 @@
     x-data="pwaInstaller()"
     x-init="initPWA()"
     x-show="showBanner"
+    x-cloak
     x-transition:enter="transition ease-out duration-300"
-    x-transition:enter-start="opacity-0 translate-y-4"
-    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:enter-start="opacity-0 translate-y-6 scale-95"
+    x-transition:enter-end="opacity-100 translate-y-0 scale-100"
     x-transition:leave="transition ease-in duration-200"
-    x-transition:leave-start="opacity-100 translate-y-0"
-    x-transition:leave-end="opacity-0 translate-y-4"
-    class="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md rounded-2xl border border-gray-200/80 bg-white/95 p-5 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/95 sm:bottom-6"
+    x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+    x-transition:leave-end="opacity-0 translate-y-6 scale-95"
+    class="fixed bottom-4 left-4 right-4 z-[99999] mx-auto max-w-sm rounded-2xl border border-gray-200/90 bg-white/95 p-4 shadow-2xl backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900/95 sm:bottom-6 sm:left-auto sm:right-6"
     style="display: none;"
 >
+    <!-- Toast Header & App Icon -->
     <div class="flex items-start justify-between gap-3">
         <div class="flex items-center gap-3">
-            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gray-950 p-2 shadow-sm dark:bg-white/10">
-                <img src="{{ asset('images/logo/paperwork-logo.png') }}" alt="Paperwork App" class="h-8 w-8 object-contain dark:hidden">
-                <img src="{{ asset('img/logo/logo_white.png') }}" alt="Paperwork App" class="hidden h-8 w-8 object-contain dark:block">
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gray-900 p-2 shadow-sm dark:bg-white/10">
+                <img src="{{ asset('images/logo/paperwork-logo.png') }}" alt="Paperwork App" class="h-7 w-7 object-contain dark:hidden">
+                <img src="{{ asset('img/logo/logo_white.png') }}" alt="Paperwork App" class="hidden h-7 w-7 object-contain dark:block">
             </div>
             <div>
-                <h3 class="text-base font-bold text-gray-950 dark:text-white">Paperwork Mobile</h3>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Pasang aplikasi di Layar Utama HP Anda</p>
+                <h3 class="text-sm font-bold text-gray-950 dark:text-white">Pasang Aplikasi Paperwork</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Tambahkan ke Layar Utama HP untuk akses cepat & notifikasi</p>
             </div>
         </div>
-        <button @click="dismiss()" class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-white/10">
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <button @click="dismiss()" aria-label="Tutup" class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-white/10">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
         </button>
     </div>
 
-    <!-- iOS Instructions -->
-    <div x-show="isIOS" class="mt-4 rounded-xl border border-amber-200/60 bg-amber-50/60 p-3.5 text-xs text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
-        <p class="font-semibold text-amber-950 dark:text-amber-200 mb-1.5">Cara pasang di iPhone / iPad:</p>
-        <ol class="list-decimal space-y-1 pl-4 leading-relaxed">
-            <li>Tekan tombol <strong>Share</strong> (Ikon Kotak + Panah ke atas <svg class="inline-block h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>) di Safari.</li>
-            <li>Geser ke bawah dan pilih <strong>"Tambahkan ke Layar Utama"</strong> (Add to Home Screen).</li>
+    <!-- iOS Instructions Accordion -->
+    <div x-show="isIOS" class="mt-3 rounded-xl border border-amber-200/60 bg-amber-50/60 p-3 text-xs text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
+        <p class="font-semibold text-amber-950 dark:text-amber-200 mb-1">Cara pasang di iPhone / iPad:</p>
+        <ol class="list-decimal space-y-1 pl-4 leading-relaxed text-[11px]">
+            <li>Tekan tombol <strong>Share</strong> (Ikon Kotak + Panah) di Safari.</li>
+            <li>Pilih <strong>"Tambahkan ke Layar Utama"</strong>.</li>
             <li>Tekan <strong>"Tambah"</strong> di kanan atas.</li>
         </ol>
     </div>
 
-    <!-- Android Install Button -->
-    <div x-show="!isIOS" class="mt-4">
+    <!-- Action Toast Buttons -->
+    <div class="mt-3 flex items-center gap-2">
         <button
+            x-show="!isIOS"
             @click="installAndroid()"
-            class="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gray-950 text-sm font-semibold text-white shadow-md transition hover:bg-gray-800 active:scale-[0.98] dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200"
+            class="flex-1 flex h-9 items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-3 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-700 active:scale-[0.98] dark:bg-brand-500 dark:hover:bg-brand-600"
         >
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
-            Pasang Aplikasi Sekarang
+            Pasang Sekarang
         </button>
-    </div>
-
-    <div class="mt-3 flex items-center justify-between text-xs">
-        <span class="text-gray-400">Gratis & Tanpa Toko Aplikasi</span>
-        <button @click="dismiss(true)" class="font-medium text-gray-500 hover:text-gray-800 dark:hover:text-gray-300 underline">
-            Jangan Tampilkan Lagi
+        <button
+            @click="dismiss(true)"
+            class="flex h-9 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 px-3 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+        >
+            Nanti
         </button>
     </div>
 </div>
@@ -84,7 +86,9 @@ function pwaInstaller() {
             if (isMobile) {
                 // Register Service Worker
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('/sw.js').catch(err => console.error('SW Error:', err));
+                    navigator.serviceWorker.register('/sw.js').then((reg) => {
+                        console.log('[SW] Service Worker registered successfully:', reg.scope);
+                    }).catch(err => console.error('[SW] Registration Error:', err));
                 }
 
                 window.__paperworkVapidPublicKey = this.vapidPublicKey;
@@ -95,12 +99,15 @@ function pwaInstaller() {
                     e.preventDefault();
                     this.deferredPrompt = e;
                     this.showBanner = true;
+                    if (window.toast) {
+                        window.toast('info', 'Aplikasi Paperwork siap dipasang ke Layar Utama HP Anda.');
+                    }
                 });
 
                 // Show for iOS or general mobile after small delay
                 setTimeout(() => {
                     this.showBanner = true;
-                }, 1500);
+                }, 2000);
             }
         },
 
@@ -110,11 +117,16 @@ function pwaInstaller() {
                 this.deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
                         this.showBanner = false;
+                        if (window.toast) window.toast('success', 'Paperwork berhasil dipasang ke Layar Utama.');
                     }
                     this.deferredPrompt = null;
                 });
             } else {
-                alert('Silakan gunakan opsi "Tambahkan ke Layar Utama" pada menu browser Anda.');
+                if (window.toast) {
+                    window.toast('info', 'Silakan gunakan opsi "Tambahkan ke Layar Utama" pada menu browser Anda.');
+                } else {
+                    alert('Silakan gunakan opsi "Tambahkan ke Layar Utama" pada menu browser Anda.');
+                }
             }
         },
 

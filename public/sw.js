@@ -1,15 +1,50 @@
-const CACHE_NAME = 'paperwork-pwa-v1';
+// Paperwork PWA & Firebase Cloud Messaging Service Worker
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+
+const CACHE_NAME = 'paperwork-pwa-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
   '/images/logo/paperwork-logo.png',
+  '/img/logo/logo_white.png',
+  '/img/logo/logo.png',
   '/favicon.ico'
 ];
+
+// Initialize Firebase App in Service Worker if config exists
+try {
+  if (firebase.apps.length === 0) {
+    firebase.initializeApp({
+      apiKey: self.FIREBASE_API_KEY || "",
+      authDomain: self.FIREBASE_AUTH_DOMAIN || "",
+      projectId: self.FIREBASE_PROJECT_ID || "",
+      storageBucket: self.FIREBASE_STORAGE_BUCKET || "",
+      messagingSenderId: self.FIREBASE_MESSAGING_SENDER_ID || "",
+      appId: self.FIREBASE_APP_ID || "",
+    });
+  }
+
+  const messaging = firebase.messaging();
+  messaging.onBackgroundMessage((payload) => {
+    console.log('[sw.js] Received Firebase background message: ', payload);
+    const title = payload.notification?.title || payload.data?.title || 'Notifikasi Paperwork';
+    const options = {
+      body: payload.notification?.body || payload.data?.body || 'Anda memiliki notifikasi baru.',
+      icon: payload.notification?.icon || '/img/logo/logo.png',
+      badge: '/img/logo/logo.png',
+      data: payload.data || {},
+    };
+    self.registration.showNotification(title, options);
+  });
+} catch (err) {
+  console.log('[sw.js] Firebase SDK init skipped or fallback to standard Web Push:', err);
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      return cache.addAll(ASSETS_TO_CACHE).catch(() => {});
     })
   );
   self.skipWaiting();
@@ -32,6 +67,9 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  // Skip caching for API requests or admin endpoints
+  if (event.request.url.includes('/api/') || event.request.url.includes('/livewire/')) return;
+
   event.respondWith(
     fetch(event.request).catch(() => {
       return caches.match(event.request);
@@ -39,16 +77,16 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Web Push Listener
+// Standard Web Push Listener fallback
 self.addEventListener('push', (event) => {
   if (event.data) {
     try {
       const data = event.data.json();
-      const title = data.title || data.notification?.title || 'Paperwork Notification';
+      const title = data.title || data.notification?.title || 'Notifikasi Paperwork';
       const options = {
         body: data.body || data.notification?.body || 'Anda memiliki notifikasi baru.',
-        icon: '/images/logo/paperwork-logo.png',
-        badge: '/images/logo/paperwork-logo.png',
+        icon: data.icon || '/img/logo/logo.png',
+        badge: '/img/logo/logo.png',
         data: data.data || {},
       };
       event.waitUntil(self.registration.showNotification(title, options));
