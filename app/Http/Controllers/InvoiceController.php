@@ -138,7 +138,7 @@ class InvoiceController extends Controller
     {
         $this->authorize('view', $invoice);
 
-        return Pdf::loadView('pdf.invoice', ['invoice' => $invoice->load(['company', 'client', 'items', 'payments', 'paymentTerms', 'creditNotes', 'expenses'])])
+        return Pdf::loadView('pdf.invoice', ['invoice' => $invoice->load(['company', 'client', 'items.product', 'payments', 'paymentTerms', 'creditNotes', 'expenses'])])
             ->download($invoice->number.'.pdf');
     }
 

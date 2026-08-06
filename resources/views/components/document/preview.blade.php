@@ -80,13 +80,45 @@
         <x-document.item-lines :items="$document->items" :is-quotation="$isQuotation" />
     </div>
 
-    <!-- Summary / Totals -->
+    <!-- Payment Terms Card Box (if invoice has payment terms) -->
+    @if (!$isQuotation && $document->paymentTerms->isNotEmpty())
+        <div class="mt-5 rounded-xl border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-white/[0.02]">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white mb-3">Termin Pembayaran</h4>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="border-b border-gray-200 text-gray-500 dark:border-gray-800 dark:text-gray-400">
+                        <tr>
+                            <th class="py-1.5 font-semibold">Termin</th>
+                            <th class="py-1.5 font-semibold w-32">Jatuh Tempo</th>
+                            <th class="py-1.5 font-semibold text-right w-32">Nominal</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                        @foreach ($document->paymentTerms as $term)
+                            <tr class="text-gray-800 dark:text-gray-200">
+                                <td class="py-2">
+                                    <span class="font-semibold text-gray-900 dark:text-white block">{{ $term->label }}</span>
+                                    <span class="text-[10px] text-gray-400">Termin {{ $term->term_number }}</span>
+                                </td>
+                                <td class="py-2 text-gray-600 dark:text-gray-400">{{ $term->due_date ? $term->due_date->format('d M Y') : '-' }}</td>
+                                <td class="py-2 text-right font-semibold text-gray-900 dark:text-white"><x-money :amount="$term->amount" /></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
+
+    <!-- Summary / Totals & Notes -->
     <div class="mt-5 flex flex-col sm:flex-row sm:justify-between gap-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-        <!-- Notes (if any) -->
+        <!-- Notes Card Box (if any) -->
         <div class="flex-1 max-w-md">
             @if ($document->notes)
-                <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">Catatan</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{!! nl2br(e($document->notes)) !!}</p>
+                <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-white/[0.02]">
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-gray-900 dark:text-white mb-1.5">Catatan</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{!! nl2br(e($document->notes)) !!}</p>
+                </div>
             @endif
         </div>
 

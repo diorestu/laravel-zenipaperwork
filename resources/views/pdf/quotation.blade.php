@@ -149,6 +149,17 @@
 
         .item-description-name {
             font-weight: 700;
+            font-size: 11px;
+            color: #111111;
+            line-height: 1.3;
+        }
+
+        .item-description-text {
+            font-weight: 400;
+            font-size: 10px;
+            color: #4b5563;
+            line-height: 1.4;
+            margin-top: 2px;
         }
 
         .item-line-total {
@@ -188,22 +199,26 @@
         }
         
         .notes-container {
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 8px 12px;
+            background-color: #fafafa;
             max-width: 400px;
         }
         
         .notes-title {
             font-size: 10px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #9ca3af;
+            color: #111111;
             margin-bottom: 4px;
         }
         
         .notes-content {
             font-size: 11px;
-            color: #6b7280;
-            line-height: 1.3;
+            color: #4b5563;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -291,13 +306,46 @@
         <tbody>
             @foreach ($quotation->items as $item)
                 @php
-                    $parts = array_filter(array_map('trim', preg_split('/\s*(?=-)/', $item->description)));
+                    $itemName = '';
+                    $itemDesc = '';
+
+                    if ($item->product) {
+                        $itemName = $item->product->name;
+                        $rawDesc = trim($item->description ?? '');
+                        if ($rawDesc !== '' && strtolower($rawDesc) !== strtolower($item->product->name)) {
+                            $cleaned = preg_replace('/^'.preg_quote($item->product->name, '/').'\s*[-:\n]?\s*/i', '', $rawDesc);
+                            $itemDesc = trim($cleaned);
+                        }
+                    } else {
+                        $fullDesc = trim($item->description ?? '');
+                        if (str_contains($fullDesc, "\n")) {
+                            $lines = array_filter(array_map('trim', explode("\n", $fullDesc)));
+                            $itemName = array_shift($lines) ?? $fullDesc;
+                            $itemDesc = implode("\n", $lines);
+                        } elseif (str_contains($fullDesc, ' - ')) {
+                            $parts = explode(' - ', $fullDesc, 2);
+                            $itemName = trim($parts[0]);
+                            $itemDesc = trim($parts[1]);
+                        } elseif (str_contains($fullDesc, ' – ')) {
+                            $parts = explode(' – ', $fullDesc, 2);
+                            $itemName = trim($parts[0]);
+                            $itemDesc = trim($parts[1]);
+                        } else {
+                            $itemName = $fullDesc;
+                            $itemDesc = '';
+                        }
+                    }
+
+                    if (empty($itemName)) {
+                        $itemName = $item->description ?? 'Item';
+                    }
                 @endphp
                 <tr>
                     <td class="item-description">
-                        @foreach ($parts as $part)
-                            <span class="item-description-line {{ $loop->first ? 'item-description-name' : '' }}">{{ $part }}</span>
-                        @endforeach
+                        <div class="item-description-name">{{ $itemName }}</div>
+                        @if ($itemDesc !== '')
+                            <div class="item-description-text">{!! nl2br(e($itemDesc)) !!}</div>
+                        @endif
                     </td>
                     <td class="text-right">{{ number_format((float) $item->quantity, 0, ',', '.') }}</td>
                     <td class="text-right"><x-money :amount="$item->unit_price" /></td>

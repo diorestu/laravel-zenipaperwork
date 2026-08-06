@@ -95,7 +95,7 @@ class QuotationController extends Controller
     {
         $this->authorize('view', $quotation);
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.quotation', ['quotation' => $quotation->load(['company', 'client', 'items'])]);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.quotation', ['quotation' => $quotation->load(['company', 'client', 'items.product'])]);
 
         return $pdf->download($quotation->number.'.pdf');
     }

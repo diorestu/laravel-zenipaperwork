@@ -116,28 +116,12 @@
             margin-top: 3px;
         }
         
-        .items-table,
-        .terms-table {
-            width: 100%;
-            border-collapse: collapse;
+        .terms-container {
+            border: 1px solid #cbd5e1;
+            background-color: #f8fafc;
+            border-radius: 4px;
+            padding: 10px 12px;
             margin-bottom: 15px;
-        }
-        
-        .items-table th,
-        .terms-table th {
-            border-bottom: 1px solid #e5e7eb;
-            padding: 4px 0;
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: #9ca3af;
-        }
-        
-        .items-table td,
-        .terms-table td {
-            border-bottom: 1px solid #f3f4f6;
-            padding: 4px 0;
-            vertical-align: top;
         }
 
         .terms-title {
@@ -145,18 +129,46 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #111111;
-            margin: 4px 0 5px 0;
+            color: #0f172a;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 4px;
+        }
+
+        .terms-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .items-table th,
+        .terms-table th {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 4px 6px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+        
+        .items-table td,
+        .terms-table td {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 5px 6px;
+            vertical-align: top;
+        }
+
+        .terms-table tr:last-child td {
+            border-bottom: none;
         }
 
         .term-label {
             font-weight: 700;
-            color: #111111;
+            color: #0f172a;
         }
 
         .term-note {
             font-size: 10px;
-            color: #9ca3af;
+            color: #64748b;
         }
         
         .item-description {
@@ -164,13 +176,19 @@
             color: #111111;
         }
         
-        .item-description-line {
-            display: block;
-            margin-bottom: 1px;
-        }
-
         .item-description-name {
             font-weight: 700;
+            font-size: 11px;
+            color: #111111;
+            line-height: 1.3;
+        }
+
+        .item-description-text {
+            font-weight: 400;
+            font-size: 10px;
+            color: #4b5563;
+            line-height: 1.4;
+            margin-top: 2px;
         }
 
         .item-line-total {
@@ -218,22 +236,28 @@
         }
         
         .notes-container {
-            max-width: 400px;
+            border: 1px solid #cbd5e1;
+            background-color: #f8fafc;
+            border-radius: 4px;
+            padding: 10px 12px;
+            max-width: 380px;
         }
         
         .notes-title {
             font-size: 10px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #9ca3af;
-            margin-bottom: 4px;
+            color: #0f172a;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 4px;
         }
         
         .notes-content {
             font-size: 11px;
-            color: #6b7280;
-            line-height: 1.3;
+            color: #334155;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -321,13 +345,46 @@
         <tbody>
             @foreach ($invoice->items as $item)
                 @php
-                    $parts = array_filter(array_map('trim', preg_split('/\s*(?=-)/', $item->description)));
+                    $itemName = '';
+                    $itemDesc = '';
+
+                    if ($item->product) {
+                        $itemName = $item->product->name;
+                        $rawDesc = trim($item->description ?? '');
+                        if ($rawDesc !== '' && strtolower($rawDesc) !== strtolower($item->product->name)) {
+                            $cleaned = preg_replace('/^'.preg_quote($item->product->name, '/').'\s*[-:\n]?\s*/i', '', $rawDesc);
+                            $itemDesc = trim($cleaned);
+                        }
+                    } else {
+                        $fullDesc = trim($item->description ?? '');
+                        if (str_contains($fullDesc, "\n")) {
+                            $lines = array_filter(array_map('trim', explode("\n", $fullDesc)));
+                            $itemName = array_shift($lines) ?? $fullDesc;
+                            $itemDesc = implode("\n", $lines);
+                        } elseif (str_contains($fullDesc, ' - ')) {
+                            $parts = explode(' - ', $fullDesc, 2);
+                            $itemName = trim($parts[0]);
+                            $itemDesc = trim($parts[1]);
+                        } elseif (str_contains($fullDesc, ' – ')) {
+                            $parts = explode(' – ', $fullDesc, 2);
+                            $itemName = trim($parts[0]);
+                            $itemDesc = trim($parts[1]);
+                        } else {
+                            $itemName = $fullDesc;
+                            $itemDesc = '';
+                        }
+                    }
+
+                    if (empty($itemName)) {
+                        $itemName = $item->description ?? 'Item';
+                    }
                 @endphp
                 <tr>
                     <td class="item-description">
-                        @foreach ($parts as $part)
-                            <span class="item-description-line {{ $loop->first ? 'item-description-name' : '' }}">{{ $part }}</span>
-                        @endforeach
+                        <div class="item-description-name">{{ $itemName }}</div>
+                        @if ($itemDesc !== '')
+                            <div class="item-description-text">{!! nl2br(e($itemDesc)) !!}</div>
+                        @endif
                     </td>
                     <td class="text-right">{{ number_format((float) $item->quantity, 0, ',', '.') }}</td>
                     <td class="text-right"><x-money :amount="$item->unit_price" /></td>
@@ -338,28 +395,30 @@
     </table>
 
     @if ($invoice->paymentTerms->isNotEmpty())
-        <div class="terms-title">Termin Pembayaran</div>
-        <table class="terms-table">
-            <thead>
-                <tr>
-                    <th style="text-align: left;">Termin</th>
-                    <th style="text-align: left; width: 120px;">Jatuh Tempo</th>
-                    <th class="text-right" style="width: 130px;">Nominal</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($invoice->paymentTerms as $term)
+        <div class="terms-container">
+            <div class="terms-title">Termin Pembayaran</div>
+            <table class="terms-table">
+                <thead>
                     <tr>
-                        <td>
-                            <div class="term-label">{{ $term->label }}</div>
-                            <div class="term-note">Termin {{ $term->term_number }}</div>
-                        </td>
-                        <td>{{ $term->due_date ? $term->due_date->format('d M Y') : '-' }}</td>
-                        <td class="text-right item-line-total"><x-money :amount="$term->amount" /></td>
+                        <th style="text-align: left;">Termin</th>
+                        <th style="text-align: left; width: 120px;">Jatuh Tempo</th>
+                        <th class="text-right" style="width: 130px;">Nominal</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach ($invoice->paymentTerms as $term)
+                        <tr>
+                            <td>
+                                <div class="term-label">{{ $term->label }}</div>
+                                <div class="term-note">Termin {{ $term->term_number }}</div>
+                            </td>
+                            <td>{{ $term->due_date ? $term->due_date->format('d M Y') : '-' }}</td>
+                            <td class="text-right item-line-total"><x-money :amount="$term->amount" /></td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     @endif
 
     <!-- Summary & Notes -->
