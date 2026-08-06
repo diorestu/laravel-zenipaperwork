@@ -116,6 +116,12 @@
             margin-top: 3px;
         }
         
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
         .terms-container {
             border: 1px solid #cbd5e1;
             background-color: #f8fafc;

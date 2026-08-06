@@ -50,8 +50,16 @@
 
             <!-- Logo (mobile only) -->
             <a href="/" class="flex items-center gap-2 xl:hidden">
-                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500 text-sm font-bold text-white shadow-theme-xs">P</span>
-                <span class="text-base font-semibold tracking-tight text-gray-900 dark:text-white">Paperwork</span>
+                <img
+                    src="{{ asset('images/logo/paperwork-logo.png') }}"
+                    alt="Paperwork Logo"
+                    class="h-7 w-auto object-contain dark:hidden"
+                />
+                <img
+                    src="{{ asset('img/logo/logo_white.png') }}"
+                    alt="Paperwork Logo"
+                    class="hidden h-7 w-auto object-contain dark:block"
+                />
             </a>
 
             <!-- Application Menu Toggle (mobile only) -->
