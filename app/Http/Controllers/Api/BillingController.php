@@ -68,21 +68,38 @@ class BillingController extends Controller
 
         if ($submission->payment_method === 'qris') {
             $submission->update(['payment_order_id' => 'BILL-'.$submission->id]);
-            $payload = $pakasir->createQris($submission->refresh());
-            $submission->update([
-                'payment_number' => $payload['payment_number'] ?? $payload['number'] ?? data_get($payload, 'payment.payment_number'),
-                'payment_url' => $payload['payment_url'] ?? $payload['checkout_url'] ?? $payload['url'] ?? null,
-                'payment_payload' => $payload,
-            ]);
+            $payload = rescue(fn () => $pakasir->createQris($submission->refresh()), [], false);
+            if (! empty($payload)) {
+                $submission->update([
+                    'payment_number' => $payload['payment_number'] ?? $payload['number'] ?? data_get($payload, 'payment.payment_number'),
+                    'payment_url' => $payload['payment_url'] ?? $payload['checkout_url'] ?? $payload['url'] ?? null,
+                    'payment_payload' => $payload,
+                ]);
+            }
         }
 
         return new BillingSubmissionResource($submission->refresh());
     }
 
-    public function show(Request $request, BillingSubmission $billingSubmission): BillingSubmissionResource
+    public function show(Request $request, BillingSubmission $billingSubmission, PakasirPaymentGateway $pakasir): BillingSubmissionResource
     {
         $this->authorize('view', $billingSubmission);
 
-        return new BillingSubmissionResource($billingSubmission);
+        if ($billingSubmission->payment_method === 'qris' && ! $billingSubmission->payment_number) {
+            $payload = rescue(fn () => $pakasir->detail($billingSubmission), [], false);
+            if (empty($payload['payment_number'])) {
+                $payload = rescue(fn () => $pakasir->createQris($billingSubmission), [], false);
+            }
+
+            if ($payload !== []) {
+                $billingSubmission->update([
+                    'payment_number' => $payload['payment_number'] ?? null,
+                    'payment_url' => $payload['payment_url'] ?? null,
+                    'payment_payload' => $payload,
+                ]);
+            }
+        }
+
+        return new BillingSubmissionResource($billingSubmission->refresh());
     }
 }

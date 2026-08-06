@@ -21,13 +21,13 @@
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-analytics.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyBQ8LYQi_ylwA3jX9z73SIJM0cMrWW98j8",
-            authDomain: "paperwork-cc867.firebaseapp.com",
-            projectId: "paperwork-cc867",
-            storageBucket: "paperwork-cc867.firebasestorage.app",
-            messagingSenderId: "949071865390",
-            appId: "1:949071865390:web:08201f4acff0e05e4b21bf",
-            measurementId: "G-HG4PWF6P1K"
+            apiKey: "{{ config('services.firebase.api_key') }}",
+            authDomain: "{{ config('services.firebase.auth_domain') }}",
+            projectId: "{{ config('services.firebase.project_id') }}",
+            storageBucket: "{{ config('services.firebase.storage_bucket') }}",
+            messagingSenderId: "{{ config('services.firebase.messaging_sender_id') }}",
+            appId: "{{ config('services.firebase.app_id') }}",
+            measurementId: "{{ config('services.firebase.measurement_id') }}"
         };
 
         const app = initializeApp(firebaseConfig);
