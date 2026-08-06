@@ -10,11 +10,29 @@
     <link rel="apple-touch-icon" href="{{ asset('images/logo/sq_white.png') }}">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#111111">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Paperwork">
 
     <title>{{ $title ?? 'Paperwork' }} | Paperwork</title>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQ8LYQi_ylwA3jX9z73SIJM0cMrWW98j8",
+            authDomain: "paperwork-cc867.firebaseapp.com",
+            projectId: "paperwork-cc867",
+            storageBucket: "paperwork-cc867.firebasestorage.app",
+            messagingSenderId: "949071865390",
+            appId: "1:949071865390:web:08201f4acff0e05e4b21bf",
+            measurementId: "G-HG4PWF6P1K"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        getAnalytics(app);
+    </script>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

@@ -21,6 +21,8 @@ class PakasirPaymentGateway
         }
 
         $response = Http::timeout((int) config('services.pakasir.timeout', 15))
+            ->withUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) Paperwork/1.0')
+            ->acceptJson()
             ->post($baseUrl.'/transactioncreate/qris', [
                 'project' => $project,
                 'order_id' => $submission->payment_order_id,
@@ -46,6 +48,8 @@ class PakasirPaymentGateway
         }
 
         $response = Http::timeout((int) config('services.pakasir.timeout', 15))
+            ->withUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) Paperwork/1.0')
+            ->acceptJson()
             ->get($baseUrl.'/transactiondetail', [
                 'project' => $project,
                 'order_id' => $submission->payment_order_id,

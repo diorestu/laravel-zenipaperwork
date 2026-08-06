@@ -65,6 +65,7 @@ function pwaInstaller() {
         showBanner: false,
         isIOS: false,
         deferredPrompt: null,
+        vapidPublicKey: @js(config('services.firebase.web_push_vapid_public_key') ?: 'BE7pt7H3ZAiQ__kn1M_uv4mFOdfDQlDGCfWS_UdCDsaqEzZdmSjP-TLYQXJwCc_6q5zhZ41t6RWq35ek-wvPRyI'),
 
         initPWA() {
             // Check if already running in standalone mode (installed as PWA)
@@ -84,6 +85,9 @@ function pwaInstaller() {
                 if ('serviceWorker' in navigator) {
                     navigator.serviceWorker.register('/sw.js').catch(err => console.error('SW Error:', err));
                 }
+
+                window.__paperworkVapidPublicKey = this.vapidPublicKey;
+                this.setupWebPushSubscription();
 
                 // Listen for Android beforeinstallprompt
                 window.addEventListener('beforeinstallprompt', (e) => {
@@ -110,6 +114,69 @@ function pwaInstaller() {
                 });
             } else {
                 alert('Silakan gunakan opsi "Tambahkan ke Layar Utama" pada menu browser Anda.');
+            }
+        },
+
+        urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding)
+                .replace(/-/g, '+')
+                .replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+
+            return outputArray;
+        },
+
+        async setupWebPushSubscription() {
+            if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+                return;
+            }
+
+            if (Notification.permission === 'denied') {
+                return;
+            }
+
+            try {
+                const registration = await navigator.serviceWorker.ready;
+                let permission = Notification.permission;
+
+                if (permission === 'default') {
+                    permission = await Notification.requestPermission();
+                }
+
+                if (permission !== 'granted') {
+                    return;
+                }
+
+                let subscription = await registration.pushManager.getSubscription();
+                if (!subscription) {
+                    subscription = await registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey),
+                    });
+                }
+
+                await fetch('{{ url('/api/v1/device-tokens') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        token: JSON.stringify(subscription),
+                        device_type: 'web',
+                        device_name: navigator.userAgent,
+                    }),
+                });
+            } catch (error) {
+                console.error('Web Push subscription failed:', error);
             }
         },
 

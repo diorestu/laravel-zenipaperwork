@@ -846,7 +846,7 @@
                     </div>
 
                     <a href="{{ route('mobile.billing') }}" class="mt-3 inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-3 text-xs font-semibold text-white shadow-theme-xs hover:bg-brand-600 active:scale-[0.98]">
-                        Upgrade / Kelola Langganan (Pakasir)
+                        Upgrade / Kelola Langganan
                     </a>
                 </div>
 

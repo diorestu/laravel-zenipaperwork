@@ -115,6 +115,9 @@ class BillingController extends Controller
         $submission = $billingSubmission->load('company');
         if ($submission->payment_method === 'qris' && ! $submission->payment_number) {
             $payload = rescue(fn () => $pakasir->detail($submission), [], false);
+            if (empty($payload['payment_number'])) {
+                $payload = rescue(fn () => $pakasir->createQris($submission), [], false);
+            }
 
             if ($payload !== []) {
                 $submission->update([
@@ -141,6 +144,9 @@ class BillingController extends Controller
         $submission = $billingSubmission->load('company');
         if ($submission->payment_method === 'qris' && ! $submission->payment_number) {
             $payload = rescue(fn () => $pakasir->detail($submission), [], false);
+            if (empty($payload['payment_number'])) {
+                $payload = rescue(fn () => $pakasir->createQris($submission), [], false);
+            }
 
             if ($payload !== []) {
                 $submission->update([

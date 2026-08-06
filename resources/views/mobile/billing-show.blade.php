@@ -22,7 +22,7 @@
                 <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
                 Workspace App
             </a>
-            <h1 class="text-sm font-bold text-gray-900 dark:text-white">Pembayaran QRIS Pakasir</h1>
+            <h1 class="text-sm font-bold text-gray-900 dark:text-white">Pembayaran QRIS</h1>
             <span class="w-12"></span>
         </div>
     </header>
@@ -38,12 +38,12 @@
 
             <div class="mt-4 rounded-xl border border-gray-100 bg-white p-4 shadow-theme-xs dark:border-gray-800 dark:bg-gray-800/60">
                 @if ($paymentQrCode)
-                    <img src="{{ $paymentQrCode }}" alt="QRIS Pakasir" class="mx-auto aspect-square w-full max-w-56 object-contain">
+                    <img src="{{ $paymentQrCode }}" alt="QRIS" class="mx-auto aspect-square w-full max-w-56 object-contain">
                 @elseif ($qrisImage)
-                    <img src="{{ $qrisImage }}" alt="QRIS Pakasir" class="mx-auto aspect-square w-full max-w-56 object-contain">
+                    <img src="{{ $qrisImage }}" alt="QRIS" class="mx-auto aspect-square w-full max-w-56 object-contain">
                 @else
-                    <div class="py-8 text-center text-xs text-gray-400">
-                        Memuat QRIS Pakasir...
+                    <div class="py-8 text-center text-xs text-gray-400" x-data x-init="setTimeout(() => window.location.reload(), 3000)">
+                        Memuat QRIS...
                     </div>
                 @endif
             </div>
@@ -75,7 +75,7 @@
                 </div>
                 @if($submission->payment_order_id)
                     <div class="flex items-center justify-between">
-                        <span class="text-gray-500 dark:text-gray-400">ID Pesanan Pakasir:</span>
+                        <span class="text-gray-500 dark:text-gray-400">ID Pesanan:</span>
                         <span class="font-mono text-gray-800 dark:text-gray-200">{{ $submission->payment_order_id }}</span>
                     </div>
                 @endif
@@ -86,7 +86,7 @@
         <div class="space-y-2.5">
             @if ($submission->payment_url)
                 <a href="{{ $submission->payment_url }}" target="_blank" class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-500 text-xs font-bold text-white shadow-theme-xs transition hover:bg-brand-600 active:scale-[0.98]">
-                    Buka Link Pembayaran Pakasir ↗
+                    Buka Link Pembayaran ↗
                 </a>
             @endif
 
