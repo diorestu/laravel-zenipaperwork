@@ -68,7 +68,13 @@
                 x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
                 src="{{ asset('images/logo/paperwork-logo.png') }}"
                 alt="Paperwork"
-                class="h-9 w-auto"
+                class="h-9 w-auto dark:hidden"
+            >
+            <img
+                x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
+                src="{{ asset('img/logo/logo_white.png') }}"
+                alt="Paperwork"
+                class="hidden h-9 w-auto dark:block"
             >
             <span
                 x-show="!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen"
@@ -78,7 +84,12 @@
                 <img
                     src="{{ asset('images/logo/paperwork-logo.png') }}"
                     alt=""
-                    class="h-9 w-[158px] max-w-none"
+                    class="h-9 w-[158px] max-w-none dark:hidden"
+                >
+                <img
+                    src="{{ asset('img/logo/logo_white.png') }}"
+                    alt=""
+                    class="hidden h-9 w-[158px] max-w-none dark:block"
                 >
             </span>
         </a>

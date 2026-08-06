@@ -21,9 +21,9 @@
 
             <div class="text-xs space-y-0.5">
                 <h3 class="font-semibold text-gray-900 dark:text-white text-sm">{{ $company->name }}</h3>
-                @if ($company->address)<p class="text-gray-500 max-w-xs leading-relaxed">{{ $company->address }}</p>@endif
+                @if ($company->address)<p class="text-gray-500 dark:text-gray-400 max-w-xs leading-relaxed">{{ $company->address }}</p>@endif
                 @if ($company->email || $company->phone)
-                    <p class="text-gray-400">
+                    <p class="text-gray-400 dark:text-gray-500">
                         {{ $company->email }} {{ $company->email && $company->phone ? '|' : '' }} {{ $company->phone }}
                     </p>
                 @endif
@@ -42,17 +42,17 @@
 
             <div class="grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs sm:flex sm:flex-col sm:items-end">
                 <div class="sm:flex sm:gap-2">
-                    <span class="text-gray-400">Tanggal:</span>
+                    <span class="text-gray-400 dark:text-gray-500">Tanggal:</span>
                     <span class="font-medium text-gray-700 dark:text-gray-300"><x-date-display :date="$document->issue_date" /></span>
                 </div>
                 @if ($isQuotation && $document->valid_until)
                     <div class="sm:flex sm:gap-2">
-                        <span class="text-gray-400">Berlaku Hingga:</span>
+                        <span class="text-gray-400 dark:text-gray-500">Berlaku Hingga:</span>
                         <span class="font-medium text-gray-700 dark:text-gray-300"><x-date-display :date="$document->valid_until" /></span>
                     </div>
                 @elseif (!$isQuotation && $document->due_date)
                     <div class="sm:flex sm:gap-2">
-                        <span class="text-gray-400">Jatuh Tempo:</span>
+                        <span class="text-gray-400 dark:text-gray-500">Jatuh Tempo:</span>
                         <span class="font-medium text-gray-700 dark:text-gray-300"><x-date-display :date="$document->due_date" /></span>
                     </div>
                 @endif
@@ -62,13 +62,13 @@
 
     <!-- Client Info -->
     <div class="mt-5 border-b border-gray-100 pb-5 dark:border-gray-800">
-        <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-2">Ditujukan Kepada</p>
+        <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">Ditujukan Kepada</p>
         <div class="text-xs space-y-0.5">
             <h4 class="font-bold text-gray-900 dark:text-white text-sm">{{ $client->name }}</h4>
             @if ($client->company_name)<p class="font-medium text-gray-700 dark:text-gray-300">{{ $client->company_name }}</p>@endif
-            @if ($client->address)<p class="text-gray-500 max-w-sm leading-relaxed">{{ $client->address }}</p>@endif
+            @if ($client->address)<p class="text-gray-500 dark:text-gray-400 max-w-sm leading-relaxed">{{ $client->address }}</p>@endif
             @if ($client->email || $client->phone)
-                <p class="text-gray-400">
+                <p class="text-gray-400 dark:text-gray-500">
                     {{ $client->email }} {{ $client->email && $client->phone ? '|' : '' }} {{ $client->phone }}
                 </p>
             @endif
@@ -85,24 +85,24 @@
         <!-- Notes (if any) -->
         <div class="flex-1 max-w-md">
             @if ($document->notes)
-                <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Catatan</p>
-                <p class="text-xs text-gray-500 leading-relaxed">{!! nl2br(e($document->notes)) !!}</p>
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">Catatan</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{!! nl2br(e($document->notes)) !!}</p>
             @endif
         </div>
 
         <!-- Totals breakdown -->
         <div class="w-full sm:w-60 space-y-2 text-xs">
-            <div class="flex justify-between text-gray-500">
+            <div class="flex justify-between text-gray-500 dark:text-gray-400">
                 <span>Subtotal</span>
                 <span class="font-medium text-gray-900 dark:text-white"><x-money :amount="$document->subtotal" /></span>
             </div>
             @if ($document->tax_rate > 0)
-                <div class="flex justify-between text-gray-500">
+                <div class="flex justify-between text-gray-500 dark:text-gray-400">
                     <span>Pajak ({{ $document->tax_rate }}%)</span>
                     <span class="font-medium text-gray-900 dark:text-white"><x-money :amount="$document->tax_total" /></span>
                 </div>
             @endif
-            <div class="flex justify-between border-t border-gray-200 pt-2 text-sm font-bold text-gray-900 dark:text-white">
+            <div class="flex justify-between border-t border-gray-200 pt-2 text-sm font-bold text-gray-900 dark:text-white dark:border-gray-800">
                 <span>Total</span>
                 <span><x-money :amount="$document->total" /></span>
             </div>

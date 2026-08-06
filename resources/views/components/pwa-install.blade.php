@@ -13,8 +13,9 @@
 >
     <div class="flex items-start justify-between gap-3">
         <div class="flex items-center gap-3">
-            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gray-950 p-2 shadow-sm dark:bg-white">
-                <img src="{{ asset('images/logo/paperwork-logo.png') }}" alt="Paperwork App" class="h-8 w-8 object-contain">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gray-950 p-2 shadow-sm dark:bg-white/10">
+                <img src="{{ asset('images/logo/paperwork-logo.png') }}" alt="Paperwork App" class="h-8 w-8 object-contain dark:hidden">
+                <img src="{{ asset('img/logo/logo_white.png') }}" alt="Paperwork App" class="hidden h-8 w-8 object-contain dark:block">
             </div>
             <div>
                 <h3 class="text-base font-bold text-gray-950 dark:text-white">Paperwork Mobile</h3>

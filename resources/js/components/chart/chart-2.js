@@ -1,8 +1,9 @@
-
 export const initChartTwo = () => {
     const chartElement = document.querySelector('#chartTwo');
 
     if (chartElement) {
+        const isDark = document.documentElement.classList.contains('dark');
+
         const chartTwoOptions = {
             series: [75.55],
             colors: ["#465FFF"],
@@ -22,9 +23,9 @@ export const initChartTwo = () => {
                         size: "80%",
                     },
                     track: {
-                        background: "#E4E7EC",
+                        background: isDark ? "#1F2937" : "#E4E7EC",
                         strokeWidth: "100%",
-                        margin: 5, // margin is in pixels
+                        margin: 5,
                     },
                     dataLabels: {
                         name: {
@@ -34,7 +35,7 @@ export const initChartTwo = () => {
                             fontSize: "36px",
                             fontWeight: "600",
                             offsetY: 60,
-                            color: "#1D2939",
+                            color: isDark ? "#F9FAFB" : "#1D2939",
                             formatter: function (val) {
                                 return val + "%";
                             },

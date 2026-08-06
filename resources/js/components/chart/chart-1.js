@@ -1,14 +1,16 @@
-
-
 export const initChartOne = () => {
     const chartElement = document.querySelector('#chartOne');
     if (!chartElement) return;
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const labelColor = isDark ? "#9CA3AF" : "#6B7280";
+    const borderColor = isDark ? "#1F2937" : "#E5E7EB";
 
     const chartOneOptions = {
         series: [{
             name: "Sales",
             data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
-        },],
+        }],
         colors: ["#465fff"],
         chart: {
             fontFamily: "Barlow, sans-serif",
@@ -36,18 +38,8 @@ export const initChartOne = () => {
         },
         xaxis: {
             categories: [
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Nov",
-                "Dec",
+                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
             ],
             axisBorder: {
                 show: false,
@@ -55,20 +47,34 @@ export const initChartOne = () => {
             axisTicks: {
                 show: false,
             },
+            labels: {
+                style: {
+                    colors: labelColor,
+                },
+            },
         },
         legend: {
             show: true,
             position: "top",
             horizontalAlign: "left",
             fontFamily: "Barlow",
+            labels: {
+                colors: labelColor,
+            },
             markers: {
                 radius: 99,
             },
         },
         yaxis: {
             title: false,
+            labels: {
+                style: {
+                    colors: labelColor,
+                },
+            },
         },
         grid: {
+            borderColor: borderColor,
             yaxis: {
                 lines: {
                     show: true,
@@ -78,8 +84,8 @@ export const initChartOne = () => {
         fill: {
             opacity: 1,
         },
-
         tooltip: {
+            theme: isDark ? "dark" : "light",
             x: {
                 show: false,
             },

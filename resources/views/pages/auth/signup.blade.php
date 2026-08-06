@@ -5,7 +5,8 @@
         <div class="mx-auto flex h-full w-full max-w-6xl flex-col px-5 py-4 sm:px-8 lg:px-10">
             <header class="flex items-center justify-between">
                 <a href="/" class="inline-flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
-                    <img src="{{ asset('images/logo/paperwork-logo.png') }}" alt="Paperwork Logo" class="h-8 w-auto">
+                    <img src="{{ asset('images/logo/paperwork-logo.png') }}" alt="Paperwork Logo" class="h-8 w-auto dark:hidden">
+                    <img src="{{ asset('img/logo/logo_white.png') }}" alt="Paperwork Logo" class="hidden h-8 w-auto dark:block">
                 </a>
 
                 <a href="{{ route('signin') }}" class="text-sm font-medium text-gray-500 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">

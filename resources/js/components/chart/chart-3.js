@@ -1,8 +1,11 @@
-
 export const initChartThree = () => {
     const chartElement = document.querySelector('#chartThree');
 
     if (chartElement) {
+        const isDark = document.documentElement.classList.contains('dark');
+        const labelColor = isDark ? "#9CA3AF" : "#6B7280";
+        const borderColor = isDark ? "#1F2937" : "#E5E7EB";
+
         const chartThreeOptions = {
             series: [{
                 name: "Sales",
@@ -46,6 +49,7 @@ export const initChartThree = () => {
                 position: "top",
             },
             grid: {
+                borderColor: borderColor,
                 xaxis: {
                     lines: {
                         show: false,
@@ -61,6 +65,7 @@ export const initChartThree = () => {
                 enabled: false,
             },
             tooltip: {
+                theme: isDark ? "dark" : "light",
                 x: {
                     format: "dd MMM yyyy",
                 },
@@ -68,18 +73,8 @@ export const initChartThree = () => {
             xaxis: {
                 type: "category",
                 categories: [
-                    "Jan",
-                    "Feb",
-                    "Mar",
-                    "Apr",
-                    "May",
-                    "Jun",
-                    "Jul",
-                    "Aug",
-                    "Sep",
-                    "Oct",
-                    "Nov",
-                    "Dec",
+                    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
                 ],
                 axisBorder: {
                     show: false,
@@ -87,12 +82,22 @@ export const initChartThree = () => {
                 axisTicks: {
                     show: false,
                 },
+                labels: {
+                    style: {
+                        colors: labelColor,
+                    },
+                },
                 tooltip: false,
             },
             yaxis: {
                 title: {
                     style: {
                         fontSize: "0px",
+                    },
+                },
+                labels: {
+                    style: {
+                        colors: labelColor,
                     },
                 },
             },

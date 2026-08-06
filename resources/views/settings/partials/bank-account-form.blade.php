@@ -26,17 +26,17 @@
     <x-form.input name="account_number" label="Nomor Rekening" :value="$account?->account_number" />
     <x-form.input name="branch" label="Cabang" :value="$account?->branch" />
     <x-form.input name="currency" label="Mata Uang" :value="$account?->currency ?? 'IDR'" />
-    <label class="flex items-center gap-2 text-sm text-gray-700">
-        <input type="checkbox" name="is_primary" value="1" @checked(old('is_primary', $account?->is_primary)) class="rounded border-gray-300">
+    <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+        <input type="checkbox" name="is_primary" value="1" @checked(old('is_primary', $account?->is_primary)) class="rounded border-gray-300 dark:border-gray-700 dark:bg-gray-900">
         Rekening utama
     </label>
-    <label class="flex items-center gap-2 text-sm text-gray-700">
-        <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $account?->is_active ?? true)) class="rounded border-gray-300">
+    <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+        <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $account?->is_active ?? true)) class="rounded border-gray-300 dark:border-gray-700 dark:bg-gray-900">
         Aktif
     </label>
     <label class="block">
-        <span class="mb-1 block text-sm font-medium text-gray-700">Catatan</span>
-        <textarea name="notes" rows="3" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none">{{ old('notes', $account?->notes) }}</textarea>
+        <span class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Catatan</span>
+        <textarea name="notes" rows="3" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-gray-500">{{ old('notes', $account?->notes) }}</textarea>
     </label>
     <div class="flex justify-end">
         <button class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">Simpan</button>

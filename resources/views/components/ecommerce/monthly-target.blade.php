@@ -19,7 +19,7 @@
             <div id="chartTwo" class="h-full"></div>
             <span class="absolute left-1/2 top-[85%] -translate-x-1/2 -translate-y-[85%] rounded-full bg-success-50 px-3 py-1 text-xs font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">+10%</span>
         </div>
-        <p class="mx-auto mt-1.5 w-full max-w-[380px] text-center text-sm text-gray-500 sm:text-base">
+        <p class="mx-auto mt-1.5 w-full max-w-[380px] text-center text-sm text-gray-500 dark:text-gray-400 sm:text-base">
             You earn $3287 today, it's higher than last month. Keep up your good work!
         </p>
     </div>

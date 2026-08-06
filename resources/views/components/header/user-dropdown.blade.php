@@ -14,7 +14,11 @@
         type="button"
     >
         <span class="mr-2 overflow-hidden rounded-full h-9 w-9">
-            <img src="/images/user/owner.png" alt="User" />
+            @if(auth()->user()?->company?->logo_path)
+                <img src="{{ asset('storage/' . auth()->user()->company->logo_path) }}" alt="{{ auth()->user()?->name ?? 'User' }}" class="h-full w-full object-cover" />
+            @else
+                <img src="/images/user/owner.jpg" alt="{{ auth()->user()?->name ?? 'User' }}" class="h-full w-full object-cover" />
+            @endif
         </span>
 
        <span class="hidden mr-1 font-medium text-theme-sm sm:block">{{ auth()->user()?->name ?? 'User' }}</span>

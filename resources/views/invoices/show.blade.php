@@ -73,7 +73,7 @@
     @if($invoice->status === 'draft')
         <form method="POST" action="{{ route('invoices.send', $invoice) }}">
             @csrf
-            <button class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white cursor-pointer">Kirim ke Klien</button>
+            <button class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:bg-brand-600 dark:hover:bg-brand-500 transition-colors cursor-pointer">Kirim ke Klien</button>
         </form>
     @endif
 </div>
@@ -99,7 +99,7 @@
             @endphp
             <div class="mt-4">
                 <div class="flex justify-between items-center text-xs font-medium mb-1">
-                    <span class="text-gray-500">Progress Pelunasan</span>
+                    <span class="text-gray-500 dark:text-gray-400">Progress Pelunasan</span>
                     <span class="text-brand-700 dark:text-brand-400 font-semibold">{{ $percent }}% Terbayar</span>
                 </div>
                 <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2">
@@ -110,27 +110,27 @@
             <!-- Ledger Details -->
             <div class="mt-4 space-y-2 text-xs leading-relaxed">
                 <div class="flex justify-between items-center py-1">
-                    <span class="text-gray-500">Total Tagihan</span>
+                    <span class="text-gray-500 dark:text-gray-400">Total Tagihan</span>
                     <span class="font-semibold text-gray-900 dark:text-white"><x-money :amount="$invoice->total" /></span>
                 </div>
 
                 @if((float) $invoice->down_payment_amount > 0)
                     <div class="flex justify-between items-center py-1 border-t border-gray-50 dark:border-gray-800/40">
-                        <span class="text-gray-500">Uang Muka (DP)</span>
+                        <span class="text-gray-500 dark:text-gray-400">Uang Muka (DP)</span>
                         <span class="font-medium text-gray-800 dark:text-gray-200"><x-money :amount="$invoice->down_payment_amount" /></span>
                     </div>
-                    <div class="flex justify-between items-center text-[11px] text-gray-400 pl-3">
+                    <div class="flex justify-between items-center text-[11px] text-gray-400 dark:text-gray-500 pl-3">
                         <span>DP Terbayar</span>
                         <span><x-money :amount="$invoice->down_payment_paid" /></span>
                     </div>
-                    <div class="flex justify-between items-center text-[11px] text-gray-400 pl-3">
+                    <div class="flex justify-between items-center text-[11px] text-gray-400 dark:text-gray-500 pl-3">
                         <span>Sisa Uang Muka</span>
                         <span><x-money :amount="$invoice->down_payment_remaining" /></span>
                     </div>
                 @endif
 
                 <div class="flex justify-between items-center py-1 border-t border-gray-50 dark:border-gray-800/40">
-                    <span class="text-gray-500">Total Terbayar</span>
+                    <span class="text-gray-500 dark:text-gray-400">Total Terbayar</span>
                     <span class="font-semibold text-success-600 dark:text-success-400"><x-money :amount="$invoice->amount_paid" /></span>
                 </div>
 
@@ -317,7 +317,7 @@
 
                         <x-form.input name="reference" label="No. Referensi / Transaksi" />
                         
-                        <button class="w-full rounded-md bg-gray-900 px-4 py-2.5 text-xs font-semibold text-white hover:bg-gray-800 transition-colors cursor-pointer">
+                        <button class="w-full rounded-md bg-gray-900 px-4 py-2.5 text-xs font-semibold text-white hover:bg-gray-800 dark:bg-brand-600 dark:hover:bg-brand-500 transition-colors cursor-pointer">
                             Simpan Pembayaran
                         </button>
                     </form>

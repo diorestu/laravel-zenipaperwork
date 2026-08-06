@@ -6,7 +6,8 @@
             <!-- Header Logo (Centered) -->
             <div class="mb-6 flex justify-center">
                 <a href="/" class="inline-flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
-                    <img src="{{ asset('images/logo/paperwork-logo.png') }}" alt="Paperwork Logo" class="h-8 w-auto">
+                    <img src="{{ asset('images/logo/paperwork-logo.png') }}" alt="Paperwork Logo" class="h-8 w-auto dark:hidden">
+                    <img src="{{ asset('img/logo/logo_white.png') }}" alt="Paperwork Logo" class="hidden h-8 w-auto dark:block">
                 </a>
             </div>
 

@@ -11,7 +11,8 @@
 <main class="mobile-pwa" x-data="mobileInstallPage()" x-init="init()">
     <nav class="mobile-pwa__nav" aria-label="Navigasi mobile">
         <a class="mobile-pwa__brand" href="{{ url('/') }}" aria-label="Paperwork">
-            <img src="{{ asset('images/logo/paperwork-logo.png') }}" alt="" width="28" height="28">
+            <img src="{{ asset('images/logo/paperwork-logo.png') }}" alt="" width="28" height="28" class="dark:hidden">
+            <img src="{{ asset('img/logo/logo_white.png') }}" alt="" width="28" height="28" class="hidden dark:block">
             <span>Paperwork</span>
         </a>
         <a class="mobile-pwa__nav-action" href="{{ $dashboardUrl }}">{{ $primaryLabel }}</a>
