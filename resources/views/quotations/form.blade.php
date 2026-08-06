@@ -23,7 +23,7 @@
         $defaultNotes = $quotation->notes;
     }
 @endphp
-<form method="POST" action="{{ $action }}" class="space-y-5 rounded-lg border border-gray-200 bg-white p-5" x-data="itemForm({ productData: {{ $productJson }}, existingItems: {{ $itemsJson }} })">
+<form method="POST" action="{{ $action }}" @submit="validateForm($event)" class="space-y-5 rounded-lg border border-gray-200 bg-white p-5" x-data="itemForm({ productData: {{ $productJson }}, existingItems: {{ $itemsJson }} })">
     @csrf
     @method($method)
     <div class="grid gap-4 sm:grid-cols-2">
@@ -111,6 +111,40 @@ document.addEventListener('alpine:init', () => {
             const cleaned = String(raw).replace(/[^\d,.-]/g, '').replace('.', '').replace(',', '.');
             const n = parseFloat(cleaned);
             return isNaN(n) || n < 0 ? 0 : n;
+        },
+
+        validateForm(e) {
+            const clientId = document.querySelector('[name="client_id"]')?.value;
+            if (!clientId) {
+                alert('Silakan pilih Klien terlebih dahulu.');
+                e.preventDefault();
+                return false;
+            }
+
+            if (!this.items || this.items.length === 0) {
+                alert('Penawaran harus memiliki setidaknya 1 item produk/jasa.');
+                e.preventDefault();
+                return false;
+            }
+
+            for (let i = 0; i < this.items.length; i++) {
+                const item = this.items[i];
+                if (!item.product_id && !item.description) {
+                    alert(`Item ke-${i + 1}: Silakan pilih produk atau isi deskripsi.`);
+                    e.preventDefault();
+                    return false;
+                }
+                if (Number(item.quantity) <= 0) {
+                    alert(`Item ke-${i + 1}: Jumlah (Qty) harus lebih besar dari 0.`);
+                    e.preventDefault();
+                    return false;
+                }
+                if (Number(item.unit_price) < 0) {
+                    alert(`Item ke-${i + 1}: Harga satuan tidak boleh bernilai negatif.`);
+                    e.preventDefault();
+                    return false;
+                }
+            }
         },
 
         fmt,

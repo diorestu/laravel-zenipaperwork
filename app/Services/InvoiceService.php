@@ -25,6 +25,14 @@ class InvoiceService
             $terms = $this->normalizePaymentTerms($data['payment_terms'] ?? []);
             $downPayment = (float) ($terms[0]['amount'] ?? ($data['down_payment_amount'] ?? 0));
             $pphAmount = round($totals['subtotal'] * ($pphRate / 100), 2);
+            $isRecurring = $data['is_recurring'] ?? false;
+            $recurringCycle = $data['recurring_cycle'] ?? null;
+            $nextRecurrenceDate = null;
+            if ($isRecurring && $recurringCycle) {
+                $nextRecurrenceDate = $recurringCycle === 'monthly'
+                    ? \Carbon\Carbon::parse($data['issue_date'])->addMonth()
+                    : \Carbon\Carbon::parse($data['issue_date'])->addYear();
+            }
 
             $invoice = Invoice::create([
                 'company_id' => $user->company_id,
@@ -43,6 +51,10 @@ class InvoiceService
                 'down_payment_amount' => $downPayment,
                 'profit_total' => $this->profitFor($totals['total'], $pphAmount, 0, $downPayment),
                 'notes' => $data['notes'] ?? null,
+                'is_recurring' => $isRecurring,
+                'recurring_cycle' => $recurringCycle,
+                'next_recurrence_date' => $nextRecurrenceDate,
+                'bank_account_id' => $data['bank_account_id'] ?? null,
             ]);
 
             $invoice->items()->createMany($totals['items']);
@@ -61,6 +73,14 @@ class InvoiceService
             $terms = $this->normalizePaymentTerms($data['payment_terms'] ?? []);
             $downPayment = (float) ($terms[0]['amount'] ?? ($data['down_payment_amount'] ?? 0));
             $pphAmount = round($totals['subtotal'] * ($pphRate / 100), 2);
+            $isRecurring = $data['is_recurring'] ?? false;
+            $recurringCycle = $data['recurring_cycle'] ?? null;
+            $nextRecurrenceDate = null;
+            if ($isRecurring && $recurringCycle) {
+                $nextRecurrenceDate = $recurringCycle === 'monthly'
+                    ? \Carbon\Carbon::parse($data['issue_date'])->addMonth()
+                    : \Carbon\Carbon::parse($data['issue_date'])->addYear();
+            }
 
             $invoice->update([
                 'client_id' => $data['client_id'],
@@ -77,6 +97,10 @@ class InvoiceService
                 'down_payment_amount' => $downPayment,
                 'profit_total' => $this->profitFor($totals['total'], $pphAmount, (float) $invoice->expense_total, $downPayment),
                 'notes' => $data['notes'] ?? null,
+                'is_recurring' => $isRecurring,
+                'recurring_cycle' => $recurringCycle,
+                'next_recurrence_date' => $nextRecurrenceDate,
+                'bank_account_id' => $data['bank_account_id'] ?? null,
             ]);
             $invoice->items()->delete();
             $invoice->items()->createMany($totals['items']);

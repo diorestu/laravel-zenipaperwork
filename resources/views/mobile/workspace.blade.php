@@ -340,7 +340,7 @@
             </div>
 
             <!-- Form Wrapper with Scrollable Body and Sticky Action Footer -->
-            <form method="POST" action="{{ route('invoices.store') }}" class="flex flex-1 flex-col overflow-hidden" x-data="itemForm({ productData: {{ $productJson }}, existingItems: [], existingTerms: [] })">
+            <form method="POST" action="{{ route('invoices.store') }}" @submit="validateForm($event)" class="flex flex-1 flex-col overflow-hidden" x-data="itemForm({ productData: {{ $productJson }}, existingItems: [], existingTerms: [] })">
                 @csrf
                 <input type="hidden" name="from_mobile" value="1">
                 <!-- Scrollable Form Body -->
@@ -392,6 +392,36 @@
                             </div>
                         </div>
                     </div>
+                    
+                    @if($bankAccounts->count() > 1)
+                        <div class="space-y-1">
+                            <label class="mb-1 block font-medium text-gray-700 dark:text-gray-300">Rekening Pembayaran</label>
+                            <select name="bank_account_id" class="w-full appearance-none rounded-lg border border-gray-200 bg-white py-2.5 pl-3.5 pr-10 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20fill=%27none%27%20viewBox=%270%200%2024%2024%27%20stroke-width=%271.8%27%20stroke=%27%239ca3af%27%3E%3Cpath%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%20d=%27m19.5%208.25-7.5%207.5-7.5-7.5%27%20/%3E%3C/svg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_1rem_center] bg-no-repeat">
+                                <option value="">Semua Rekening</option>
+                                @foreach($bankAccounts as $acc)
+                                    <option value="{{ $acc->id }}">{{ $acc->bank_name }} - {{ $acc->account_number }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @elseif($bankAccounts->count() === 1)
+                        <input type="hidden" name="bank_account_id" value="{{ $bankAccounts->first()->id }}">
+                    @endif
+
+                    <div x-data="{ isRecurring: false }" class="space-y-2 rounded-lg border border-gray-200 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-white/[0.02]">
+                        <label class="inline-flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                            <input type="hidden" name="is_recurring" value="0">
+                            <input type="checkbox" name="is_recurring" value="1" x-model="isRecurring" class="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900">
+                            <span>Jadikan Invoice Berulang (Recurring)</span>
+                        </label>
+                        <div x-show="isRecurring" class="pt-2">
+                            <label class="mb-1 block font-medium text-gray-700 dark:text-gray-300">Siklus Perulangan</label>
+                            <select name="recurring_cycle" class="w-full appearance-none rounded-lg border border-gray-200 bg-white py-2.5 pl-3.5 pr-10 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20fill=%27none%27%20viewBox=%270%200%2024%2024%27%20stroke-width=%271.8%27%20stroke=%27%239ca3af%27%3E%3Cpath%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%20d=%27m19.5%208.25-7.5%207.5-7.5-7.5%27%20/%3E%3C/svg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_1rem_center] bg-no-repeat">
+                                <option value="monthly">Bulanan</option>
+                                <option value="yearly">Tahunan</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <input type="hidden" name="down_payment_amount" :value="paymentTerms.length ? paymentTerms[0].amount : 0">
 
                     <!-- Dynamic Items Table Section -->
@@ -524,7 +554,7 @@
             </div>
 
             <!-- Form Wrapper with Scrollable Body and Sticky Action Footer -->
-            <form method="POST" action="{{ route('quotations.store') }}" class="flex flex-1 flex-col overflow-hidden" x-data="itemForm({ productData: {{ $productJson }}, existingItems: [], existingTerms: [] })">
+            <form method="POST" action="{{ route('quotations.store') }}" @submit="validateForm($event)" class="flex flex-1 flex-col overflow-hidden" x-data="itemForm({ productData: {{ $productJson }}, existingItems: [], existingTerms: [] })">
                 @csrf
                 <input type="hidden" name="from_mobile" value="1">
                 <!-- Scrollable Form Body -->
@@ -744,16 +774,16 @@
                 <div class="flex-1 space-y-3 overflow-y-auto p-5 text-xs">
                     <div>
                         <label class="mb-1 block font-medium text-gray-700 dark:text-gray-300">Nama Produk / Jasa</label>
-                        <input type="text" name="name" required placeholder="Contoh: Desain Landing Page" class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white">
+                        <input type="text" name="name" required minlength="2" maxlength="255" placeholder="Contoh: Desain Landing Page" class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white">
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="mb-1 block font-medium text-gray-700 dark:text-gray-300">Harga Satuan (Rp)</label>
-                            <input type="number" step="0.01" name="price" required placeholder="1500000" class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white">
+                            <input type="text" inputmode="numeric" data-money-input name="price" required placeholder="1.500.000" class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white">
                         </div>
                         <div>
                             <label class="mb-1 block font-medium text-gray-700 dark:text-gray-300">Satuan</label>
-                            <input type="text" name="unit" value="pcs" required placeholder="pcs, jam, paket" class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white">
+                            <input type="text" name="unit" value="pcs" required maxlength="50" placeholder="pcs, jam, paket" class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white">
                         </div>
                     </div>
                     <div>
@@ -1072,6 +1102,52 @@ document.addEventListener('alpine:init', () => {
             const n = Number(digits);
 
             return Number.isFinite(n) && n > 0 ? n : 0;
+        },
+
+        validateForm(e) {
+            const form = e.target;
+            const clientId = form.querySelector('[name="client_id"]')?.value;
+            if (!clientId) {
+                alert('Silakan pilih Klien terlebih dahulu.');
+                e.preventDefault();
+                return false;
+            }
+
+            if (!this.items || this.items.length === 0) {
+                alert('Dokumen harus memiliki setidaknya 1 item produk/jasa.');
+                e.preventDefault();
+                return false;
+            }
+
+            for (let i = 0; i < this.items.length; i++) {
+                const item = this.items[i];
+                if (!item.product_id && !item.description) {
+                    alert(`Item ke-${i + 1}: Silakan pilih produk atau isi deskripsi.`);
+                    e.preventDefault();
+                    return false;
+                }
+                if (Number(item.quantity) <= 0) {
+                    alert(`Item ke-${i + 1}: Jumlah (Qty) harus lebih besar dari 0.`);
+                    e.preventDefault();
+                    return false;
+                }
+                if (Number(item.unit_price) < 0) {
+                    alert(`Item ke-${i + 1}: Harga satuan tidak boleh bernilai negatif.`);
+                    e.preventDefault();
+                    return false;
+                }
+            }
+
+            if (this.paymentTerms && this.paymentTerms.length > 0) {
+                for (let i = 0; i < this.paymentTerms.length; i++) {
+                    const term = this.paymentTerms[i];
+                    if (Number(term.amount) <= 0) {
+                        alert(`Termin ke-${i + 1}: Nominal termin harus lebih besar dari Rp 0.`);
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+            }
         },
 
         fmt,

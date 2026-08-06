@@ -104,7 +104,7 @@
                                 @if($index > 0)- @endif{{ $line }}
                             </p>
                         @endforeach
-                        <p class="text-gray-400 text-[11px] pt-0.5">{{ $item->quantity }} x Rp {{ number_format((float) $item->unit_price, 0, ',', '.') }}</p>
+                        <p class="text-gray-400 text-[11px] pt-0.5">Qty {{ number_format((float) $item->quantity, 0, ',', '.') }} x Rp {{ number_format((float) $item->unit_price, 0, ',', '.') }}</p>
                     </div>
                 @endforeach
             </div>

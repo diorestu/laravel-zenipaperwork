@@ -88,9 +88,9 @@
             @csrf
             @method('PUT')
             <input type="hidden" name="id">
-            <x-form.input name="name" label="Nama" />
-            <x-form.input name="price" label="Harga" type="number" />
-            <x-form.input name="unit" label="Satuan" />
+            <x-form.input name="name" label="Nama" required minlength="2" maxlength="255" />
+            <x-form.input name="price" label="Harga" type="text" data-money-input inputmode="numeric" placeholder="150.000" required />
+            <x-form.input name="unit" label="Satuan" required maxlength="50" />
             <label class="grid gap-2 sm:grid-cols-[30%_1fr] sm:items-start">
                 <span class="pt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Deskripsi</span>
                 <span class="block">
@@ -114,9 +114,9 @@
         <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white/90">Tambah Produk</h2>
         <form method="POST" action="{{ route('products.store') }}" class="mt-4 space-y-4">
             @csrf
-            <x-form.input name="name" label="Nama" />
-            <x-form.input name="price" label="Harga" type="number" />
-            <x-form.input name="unit" label="Satuan" value="layanan" />
+            <x-form.input name="name" label="Nama" required minlength="2" maxlength="255" />
+            <x-form.input name="price" label="Harga" type="text" data-money-input inputmode="numeric" placeholder="150.000" required />
+            <x-form.input name="unit" label="Satuan" value="layanan" required maxlength="50" />
             <label class="grid gap-2 sm:grid-cols-[30%_1fr] sm:items-start">
                 <span class="pt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Deskripsi</span>
                 <span class="block">

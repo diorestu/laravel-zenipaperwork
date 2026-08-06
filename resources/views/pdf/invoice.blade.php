@@ -329,7 +329,7 @@
                             <span class="item-description-line {{ $loop->first ? 'item-description-name' : '' }}">{{ $part }}</span>
                         @endforeach
                     </td>
-                    <td class="text-right">{{ number_format((float) $item->quantity, 2) }}</td>
+                    <td class="text-right">{{ number_format((float) $item->quantity, 0, ',', '.') }}</td>
                     <td class="text-right"><x-money :amount="$item->unit_price" /></td>
                     <td class="text-right item-line-total"><x-money :amount="$item->line_total" /></td>
                 </tr>
@@ -369,17 +369,28 @@
             <td>
                 @php
                     $notes = trim((string) $invoice->notes);
-                    $bankAccounts = $invoice->company?->bankAccounts ?? collect();
+                    $selectedBank = $invoice->bankAccount;
 
-                    if ($bankAccounts->isNotEmpty()) {
-                        $notes .= ($notes !== '' ? "\n\n" : '') . "Pembayaran dapat ditransfer melalui rekening berikut:\n";
-
-                        foreach ($bankAccounts as $account) {
-                            $notes .= "- {$account->bank_name} a/n {$account->account_name} ({$account->account_number})\n";
+                    if ($selectedBank) {
+                        $singleBankText = "- {$selectedBank->bank_name} a/n {$selectedBank->account_name} ({$selectedBank->account_number})";
+                        if (preg_match('/Pembayaran dapat ditransfer melalui rekening berikut:[\s\S]*?(?=\n\n|\r\n\r\n|$)/i', $notes, $matches)) {
+                            $notes = str_replace($matches[0], "Pembayaran dapat ditransfer melalui rekening berikut:\n" . $singleBankText, $notes);
+                        } elseif (!str_contains($notes, $selectedBank->account_number)) {
+                            $notes .= ($notes !== '' ? "\n\n" : '') . "Pembayaran dapat ditransfer melalui rekening berikut:\n" . $singleBankText;
                         }
-
-                        $notes = trim($notes);
+                    } else {
+                        $hasBankInNotes = preg_match('/(?:rekening|transfer|a\/n\s+[^\n]+|\d{5,})/i', $notes);
+                        if (!$hasBankInNotes) {
+                            $bankAccounts = $invoice->company?->bankAccounts ?? collect();
+                            if ($bankAccounts->isNotEmpty()) {
+                                $notes .= ($notes !== '' ? "\n\n" : '') . "Pembayaran dapat ditransfer melalui rekening berikut:\n";
+                                foreach ($bankAccounts as $account) {
+                                    $notes .= "- {$account->bank_name} a/n {$account->account_name} ({$account->account_number})\n";
+                                }
+                            }
+                        }
                     }
+                    $notes = trim($notes);
                 @endphp
 
                 @if ($notes !== '')

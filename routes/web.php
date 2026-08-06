@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 Route::get('/public/invoices/{token}', [PublicInvoiceController::class, 'show'])->name('public.invoices.show');
+Route::post('/public/invoices/{token}/pay', [PublicInvoiceController::class, 'pay'])->name('public.invoices.pay');
 Route::post('/webhooks/pakasir', PakasirWebhookController::class)->name('webhooks.pakasir');
 Route::view('/privacy-policy', 'pages.privacy-policy')->name('privacy-policy');
 Route::view('/terms-of-service', 'pages.terms-of-service')->name('terms-of-service');

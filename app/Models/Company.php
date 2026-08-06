@@ -26,6 +26,8 @@ class Company extends Model
         'trial_ends_at',
         'active_plan',
         'subscription_ends_at',
+        'pakasir_project_id',
+        'pakasir_api_key',
     ];
 
     protected function casts(): array

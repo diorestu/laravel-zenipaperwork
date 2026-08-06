@@ -149,11 +149,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 field.checked = Boolean(value);
             } else {
                 field.value = value ?? '';
+                if (field.hasAttribute('data-money-input')) {
+                    formatMoneyInputValue(field);
+                }
             }
         });
 
         window.dispatchEvent(new CustomEvent('open-modal', { detail: modalName }));
     });
+
+    function formatMoneyInputValue(el) {
+        if (!el) return;
+        const raw = String(el.value).replace(/[^0-9]/g, '');
+        el.value = raw ? new Intl.NumberFormat('id-ID').format(parseInt(raw, 10)) : '';
+    }
+
+    document.addEventListener('input', (e) => {
+        if (e.target.matches('[data-money-input]')) {
+            e.target.setCustomValidity('');
+            formatMoneyInputValue(e.target);
+        }
+    });
+
+    document.addEventListener('submit', (e) => {
+        const moneyInputs = e.target.querySelectorAll('[data-money-input]');
+        let hasError = false;
+
+        moneyInputs.forEach(input => {
+            const raw = input.value.replace(/[^0-9]/g, '');
+            if (input.hasAttribute('required') && (!raw || parseInt(raw, 10) <= 0)) {
+                input.setCustomValidity('Harga harus diisi dan lebih besar dari Rp 0.');
+                input.reportValidity();
+                hasError = true;
+            } else {
+                input.setCustomValidity('');
+                input.value = raw;
+            }
+        });
+
+        if (hasError) {
+            e.preventDefault();
+        }
+    });
+
+    document.querySelectorAll('[data-money-input]').forEach(formatMoneyInputValue);
 
     // Map imports
     if (document.querySelector('#mapOne')) {

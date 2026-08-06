@@ -11,6 +11,14 @@ class StoreProductRequest extends FormRequest
         return $this->user()?->canManageCompany() ?? false;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('price')) {
+            $price = preg_replace('/[^0-9]/', '', (string) $this->price);
+            $this->merge(['price' => $price !== '' ? $price : 0]);
+        }
+    }
+
     public function rules(): array
     {
         return [

@@ -21,6 +21,8 @@ class Invoice extends Model
         'subtotal', 'tax_rate', 'tax_total', 'pph_rate', 'pph_amount',
         'total', 'down_payment_amount', 'expense_total', 'profit_total',
         'amount_paid', 'credit_note_total', 'balance_due', 'notes',
+        'is_recurring', 'recurring_cycle', 'next_recurrence_date', 'parent_invoice_id',
+        'payment_order_id', 'payment_number', 'payment_url', 'bank_account_id',
     ];
 
     protected function casts(): array
@@ -42,6 +44,8 @@ class Invoice extends Model
             'amount_paid' => 'decimal:2',
             'credit_note_total' => 'decimal:2',
             'balance_due' => 'decimal:2',
+            'is_recurring' => 'boolean',
+            'next_recurrence_date' => 'date',
         ];
     }
 
@@ -110,6 +114,21 @@ class Invoice extends Model
     public function expenses(): HasMany
     {
         return $this->hasMany(InvoiceExpense::class);
+    }
+
+    public function parentInvoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class, 'parent_invoice_id');
+    }
+
+    public function childInvoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class, 'parent_invoice_id');
+    }
+
+    public function bankAccount(): BelongsTo
+    {
+        return $this->belongsTo(BankAccount::class);
     }
 
     public function getAmountPaidAttribute(): string

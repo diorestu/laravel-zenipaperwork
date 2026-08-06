@@ -299,7 +299,7 @@
                             <span class="item-description-line {{ $loop->first ? 'item-description-name' : '' }}">{{ $part }}</span>
                         @endforeach
                     </td>
-                    <td class="text-right">{{ number_format((float) $item->quantity, 2) }}</td>
+                    <td class="text-right">{{ number_format((float) $item->quantity, 0, ',', '.') }}</td>
                     <td class="text-right"><x-money :amount="$item->unit_price" /></td>
                     <td class="text-right item-line-total"><x-money :amount="$item->line_total" /></td>
                 </tr>

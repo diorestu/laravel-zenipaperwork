@@ -29,7 +29,7 @@
         $defaultNotes = $invoice->notes;
     }
 @endphp
-<form method="POST" action="{{ $action }}" class="space-y-5 rounded-lg border border-gray-200 bg-white p-5" x-data="itemForm({ productData: {{ $productJson }}, existingItems: {{ $itemsJson }}, existingTerms: {{ $termsJson }} })">
+<form method="POST" action="{{ $action }}" @submit="validateForm($event)" class="space-y-5 rounded-lg border border-gray-200 bg-white p-5" x-data="itemForm({ productData: {{ $productJson }}, existingItems: {{ $itemsJson }}, existingTerms: {{ $termsJson }} })">
     @csrf
     @method($method)
     <div class="grid gap-4 sm:grid-cols-2">
@@ -43,7 +43,38 @@
         <x-form.input name="due_date" label="Jatuh Tempo" type="date" :value="optional($invoice?->due_date)->format('Y-m-d')" />
         <x-form.input name="tax_rate" label="PPN (%)" type="number" step="0.01" :value="$invoice?->tax_rate ?? 0" />
         <x-form.input name="pph_rate" label="PPh (%)" type="number" step="0.01" :value="$invoice?->pph_rate ?? 0" />
+        
+        @if($bankAccounts->count() > 1)
+            <x-form.select name="bank_account_id" label="Rekening Bank (Pembayaran)">
+                <option value="">— Gunakan Semua Rekening —</option>
+                @foreach ($bankAccounts as $acc)
+                    <option value="{{ $acc->id }}" @selected((int) old('bank_account_id', $invoice?->bank_account_id) === $acc->id)>
+                        {{ $acc->bank_name }} - {{ $acc->account_number }} ({{ $acc->account_name }})
+                    </option>
+                @endforeach
+            </x-form.select>
+        @elseif($bankAccounts->count() === 1)
+            <input type="hidden" name="bank_account_id" value="{{ $bankAccounts->first()->id }}">
+        @endif
+        
         <input type="hidden" name="down_payment_amount" :value="paymentTerms.length ? paymentTerms[0].amount : 0">
+    </div>
+
+    <!-- Recurring Invoice Settings -->
+    <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-white/[0.02]" x-data="{ isRecurring: {{ old('is_recurring', $invoice?->is_recurring ? 'true' : 'false') }} }">
+        <label class="flex items-center gap-2 cursor-pointer">
+            <input type="hidden" name="is_recurring" value="0">
+            <input type="checkbox" name="is_recurring" value="1" x-model="isRecurring" class="rounded border-gray-300 text-brand-600 focus:ring-brand-600">
+            <span class="text-sm font-medium text-gray-900 dark:text-white">Jadikan Invoice Berulang (Recurring)</span>
+        </label>
+        
+        <div x-show="isRecurring" x-collapse class="mt-3">
+            <x-form.select name="recurring_cycle" label="Siklus Perulangan">
+                <option value="monthly" @selected(old('recurring_cycle', $invoice?->recurring_cycle) === 'monthly')>Bulanan</option>
+                <option value="yearly" @selected(old('recurring_cycle', $invoice?->recurring_cycle) === 'yearly')>Tahunan</option>
+            </x-form.select>
+            <p class="mt-1 text-xs text-gray-500">Invoice baru akan otomatis dibuat sesuai siklus yang dipilih berdasarkan Tanggal Terbit.</p>
+        </div>
     </div>
 
     <div class="space-y-3">
@@ -215,6 +246,51 @@ document.addEventListener('alpine:init', () => {
             const n = Number(digits);
 
             return Number.isFinite(n) && n > 0 ? n : 0;
+        },
+
+        validateForm(e) {
+            const clientId = document.querySelector('[name="client_id"]')?.value;
+            if (!clientId) {
+                alert('Silakan pilih Klien terlebih dahulu.');
+                e.preventDefault();
+                return false;
+            }
+
+            if (!this.items || this.items.length === 0) {
+                alert('Invoice harus memiliki setidaknya 1 item produk/jasa.');
+                e.preventDefault();
+                return false;
+            }
+
+            for (let i = 0; i < this.items.length; i++) {
+                const item = this.items[i];
+                if (!item.product_id && !item.description) {
+                    alert(`Item ke-${i + 1}: Silakan pilih produk atau isi deskripsi.`);
+                    e.preventDefault();
+                    return false;
+                }
+                if (Number(item.quantity) <= 0) {
+                    alert(`Item ke-${i + 1}: Jumlah (Qty) harus lebih besar dari 0.`);
+                    e.preventDefault();
+                    return false;
+                }
+                if (Number(item.unit_price) < 0) {
+                    alert(`Item ke-${i + 1}: Harga satuan tidak boleh bernilai negatif.`);
+                    e.preventDefault();
+                    return false;
+                }
+            }
+
+            if (this.paymentTerms && this.paymentTerms.length > 0) {
+                for (let i = 0; i < this.paymentTerms.length; i++) {
+                    const term = this.paymentTerms[i];
+                    if (Number(term.amount) <= 0) {
+                        alert(`Termin ke-${i + 1}: Nominal termin harus lebih besar dari Rp 0.`);
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+            }
         },
 
         fmt,
