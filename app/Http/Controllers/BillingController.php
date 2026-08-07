@@ -96,7 +96,7 @@ class BillingController extends Controller
         ]);
 
         if ($submission->payment_method === 'qris') {
-            $submission->update(['payment_order_id' => 'BILL-'.$submission->id]);
+            $submission->update(['payment_order_id' => $submission->payment_order_id ?: 'PAPERWORK-B'.str_pad((string) $submission->id, 5, '0', STR_PAD_LEFT)]);
             $payload = rescue(fn () => $pakasir->createQris($submission->refresh()), [], false);
             if (! empty($payload)) {
                 $submission->update([
@@ -170,9 +170,21 @@ class BillingController extends Controller
             }
         }
 
-        $paymentNumber = (string) ($submission->payment_number ?? data_get($submission->payment_payload, 'payment.payment_number'));
-        $paymentQrCode = $paymentNumber !== ''
-            ? rescue(fn () => (new Builder)->build(data: $paymentNumber, size: 320, margin: 16)->getDataUri(), null, false)
+        $paymentString = (string) (
+            $submission->payment_number
+            ?? data_get($submission->payment_payload, 'payment.payment_number')
+            ?? data_get($submission->payment_payload, 'payment_number')
+            ?? $submission->payment_url
+        );
+
+        if ($paymentString === '' && $submission->amount > 0) {
+            $webBaseUrl = str_replace('/api', '', rtrim((string) config('services.pakasir.base_url', 'https://app.pakasir.com/api'), '/'));
+            $proj = config('services.pakasir.project') ?: 'paperwork';
+            $paymentString = "{$webBaseUrl}/pay/{$proj}/".(int) $submission->amount.'?order_id='.($submission->payment_order_id ?? 'PAPERWORK-B'.str_pad((string) $submission->id, 5, '0', STR_PAD_LEFT)).'&qris_only=1';
+        }
+
+        $paymentQrCode = $paymentString !== ''
+            ? rescue(fn () => (new Builder)->build(data: $paymentString, size: 320, margin: 16)->getDataUri(), null, false)
             : null;
 
         return view('settings.billing-show', compact('submission', 'paymentQrCode'));

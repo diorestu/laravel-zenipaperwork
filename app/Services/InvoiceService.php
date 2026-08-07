@@ -34,11 +34,19 @@ class InvoiceService
                     : \Carbon\Carbon::parse($data['issue_date'])->addYear();
             }
 
+            $number = ! empty($data['number'])
+                ? $data['number']
+                : ($user->company ? $user->company->generateNextInvoiceNumber(\Carbon\Carbon::parse($data['issue_date'] ?? now()), true) : 'INV-'.now()->format('Ymd-His'));
+
+            if (! empty($data['number']) && $user->company) {
+                $user->company->increment('invoice_next_number');
+            }
+
             $invoice = Invoice::create([
                 'company_id' => $user->company_id,
                 'client_id' => $data['client_id'],
                 'quotation_id' => $data['quotation_id'] ?? null,
-                'number' => $data['number'],
+                'number' => $number,
                 'issue_date' => $data['issue_date'],
                 'due_date' => $data['due_date'] ?? null,
                 'status' => $data['status'] ?? 'draft',

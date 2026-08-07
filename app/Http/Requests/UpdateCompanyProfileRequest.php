@@ -23,6 +23,10 @@ class UpdateCompanyProfileRequest extends FormRequest
             'pic_name' => ['nullable', 'string', 'max:255'],
             'pic_email' => ['nullable', 'email', 'max:255'],
             'pic_phone' => ['nullable', 'string', 'max:50'],
+            'invoice_number_prefix' => ['nullable', 'string', 'max:20'],
+            'invoice_number_format' => ['nullable', 'string', 'max:100'],
+            'invoice_number_padding' => ['nullable', 'integer', 'min:1', 'max:10'],
+            'invoice_next_number' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }

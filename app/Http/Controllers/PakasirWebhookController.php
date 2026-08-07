@@ -29,18 +29,48 @@ class PakasirWebhookController extends Controller
             return response()->json(['message' => 'Project tidak valid.'], 422);
         }
 
+        // 1. Check if this is a Billing Submission payment (PAPERWORK-B...)
         $submission = BillingSubmission::query()
             ->where('payment_gateway', 'pakasir')
             ->where('payment_order_id', $orderId)
             ->first();
 
-        if (! $submission) {
-            Log::warning('Webhook Pakasir tidak menemukan billing submission.', ['payload' => $payload]);
+        // 2. Check if this is an Invoice payment (INV-...)
+        $invoice = null;
+        if (! $submission && str_starts_with($orderId, 'INV-')) {
+            $invoice = \App\Models\Invoice::where('payment_order_id', $orderId)->first();
+        }
+
+        if (! $submission && ! $invoice) {
+            Log::warning('Webhook Pakasir tidak menemukan transaksi billing submission atau invoice.', ['payload' => $payload]);
 
             return response()->json(['message' => 'Transaksi tidak ditemukan.'], 404);
         }
 
-        // Return early if already processed to prevent duplicate processing and API hits
+        // Handle Invoice payment callback
+        if ($invoice) {
+            if ($status === 'completed') {
+                if ($invoice->status !== 'paid') {
+                    $invoice->payments()->create([
+                        'company_id' => $invoice->company_id,
+                        'amount' => $amount > 0 ? $amount : $invoice->balance_due,
+                        'paid_at' => now(),
+                        'method' => 'qris',
+                        'reference' => 'Pakasir QRIS '.$orderId,
+                        'notes' => 'Pembayaran otomatis via Webhook Pakasir QRIS',
+                    ]);
+
+                    $invoice->refresh();
+                    $invoice->updateStatusBasedOnPayments();
+                }
+
+                return response()->json(['message' => 'Pembayaran invoice berhasil dicatat.']);
+            }
+
+            return response()->json(['message' => 'Webhook invoice diterima, status belum completed.']);
+        }
+
+        // Return early if billing submission already processed
         if ($submission->status === 'confirmed') {
             return response()->json(['message' => 'Billing sudah diaktifkan sebelumnya.']);
         }

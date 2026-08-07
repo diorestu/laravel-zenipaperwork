@@ -27,8 +27,10 @@
     </style>
 </head>
 <body>
-    @if ($invoice->company?->onTrial() || $invoice->company?->getActivePlanSlug() === 'trial')
+    @if ($invoice->company?->getActivePlanSlug() === 'trial')
         <div class="watermark">PAPERWORK TRIAL</div>
+    @elseif ($invoice->company?->getActivePlanSlug() === 'free')
+        <div class="watermark">PAPERWORK FREE</div>
     @endif
 
     <h1>Kuitansi {{ $invoice->number }}</h1>

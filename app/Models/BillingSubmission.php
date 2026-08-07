@@ -34,4 +34,15 @@ class BillingSubmission extends Model
             'payment_payload' => 'array',
         ];
     }
+
+    protected static function booted(): void
+    {
+        static::created(function (BillingSubmission $submission) {
+            if (! $submission->payment_order_id) {
+                $submission->updateQuietly([
+                    'payment_order_id' => 'PAPERWORK-B'.str_pad((string) $submission->id, 5, '0', STR_PAD_LEFT),
+                ]);
+            }
+        });
+    }
 }

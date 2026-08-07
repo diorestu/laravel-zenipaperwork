@@ -79,7 +79,7 @@ it('automatically sets a 30-day free trial on company creation during registrati
     expect($company->trial_ends_at)->not->toBeNull();
     
     $diffInDays = (int) round(now()->diffInDays($company->trial_ends_at));
-    expect($diffInDays)->toBe(30);
+    expect($diffInDays)->toBe(14);
 });
 
 it('automatically sets a 30-day free trial on company creation in middleware context fallback', function () {
@@ -96,5 +96,5 @@ it('automatically sets a 30-day free trial on company creation in middleware con
     expect($company->trial_ends_at)->not->toBeNull();
     
     $diffInDays = (int) round(now()->diffInDays($company->trial_ends_at));
-    expect($diffInDays)->toBe(30);
+    expect($diffInDays)->toBe(14);
 });

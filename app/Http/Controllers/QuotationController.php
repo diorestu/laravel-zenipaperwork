@@ -76,10 +76,12 @@ class QuotationController extends Controller
         $data = $request->validate(['status' => ['required', 'in:approved,rejected,sent,draft']]);
 
         if ($data['status'] === 'approved') {
-            $invoiceNumber = 'INV-' . now()->format('Ymd-His');
+            $invoiceNumber = $quotation->company
+                ? $quotation->company->generateNextInvoiceNumber(now(), true)
+                : 'INV-'.now()->format('Ymd-His');
             $exists = \App\Models\Invoice::where('company_id', $quotation->company_id)->where('number', $invoiceNumber)->exists();
             if ($exists) {
-                $invoiceNumber .= '-' . rand(10, 99);
+                $invoiceNumber .= '-'.rand(10, 99);
             }
 
             $invoice = $invoiceService->convertQuotation($quotation->load('items'), $invoiceNumber);

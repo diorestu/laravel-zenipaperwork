@@ -67,7 +67,7 @@ class BillingController extends Controller
         ]);
 
         if ($submission->payment_method === 'qris') {
-            $submission->update(['payment_order_id' => 'BILL-'.$submission->id]);
+            $submission->update(['payment_order_id' => $submission->payment_order_id ?: 'PAPERWORK-B'.str_pad((string) $submission->id, 5, '0', STR_PAD_LEFT)]);
             $payload = rescue(fn () => $pakasir->createQris($submission->refresh()), [], false);
             if (! empty($payload)) {
                 $submission->update([

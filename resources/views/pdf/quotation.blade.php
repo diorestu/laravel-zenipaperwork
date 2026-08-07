@@ -240,8 +240,10 @@
     </style>
 </head>
 <body>
-    @if ($quotation->company?->onTrial() || $quotation->company?->getActivePlanSlug() === 'trial')
+    @if ($quotation->company?->getActivePlanSlug() === 'trial')
         <div class="watermark">PAPERWORK TRIAL</div>
+    @elseif ($quotation->company?->getActivePlanSlug() === 'free')
+        <div class="watermark">PAPERWORK FREE</div>
     @endif
 
     <!-- Top Header: Logo & Company Info vs Doc Title & Metadata -->

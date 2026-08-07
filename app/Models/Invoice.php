@@ -55,6 +55,14 @@ class Invoice extends Model
             $invoice->public_token ??= Str::random(40);
         });
 
+        static::created(function (Invoice $invoice) {
+            if (! $invoice->payment_order_id) {
+                $invoice->updateQuietly([
+                    'payment_order_id' => 'INV-'.str_pad((string) $invoice->id, 6, '0', STR_PAD_LEFT),
+                ]);
+            }
+        });
+
         static::saved(function (Invoice $invoice): void {
             $invoice->recalculateTotals();
         });

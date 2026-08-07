@@ -28,6 +28,10 @@ class Company extends Model
         'subscription_ends_at',
         'pakasir_project_id',
         'pakasir_api_key',
+        'invoice_number_prefix',
+        'invoice_number_format',
+        'invoice_number_padding',
+        'invoice_next_number',
     ];
 
     protected function casts(): array
@@ -43,7 +47,7 @@ class Company extends Model
         return $this->trial_ends_at !== null && $this->trial_ends_at->isFuture();
     }
 
-    public function getActivePlanSlug(): ?string
+    public function getActivePlanSlug(): string
     {
         if ($this->active_plan && $this->subscription_ends_at && $this->subscription_ends_at->isFuture()) {
             return $this->active_plan;
@@ -51,13 +55,15 @@ class Company extends Model
         if ($this->onTrial()) {
             return 'trial';
         }
-        return null;
+
+        return 'free';
     }
 
     public function hasReachedClientLimit(): bool
     {
         $plan = $this->getActivePlanSlug();
         $limit = match ($plan) {
+            'free' => 20,
             'starter' => 100,
             'business', 'trial' => 500,
             default => -1, // Unlimited for enterprise or others
@@ -74,6 +80,7 @@ class Company extends Model
     {
         $plan = $this->getActivePlanSlug();
         $limit = match ($plan) {
+            'free' => 20,
             'starter' => 100,
             'business', 'trial' => 500,
             default => -1,
@@ -89,10 +96,19 @@ class Company extends Model
     public function hasReachedInvoiceLimit(): bool
     {
         $plan = $this->getActivePlanSlug();
+        if ($plan === 'free') {
+            $startOfMonth = now()->startOfMonth();
+            $invoicesCount = $this->invoices()->where('created_at', '>=', $startOfMonth)->count();
+            $quotationsCount = $this->quotations()->where('created_at', '>=', $startOfMonth)->count();
+
+            return ($invoicesCount + $quotationsCount) >= 25;
+        }
+
         if ($plan === 'starter') {
             $startOfMonth = now()->startOfMonth();
             $invoicesCount = $this->invoices()->where('created_at', '>=', $startOfMonth)->count();
             $quotationsCount = $this->quotations()->where('created_at', '>=', $startOfMonth)->count();
+
             return ($invoicesCount + $quotationsCount) >= 50;
         }
 
@@ -106,10 +122,19 @@ class Company extends Model
     public function hasReachedQuotationLimit(): bool
     {
         $plan = $this->getActivePlanSlug();
+        if ($plan === 'free') {
+            $startOfMonth = now()->startOfMonth();
+            $invoicesCount = $this->invoices()->where('created_at', '>=', $startOfMonth)->count();
+            $quotationsCount = $this->quotations()->where('created_at', '>=', $startOfMonth)->count();
+
+            return ($invoicesCount + $quotationsCount) >= 25;
+        }
+
         if ($plan === 'starter') {
             $startOfMonth = now()->startOfMonth();
             $invoicesCount = $this->invoices()->where('created_at', '>=', $startOfMonth)->count();
             $quotationsCount = $this->quotations()->where('created_at', '>=', $startOfMonth)->count();
+
             return ($invoicesCount + $quotationsCount) >= 50;
         }
 
@@ -144,5 +169,42 @@ class Company extends Model
     public function quotations(): HasMany
     {
         return $this->hasMany(Quotation::class);
+    }
+
+    public function generateNextInvoiceNumber(?\Carbon\Carbon $date = null, bool $increment = false): string
+    {
+        $date = $date ?? now();
+        $prefix = $this->invoice_number_prefix ?: 'INV';
+        $format = $this->invoice_number_format ?: '{PREFIX}/{YYYY}/{MM}/{NUMBER}';
+        $padding = max(1, (int) ($this->invoice_number_padding ?: 4));
+        $nextNumber = max(1, (int) ($this->invoice_next_number ?: 1));
+
+        $paddedNumber = str_pad((string) $nextNumber, $padding, '0', STR_PAD_LEFT);
+
+        $romanMonths = [
+            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+            7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII',
+        ];
+        $romanMonth = $romanMonths[$date->month] ?? (string) $date->month;
+
+        $replacements = [
+            '{PREFIX}' => $prefix,
+            '{YYYY}' => $date->format('Y'),
+            '{YY}' => $date->format('y'),
+            '{MM}' => $date->format('m'),
+            '{DD}' => $date->format('d'),
+            '{NUMBER}' => $paddedNumber,
+            '{NUM}' => $paddedNumber,
+            '{ROMAN}' => $romanMonth,
+            '{ROMAN_MONTH}' => $romanMonth,
+        ];
+
+        $generatedNumber = str_replace(array_keys($replacements), array_values($replacements), $format);
+
+        if ($increment) {
+            $this->increment('invoice_next_number');
+        }
+
+        return $generatedNumber;
     }
 }

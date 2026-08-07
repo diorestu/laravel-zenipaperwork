@@ -271,7 +271,7 @@ it('renders billing pricing cards and creates a Pakasir payment detail page', fu
 
     $submission = BillingSubmission::first();
     expect($submission->payment_gateway)->toBe('pakasir');
-    expect($submission->payment_order_id)->toBe('BILL-'.$submission->id);
+    expect($submission->payment_order_id)->toBe('PAPERWORK-B'.str_pad((string) $submission->id, 5, '0', STR_PAD_LEFT));
 
     $this->actingAs($user)->get(route('settings.billing.show', $submission))
         ->assertOk()
@@ -480,4 +480,20 @@ it('formats quotation item descriptions with smaller font and handles hyphens as
         ->assertOk()
         ->assertSee('text-xs', false)
         ->assertSee('Item Utama<br>Detail A<br>Detail B', false);
+});
+
+it('customizes invoice numbering template and auto-generates sequential invoice numbers', function () {
+    $user = paperworkUser();
+    $user->company->update([
+        'invoice_number_prefix' => 'FAKTUR',
+        'invoice_number_format' => '{PREFIX}/{ROMAN}/{YYYY}/{NUMBER}',
+        'invoice_number_padding' => 4,
+        'invoice_next_number' => 10,
+    ]);
+
+    $generated = $user->company->generateNextInvoiceNumber(now(), true);
+    $monthRoman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'][now()->month - 1];
+    $expected = 'FAKTUR/' . $monthRoman . '/' . now()->year . '/0010';
+    expect($generated)->toBe($expected);
+    expect($user->company->refresh()->invoice_next_number)->toBe(11);
 });
