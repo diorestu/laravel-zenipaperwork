@@ -172,7 +172,19 @@
                                 {{ str_replace('_', ' ', strtoupper($submission->payment_method)) }}
                             </td>
                             <td class="px-5 py-3.5">
-                                <x-status-badge :status="$submission->status" />
+                                @if ($submission->payment_method === 'qris')
+                                    @if ($submission->status === 'confirmed')
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-success-50 px-2.5 py-0.5 text-[11px] font-semibold text-success-700 dark:bg-success-500/10 dark:text-success-400">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-success-500"></span> Auto-Aktif (QRIS)
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span> Menunggu Webhook QRIS
+                                        </span>
+                                    @endif
+                                @else
+                                    <x-status-badge :status="$submission->status" />
+                                @endif
                             </td>
                             <td class="px-5 py-3.5 text-gray-500 dark:text-gray-400">
                                 {{ $submission->created_at->format('d M Y H:i') }}
@@ -183,11 +195,11 @@
                                         <form method="POST" action="{{ route('super-admin.billing.activate', $submission) }}">
                                             @csrf
                                             @method('PATCH')
-                                            <button class="inline-flex items-center gap-1 rounded-xl bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-600 shadow-sm">
+                                            <button class="inline-flex items-center gap-1 rounded-xl bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-600 shadow-sm" title="{{ $submission->payment_method === 'manual_transfer' ? 'Verifikasi & Aktifkan Transfer Manual' : 'Paksa Aktifkan (QRIS)' }}">
                                                 <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                                 </svg>
-                                                Aktifkan
+                                                <span>{{ $submission->payment_method === 'manual_transfer' ? 'Verifikasi Manual' : 'Aktifkan' }}</span>
                                             </button>
                                         </form>
                                     @else

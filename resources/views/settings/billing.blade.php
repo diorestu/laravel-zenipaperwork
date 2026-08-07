@@ -303,7 +303,10 @@
                                 <div class="inline-flex items-center gap-2">
                                     <a href="{{ route('settings.billing.show', $submission) }}" 
                                        class="inline-flex items-center gap-1 rounded bg-gray-100 px-2 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-200 dark:bg-gray-850 dark:text-gray-300 dark:hover:bg-gray-800 transition cursor-pointer">
-                                        <i class="bx bx-show text-sm"></i>
+                                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
                                         <span>Rincian</span>
                                     </a>
                                 </div>
