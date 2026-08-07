@@ -657,3 +657,91 @@ it('supports custom taxes with addition and deduction types for invoices and quo
     expect((float) $quotation->subtotal)->toBe(1000000.0);
     expect((float) $quotation->total)->toBe(1100000.0);
 });
+
+it('supports split payment terms when creating quotation and copies terms when converted to invoice', function () {
+    $user = paperworkUser();
+    $user->company->update(['active_plan' => 'enterprise', 'subscription_ends_at' => now()->addYear()]);
+    $client = Client::factory()->for($user->company)->create();
+
+    // 1. Create Quotation with split payment terms (DP 50% & Pelunasan 50%)
+    $response = $this->actingAs($user)->post(route('quotations.store'), [
+        'client_id' => $client->id,
+        'number' => 'QUO-SPLIT-01',
+        'issue_date' => now()->toDateString(),
+        'items' => [
+            ['description' => 'Desain Landing Page', 'quantity' => 1, 'unit_price' => 2000000],
+        ],
+        'payment_terms' => [
+            ['label' => 'DP 50%', 'amount' => 1000000, 'due_date' => now()->toDateString()],
+            ['label' => 'Pelunasan 50%', 'amount' => 1000000, 'due_date' => now()->addDays(14)->toDateString()],
+        ],
+    ]);
+
+    $quotation = Quotation::where('number', 'QUO-SPLIT-01')->first();
+    expect($quotation)->not->toBeNull();
+    expect($quotation->paymentTerms)->toHaveCount(2);
+
+    $this->actingAs($user)->get(route('quotations.show', $quotation))
+        ->assertOk()
+        ->assertSee('Termin Pembayaran')
+        ->assertSee('DP 50%')
+        ->assertSee('Pelunasan 50%');
+
+    // 2. Approve and convert quotation to invoice
+    $this->actingAs($user)->patch(route('quotations.status', $quotation), ['status' => 'approved']);
+
+    $invoice = Invoice::where('quotation_id', $quotation->id)->first();
+    expect($invoice)->not->toBeNull();
+    expect($invoice->paymentTerms)->toHaveCount(2);
+    expect((float) $invoice->paymentTerms->first()->amount)->toBe(1000000.0);
+});
+
+it('supports optional discount when creating invoices and quotations', function () {
+    $user = paperworkUser();
+    $client = Client::factory()->for($user->company)->create();
+
+    // 1. Invoice with 10% discount
+    // Subtotal = 1.000.000, Diskon 10% = 100.000, Discounted Subtotal = 900.000
+    // PPN 11% = 99.000, Total = 999.000
+    $this->actingAs($user)->post(route('invoices.store'), [
+        'client_id' => $client->id,
+        'number' => 'INV-DISC-10',
+        'issue_date' => now()->toDateString(),
+        'discount_type' => 'percentage',
+        'discount_rate' => 10,
+        'tax_rate' => 11,
+        'items' => [
+            ['description' => 'Paket Jasa A', 'quantity' => 1, 'unit_price' => 1000000],
+        ],
+    ]);
+
+    $invoice = Invoice::where('number', 'INV-DISC-10')->first();
+    expect($invoice)->not->toBeNull();
+    expect((float) $invoice->subtotal)->toBe(1000000.0);
+    expect((float) $invoice->discount_amount)->toBe(100000.0);
+    expect((float) $invoice->tax_total)->toBe(99000.0);
+    expect((float) $invoice->total)->toBe(999000.0);
+
+    $this->actingAs($user)->get(route('invoices.show', $invoice))
+        ->assertOk()
+        ->assertSee('Diskon (10%)');
+
+    // 2. Quotation with fixed discount Rp 50.000
+    // Subtotal = 500.000, Diskon = 50.000, Discounted Subtotal = 450.000, Total = 450.000
+    $this->actingAs($user)->post(route('quotations.store'), [
+        'client_id' => $client->id,
+        'number' => 'QUO-DISC-FIXED',
+        'issue_date' => now()->toDateString(),
+        'discount_type' => 'fixed',
+        'discount_amount' => 50000,
+        'custom_taxes' => [],
+        'items' => [
+            ['description' => 'Desain Logo', 'quantity' => 1, 'unit_price' => 500000],
+        ],
+    ]);
+
+    $quotation = Quotation::where('number', 'QUO-DISC-FIXED')->first();
+    expect($quotation)->not->toBeNull();
+    expect((float) $quotation->discount_amount)->toBe(50000.0);
+    expect((float) $quotation->total)->toBe(450000.0);
+});

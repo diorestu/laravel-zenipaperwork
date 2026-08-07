@@ -22,7 +22,18 @@ class InvoiceService
             $taxRate = (float) ($data['tax_rate'] ?? 0);
             $pphRate = (float) ($data['pph_rate'] ?? 0);
             $customTaxes = $data['custom_taxes'] ?? [];
-            $totals = $this->calculator->totals($data['items'], $taxRate, $pphRate, $customTaxes);
+            $discountAmount = (float) ($data['discount_amount'] ?? 0);
+            $discountRate = (float) ($data['discount_rate'] ?? 0);
+            $discountType = (string) ($data['discount_type'] ?? 'fixed');
+            $totals = $this->calculator->totals(
+                $data['items'],
+                $taxRate,
+                $pphRate,
+                $customTaxes,
+                $discountAmount,
+                $discountRate,
+                $discountType
+            );
             $terms = $this->normalizePaymentTerms($data['payment_terms'] ?? []);
             $downPayment = (float) ($terms[0]['amount'] ?? ($data['down_payment_amount'] ?? 0));
             $pphAmount = $totals['pph_amount'];
@@ -55,6 +66,9 @@ class InvoiceService
                 'pph_rate' => $pphRate,
                 'pph_amount' => $pphAmount,
                 'custom_taxes' => $totals['custom_taxes'],
+                'discount_type' => $totals['discount_type'],
+                'discount_rate' => $totals['discount_rate'],
+                'discount_amount' => $totals['discount_amount'],
                 'subtotal' => $totals['subtotal'],
                 'tax_total' => $totals['tax_total'],
                 'total' => $totals['total'],
@@ -66,7 +80,6 @@ class InvoiceService
                 'next_recurrence_date' => $nextRecurrenceDate,
                 'bank_account_id' => $data['bank_account_id'] ?? null,
             ]);
-
             $invoice->items()->createMany($totals['items']);
             $this->syncPaymentTerms($invoice, $terms);
 
@@ -80,7 +93,18 @@ class InvoiceService
             $taxRate = (float) ($data['tax_rate'] ?? 0);
             $pphRate = (float) ($data['pph_rate'] ?? 0);
             $customTaxes = $data['custom_taxes'] ?? [];
-            $totals = $this->calculator->totals($data['items'], $taxRate, $pphRate, $customTaxes);
+            $discountAmount = (float) ($data['discount_amount'] ?? 0);
+            $discountRate = (float) ($data['discount_rate'] ?? 0);
+            $discountType = (string) ($data['discount_type'] ?? 'fixed');
+            $totals = $this->calculator->totals(
+                $data['items'],
+                $taxRate,
+                $pphRate,
+                $customTaxes,
+                $discountAmount,
+                $discountRate,
+                $discountType
+            );
             $terms = $this->normalizePaymentTerms($data['payment_terms'] ?? []);
             $downPayment = (float) ($terms[0]['amount'] ?? ($data['down_payment_amount'] ?? 0));
             $pphAmount = $totals['pph_amount'];
@@ -103,6 +127,9 @@ class InvoiceService
                 'pph_rate' => $pphRate,
                 'pph_amount' => $pphAmount,
                 'custom_taxes' => $totals['custom_taxes'],
+                'discount_type' => $totals['discount_type'],
+                'discount_rate' => $totals['discount_rate'],
+                'discount_amount' => $totals['discount_amount'],
                 'subtotal' => $totals['subtotal'],
                 'tax_total' => $totals['tax_total'],
                 'total' => $totals['total'],
@@ -139,6 +166,10 @@ class InvoiceService
                 'tax_rate' => $quotation->tax_rate,
                 'pph_rate' => 0,
                 'pph_amount' => $pphAmount,
+                'custom_taxes' => $quotation->custom_taxes,
+                'discount_type' => $quotation->discount_type ?? 'fixed',
+                'discount_rate' => $quotation->discount_rate ?? 0,
+                'discount_amount' => $quotation->discount_amount ?? 0,
                 'subtotal' => $quotation->subtotal,
                 'tax_total' => $quotation->tax_total,
                 'total' => $quotation->total,
@@ -156,6 +187,17 @@ class InvoiceService
                     'line_total' => $item->line_total,
                 ])->all()
             );
+
+            $quotation->load('paymentTerms');
+            if ($quotation->paymentTerms->isNotEmpty()) {
+                $terms = $this->normalizePaymentTerms($quotation->paymentTerms->map(fn ($t) => [
+                    'label' => $t->label,
+                    'amount' => (float) $t->amount,
+                    'due_date' => $t->due_date?->format('Y-m-d'),
+                ])->all());
+                $this->syncPaymentTerms($invoice, $terms);
+            }
+
             $quotation->update(['status' => 'converted']);
 
             return $invoice->load(['client', 'items', 'paymentTerms', 'creditNotes', 'expenses']);

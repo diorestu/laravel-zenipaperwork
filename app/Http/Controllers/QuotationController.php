@@ -25,7 +25,7 @@ class QuotationController extends Controller
 
         $editQuotation = null;
         if ($request->filled('edit')) {
-            $editQuotation = Quotation::forCompany($companyId)->with(['client', 'items'])->find($request->input('edit'));
+            $editQuotation = Quotation::forCompany($companyId)->with(['client', 'items', 'paymentTerms'])->find($request->input('edit'));
         }
 
         return view('quotations.index', $this->formData() + compact('editQuotation'));
@@ -52,7 +52,7 @@ class QuotationController extends Controller
     {
         $this->authorize('view', $quotation);
 
-        return view('quotations.show', ['quotation' => $quotation->load(['company', 'client', 'items'])]);
+        return view('quotations.show', ['quotation' => $quotation->load(['company', 'client', 'items', 'paymentTerms'])]);
     }
 
     public function edit(Quotation $quotation)
@@ -76,6 +76,16 @@ class QuotationController extends Controller
         $data = $request->validate(['status' => ['required', 'in:approved,rejected,sent,draft']]);
 
         if ($data['status'] === 'approved') {
+            $existingInvoice = \App\Models\Invoice::where('quotation_id', $quotation->id)->first();
+            if ($existingInvoice) {
+                return redirect()->route('invoices.show', $existingInvoice)->with('info', 'Penawaran ini telah dikonversi menjadi invoice.');
+            }
+
+            $company = $request->user()->company?->refresh();
+            if ($company && $company->hasReachedInvoiceLimit()) {
+                return back()->withErrors(['limit' => 'Limit jumlah invoice untuk paket Anda telah tercapai. Silakan upgrade paket Anda.']);
+            }
+
             $invoiceNumber = $quotation->company
                 ? $quotation->company->generateNextInvoiceNumber(now(), true)
                 : 'INV-'.now()->format('Ymd-His');
@@ -98,8 +108,17 @@ class QuotationController extends Controller
     public function convert(Request $request, Quotation $quotation, InvoiceService $service)
     {
         $this->authorize('update', $quotation);
+
+        $existingInvoice = \App\Models\Invoice::where('quotation_id', $quotation->id)->first();
+        if ($existingInvoice) {
+            return redirect()->route('invoices.show', $existingInvoice)->with('info', 'Penawaran ini telah dikonversi menjadi invoice.');
+        }
+
+        if ($quotation->status === 'rejected') {
+            return back()->withErrors(['status' => 'Penawaran yang ditolak tidak dapat dikonversi menjadi invoice.']);
+        }
+
         $data = $request->validate(['number' => ['required', 'string', 'max:100']]);
-        abort_unless(in_array($quotation->status, ['approved', 'sent'], true), 422);
 
         $company = $request->user()->company;
         if ($company && $company->hasReachedInvoiceLimit()) {

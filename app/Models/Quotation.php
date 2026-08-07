@@ -13,7 +13,7 @@ class Quotation extends Model
     use BelongsToCompany;
     use HasFactory;
 
-    protected $fillable = ['company_id', 'client_id', 'number', 'issue_date', 'valid_until', 'status', 'subtotal', 'tax_rate', 'tax_total', 'custom_taxes', 'total', 'notes'];
+    protected $fillable = ['company_id', 'client_id', 'number', 'issue_date', 'valid_until', 'status', 'subtotal', 'tax_rate', 'tax_total', 'custom_taxes', 'discount_type', 'discount_rate', 'discount_amount', 'total', 'notes'];
 
     protected function casts(): array
     {
@@ -24,6 +24,8 @@ class Quotation extends Model
             'tax_rate' => 'decimal:2',
             'tax_total' => 'decimal:2',
             'custom_taxes' => 'array',
+            'discount_rate' => 'decimal:2',
+            'discount_amount' => 'decimal:2',
             'total' => 'decimal:2',
         ];
     }
@@ -66,5 +68,10 @@ class Quotation extends Model
     public function items(): HasMany
     {
         return $this->hasMany(QuotationItem::class);
+    }
+
+    public function paymentTerms(): HasMany
+    {
+        return $this->hasMany(QuotationPaymentTerm::class)->orderBy('term_number');
     }
 }

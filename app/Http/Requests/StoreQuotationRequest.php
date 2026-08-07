@@ -27,7 +27,13 @@ class StoreQuotationRequest extends FormRequest
             'custom_taxes.*.name' => ['nullable', 'string', 'max:100'],
             'custom_taxes.*.rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'custom_taxes.*.type' => ['nullable', 'string', 'in:addition,deduction'],
-            'notes' => ['nullable', 'string'],
+            'discount_type' => ['nullable', 'string', 'in:fixed,percentage'],
+            'discount_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'discount_amount' => ['nullable', 'numeric', 'min:0'],
+            'payment_terms' => ['nullable', 'array'],
+            'payment_terms.*.label' => ['required_with:payment_terms.*.amount', 'nullable', 'string', 'max:100'],
+            'payment_terms.*.amount' => ['required_with:payment_terms.*.label', 'nullable', 'numeric', 'min:0.01'],
+            'payment_terms.*.due_date' => ['nullable', 'date'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['nullable', Rule::exists('products', 'id')->where('company_id', $companyId)],
             'items.*.description' => ['required', 'string', 'max:255'],
@@ -44,6 +50,22 @@ class StoreQuotationRequest extends FormRequest
                 if ($company && $company->hasReachedQuotationLimit()) {
                     $validator->errors()->add('limit', 'Limit jumlah penawaran untuk paket Anda telah tercapai. Silakan upgrade paket Anda.');
                 }
+            }
+
+            $subtotal = collect($this->input('items', []))->sum(function (array $item): float {
+                return (float) ($item['quantity'] ?? 0) * (float) ($item['unit_price'] ?? 0);
+            });
+            $taxRate = (float) $this->input('tax_rate', 0);
+            $grandTotal = $subtotal + ($subtotal * $taxRate / 100);
+            $paymentTerms = collect($this->input('payment_terms', []))
+                ->filter(fn (array $term): bool => (float) ($term['amount'] ?? 0) > 0);
+            $termTotal = $paymentTerms->sum(fn (array $term): float => (float) ($term['amount'] ?? 0));
+
+            if ($termTotal > $grandTotal) {
+                $validator->errors()->add(
+                    'payment_terms',
+                    'Total termin tidak boleh melebihi total penawaran.'
+                );
             }
         });
     }

@@ -80,8 +80,8 @@
         <x-document.item-lines :items="$document->items" :is-quotation="$isQuotation" />
     </div>
 
-    <!-- Payment Terms Card Box (if invoice has payment terms) -->
-    @if (!$isQuotation && $document->paymentTerms->isNotEmpty())
+    <!-- Payment Terms Card Box (if document has payment terms) -->
+    @if ($document->paymentTerms && $document->paymentTerms->isNotEmpty())
         <div class="mt-5 rounded-xl border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-white/[0.02]">
             <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white mb-3">Termin Pembayaran</h4>
             <div class="overflow-x-auto">
@@ -128,6 +128,12 @@
                 <span>Subtotal</span>
                 <span class="font-medium text-gray-900 dark:text-white"><x-money :amount="$document->subtotal" /></span>
             </div>
+            @if ($document->discount_amount > 0)
+                <div class="flex justify-between text-rose-600 dark:text-rose-400">
+                    <span>Diskon {{ $document->discount_type === 'percentage' && $document->discount_rate > 0 ? '('.(float)$document->discount_rate.'%)' : '' }}</span>
+                    <span class="font-medium">(<x-money :amount="$document->discount_amount" />)</span>
+                </div>
+            @endif
             @foreach ($document->normalized_custom_taxes as $tax)
                 @if ($tax['rate'] > 0 || $tax['amount'] > 0)
                     <div class="flex justify-between text-gray-500 dark:text-gray-400">

@@ -8,6 +8,13 @@
         'unit_price' => (float) ($i['unit_price'] ?? 0),
     ], $rawItems));
 
+    $rawTerms = old('payment_terms', $quotation?->paymentTerms?->toArray() ?: []);
+    $termsJson = json_encode(array_values(array_map(fn($term, $index) => [
+        'label' => $term['label'] ?? 'Termin '.($index + 1),
+        'amount' => (float) ($term['amount'] ?? 0),
+        'due_date' => $term['due_date'] ?? '',
+    ], $rawTerms, array_keys($rawTerms))));
+
     $rawTaxes = old('custom_taxes', $quotation?->normalized_custom_taxes ?: [
         ['name' => 'PPN', 'rate' => (float) ($quotation?->tax_rate ?? 11), 'type' => 'addition'],
     ]);
@@ -15,6 +22,10 @@
         $rawTaxes = [['name' => 'PPN', 'rate' => 11, 'type' => 'addition']];
     }
     $taxesJson = json_encode(array_values($rawTaxes));
+
+    $discountType = old('discount_type', $quotation?->discount_type ?? 'fixed');
+    $discountRate = (float) old('discount_rate', $quotation?->discount_rate ?? 0);
+    $discountAmount = (float) old('discount_amount', $quotation?->discount_amount ?? 0);
 
     $defaultNotes = '';
     if (!$quotation) {
@@ -31,7 +42,7 @@
         $defaultNotes = $quotation->notes;
     }
 @endphp
-<form method="POST" action="{{ $action }}" @submit="validateForm($event)" class="space-y-5 rounded-lg border border-gray-200 bg-white p-5" x-data="itemForm({ productData: {{ $productJson }}, existingItems: {{ $itemsJson }}, existingTaxes: {{ $taxesJson }} })">
+<form method="POST" action="{{ $action }}" @submit="validateForm($event)" class="space-y-5 rounded-lg border border-gray-200 bg-white p-5" x-data="itemForm({ productData: {{ $productJson }}, existingItems: {{ $itemsJson }}, existingTerms: {{ $termsJson }}, existingTaxes: {{ $taxesJson }}, discountType: '{{ $discountType }}', discountRate: {{ $discountRate }}, discountAmount: {{ $discountAmount }} })">
     @csrf
     @method($method)
     <div class="grid gap-4 sm:grid-cols-2">
@@ -75,6 +86,38 @@
         </template>
     </div>
 
+    <!-- Discount Section -->
+    <div class="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-white/[0.02]">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white/90">Diskon (Opsional)</h2>
+                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Berikan potongan harga pada subtotal sebelum kalkulasi pajak.</p>
+            </div>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-[12rem_1fr]">
+            <select x-model="discountType" name="discount_type" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-xs text-gray-800 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                <option value="fixed">Nominal (Rp)</option>
+                <option value="percentage">Persentase (%)</option>
+            </select>
+
+            <template x-if="discountType === 'percentage'">
+                <div class="relative flex items-center">
+                    <input type="number" step="0.01" min="0" max="100" name="discount_rate" x-model="discountRate" class="w-full rounded-md border border-gray-300 bg-white pl-3 pr-8 py-2 text-sm text-right text-gray-800 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" placeholder="0">
+                    <span class="absolute right-3 text-xs font-bold text-gray-400">%</span>
+                    <input type="hidden" name="discount_amount" :value="calculatedDiscountAmount">
+                </div>
+            </template>
+
+            <template x-if="discountType !== 'percentage'">
+                <div>
+                    <input type="hidden" name="discount_rate" value="0">
+                    <input x-on:focus="$el.value = discountAmount; $el.select()" x-on:blur="discountAmount = fixMoney($el.value); $el.value = fmt(discountAmount)" x-on:input="$el.value = moneyDigits($el.value, 12); discountAmount = fixMoney($el.value)" x-bind:value="fmt(discountAmount)" inputmode="numeric" maxlength="12" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-right text-sm text-gray-800 placeholder:text-gray-400 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" placeholder="Rp 0">
+                    <input type="hidden" name="discount_amount" :value="discountAmount">
+                </div>
+            </template>
+        </div>
+    </div>
+
     <!-- Custom Taxes Section -->
     <div class="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-white/[0.02]">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -110,6 +153,35 @@
         @error('custom_taxes')<span class="block text-xs text-error-600">{{ $message }}</span>@enderror
     </div>
 
+    <!-- Split Payment Section -->
+    <div class="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-white/[0.02]">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white/90">Pembayaran Bertahap (Split Payment)</h2>
+                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Tentukan rincian termin dan nominal yang diusulkan dalam penawaran.</p>
+            </div>
+            <button type="button" x-on:click="addTerm()" class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03]">+ Tambah Termin</button>
+        </div>
+
+        <template x-for="(term, index) in paymentTerms" :key="index">
+            <div>
+                <input type="hidden" x-bind:name="'payment_terms[' + index + '][label]'" x-model="term.label">
+                <input type="hidden" x-bind:name="'payment_terms[' + index + '][amount]'" x-model="term.amount">
+                <input type="hidden" x-bind:name="'payment_terms[' + index + '][due_date]'" x-model="term.due_date">
+                <div class="grid gap-3 rounded-md border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900 sm:grid-cols-[1fr_10rem_10rem_2rem]">
+                    <input x-model="term.label" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" placeholder="Nama termin">
+                    <input x-on:focus="$el.value = term.amount; $el.select()" x-on:blur="clampTermAmount(index, $el); $el.value = fmt(term.amount)" x-on:input="$el.value = moneyDigits($el.value, 12); clampTermAmount(index, $el)" x-bind:value="fmt(term.amount)" inputmode="numeric" maxlength="12" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-right text-sm text-gray-800 placeholder:text-gray-400 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" placeholder="Nominal">
+                    <input type="date" x-model="term.due_date" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                    <button type="button" x-on:click="removeTerm(index)" class="flex items-center justify-center text-gray-400 hover:text-error-600" title="Hapus termin">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+        </template>
+
+        @error('payment_terms')<span class="block text-xs text-error-600">{{ $message }}</span>@enderror
+    </div>
+
     <div class="mt-4">
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Catatan / Footer Dokumen</label>
         <textarea name="notes" rows="4" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-gray-500" placeholder="Tambahkan catatan khusus, informasi bank, atau ucapan terima kasih...">{{ old('notes', $defaultNotes) }}</textarea>
@@ -122,14 +194,20 @@
 document.addEventListener('alpine:init', () => {
     const fmt = (n) => new Intl.NumberFormat('id-ID').format(n || 0);
 
-    Alpine.data('itemForm', ({ productData, existingItems, existingTaxes }) => ({
+    Alpine.data('itemForm', ({ productData, existingItems, existingTerms, existingTaxes, discountType, discountRate, discountAmount }) => ({
         productData,
         items: (existingItems && existingItems.length > 0)
             ? existingItems
             : [{ product_id: '', description: '', quantity: 1, unit_price: 0 }],
+        paymentTerms: (existingTerms && existingTerms.length > 0)
+            ? existingTerms
+            : [],
         customTaxes: (existingTaxes && existingTaxes.length > 0)
             ? existingTaxes
             : [{ name: 'PPN', rate: 11, type: 'addition' }],
+        discountType: discountType || 'fixed',
+        discountRate: discountRate || 0,
+        discountAmount: discountAmount || 0,
 
         onSelect(index) {
             const pid = this.items[index].product_id;
@@ -161,17 +239,42 @@ document.addEventListener('alpine:init', () => {
             this.customTaxes.splice(index, 1);
         },
 
+        addTerm() {
+            this.paymentTerms.push({
+                label: 'Termin ' + (this.paymentTerms.length + 1),
+                amount: 0,
+                due_date: '',
+            });
+        },
+
+        removeTerm(index) {
+            this.paymentTerms.splice(index, 1);
+        },
+
         get subtotal() {
             return this.items.reduce((total, item) => total + (Number(item.quantity) * Number(item.unit_price)), 0);
         },
 
-        get calculatedTaxes() {
+        get calculatedDiscountAmount() {
             const subtotal = this.subtotal;
+            if (this.discountType === 'percentage') {
+                const rate = parseFloat(this.discountRate) || 0;
+                return Math.min(Math.round((subtotal * (rate / 100)) * 100) / 100, subtotal);
+            }
+            return Math.min(parseFloat(this.discountAmount) || 0, subtotal);
+        },
+
+        get discountedSubtotal() {
+            return Math.max(this.subtotal - this.calculatedDiscountAmount, 0);
+        },
+
+        get calculatedTaxes() {
+            const discountedSubtotal = this.discountedSubtotal;
             return this.customTaxes.map(tax => {
                 const name = tax.name || 'Pajak';
                 const rate = parseFloat(tax.rate) || 0;
                 const type = tax.type === 'deduction' ? 'deduction' : 'addition';
-                const amount = Math.round((subtotal * (rate / 100)) * 100) / 100;
+                const amount = Math.round((discountedSubtotal * (rate / 100)) * 100) / 100;
                 return { name, rate, type, amount };
             });
         },
@@ -181,10 +284,60 @@ document.addEventListener('alpine:init', () => {
             return additionTaxes.reduce((sum, t) => sum + (parseFloat(t.rate) || 0), 0);
         },
 
+        get totalAdditions() {
+            return this.calculatedTaxes
+                .filter(t => t.type === 'addition')
+                .reduce((sum, t) => sum + t.amount, 0);
+        },
+
+        get totalDeductions() {
+            return this.calculatedTaxes
+                .filter(t => t.type === 'deduction')
+                .reduce((sum, t) => sum + t.amount, 0);
+        },
+
+        get quotationTotal() {
+            const discountedSubtotal = this.discountedSubtotal;
+            return Math.max(discountedSubtotal + this.totalAdditions - this.totalDeductions, 0);
+        },
+
+        termsTotalExcept(index) {
+            return this.paymentTerms.reduce((total, term, termIndex) => {
+                return termIndex === index ? total : total + Number(term.amount || 0);
+            }, 0);
+        },
+
+        maxTermAmount(index) {
+            return Math.max(this.quotationTotal - this.termsTotalExcept(index), 0);
+        },
+
+        clampTermAmount(index, input = null) {
+            const enteredAmount = this.fixMoney(input?.value ?? this.paymentTerms[index]?.amount ?? 0, 12);
+            const maxAmount = this.maxTermAmount(index);
+            const nextAmount = Math.min(enteredAmount, maxAmount);
+
+            this.paymentTerms[index].amount = nextAmount;
+
+            if (input && enteredAmount > maxAmount) {
+                input.value = String(Math.trunc(nextAmount));
+            }
+        },
+
         fixNum(raw) {
             const cleaned = String(raw).replace(/[^\d,.-]/g, '').replace('.', '').replace(',', '.');
             const n = parseFloat(cleaned);
             return isNaN(n) || n < 0 ? 0 : n;
+        },
+
+        moneyDigits(raw, maxDigits = 12) {
+            return String(raw).replace(/\D/g, '').slice(0, maxDigits);
+        },
+
+        fixMoney(raw, maxDigits = 12) {
+            const digits = this.moneyDigits(raw, maxDigits);
+            const n = Number(digits);
+
+            return Number.isFinite(n) && n > 0 ? n : 0;
         },
 
         validateForm(e) {
@@ -217,6 +370,17 @@ document.addEventListener('alpine:init', () => {
                     alert(`Item ke-${i + 1}: Harga satuan tidak boleh bernilai negatif.`);
                     e.preventDefault();
                     return false;
+                }
+            }
+
+            if (this.paymentTerms && this.paymentTerms.length > 0) {
+                for (let i = 0; i < this.paymentTerms.length; i++) {
+                    const term = this.paymentTerms[i];
+                    if (Number(term.amount) <= 0) {
+                        alert(`Termin ke-${i + 1}: Nominal termin harus lebih besar dari Rp 0.`);
+                        e.preventDefault();
+                        return false;
+                    }
                 }
             }
         },

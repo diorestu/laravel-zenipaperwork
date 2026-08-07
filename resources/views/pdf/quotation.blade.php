@@ -373,10 +373,37 @@
                     <td class="text-right">{{ number_format((float) $item->quantity, 0, ',', '.') }}</td>
                     <td class="text-right"><x-money :amount="$item->unit_price" /></td>
                     <td class="text-right item-line-total"><x-money :amount="$item->line_total" /></td>
-                </tr>
             @endforeach
         </tbody>
     </table>
+
+    <!-- Payment Terms Table (if present) -->
+    @if ($quotation->paymentTerms->isNotEmpty())
+        <div style="margin-top: 15px; margin-bottom: 15px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #111111; margin-bottom: 6px;">Termin Pembayaran</div>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Termin</th>
+                        <th style="text-align: left; width: 120px;">Jatuh Tempo</th>
+                        <th class="text-right" style="width: 130px;">Nominal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($quotation->paymentTerms as $term)
+                        <tr>
+                            <td>
+                                <div class="term-label" style="font-weight: 600;">{{ $term->label }}</div>
+                                <div class="term-note" style="font-size: 10px; color: #6b7280;">Termin {{ $term->term_number }}</div>
+                            </td>
+                            <td>{{ $term->due_date ? $term->due_date->format('d M Y') : '-' }}</td>
+                            <td class="text-right item-line-total"><x-money :amount="$term->amount" /></td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 
     <!-- Summary & Notes -->
     <table class="footer-table">
@@ -398,6 +425,12 @@
                         <td class="totals-label">Subtotal</td>
                         <td class="totals-val"><x-money :amount="$quotation->subtotal" /></td>
                     </tr>
+                    @if ((float) $quotation->discount_amount > 0)
+                        <tr>
+                            <td class="totals-label">Diskon {{ $quotation->discount_type === 'percentage' && $quotation->discount_rate > 0 ? '('.(float)$quotation->discount_rate.'%)' : '' }}</td>
+                            <td class="totals-val">(<x-money :amount="$quotation->discount_amount" />)</td>
+                        </tr>
+                    @endif
                     @foreach ($quotation->normalized_custom_taxes as $tax)
                         @if ($tax['rate'] > 0 || $tax['amount'] > 0)
                             <tr>

@@ -115,6 +115,12 @@
                     <span>Subtotal</span>
                     <span>Rp {{ number_format((float) $invoice->subtotal, 0, ',', '.') }}</span>
                 </div>
+                @if ((float) $invoice->discount_amount > 0)
+                    <div class="flex justify-between text-rose-600 dark:text-rose-400">
+                        <span>Diskon {{ $invoice->discount_type === 'percentage' && $invoice->discount_rate > 0 ? '('.(float)$invoice->discount_rate.'%)' : '' }}</span>
+                        <span>(Rp {{ number_format((float) $invoice->discount_amount, 0, ',', '.') }})</span>
+                    </div>
+                @endif
                 @foreach ($invoice->normalized_custom_taxes as $tax)
                     @if ($tax['rate'] > 0 || $tax['amount'] > 0)
                         <div class="flex justify-between text-gray-500 dark:text-gray-400">

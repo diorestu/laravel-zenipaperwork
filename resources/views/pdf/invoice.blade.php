@@ -496,6 +496,12 @@
                         <td class="totals-label">Subtotal</td>
                         <td class="totals-val"><x-money :amount="$invoice->subtotal" /></td>
                     </tr>
+                    @if ((float) $invoice->discount_amount > 0)
+                        <tr>
+                            <td class="totals-label">Diskon {{ $invoice->discount_type === 'percentage' && $invoice->discount_rate > 0 ? '('.(float)$invoice->discount_rate.'%)' : '' }}</td>
+                            <td class="totals-val">(<x-money :amount="$invoice->discount_amount" />)</td>
+                        </tr>
+                    @endif
                     @foreach ($invoice->normalized_custom_taxes as $tax)
                         @if ($tax['rate'] > 0 || $tax['amount'] > 0)
                             <tr>
