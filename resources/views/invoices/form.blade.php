@@ -14,6 +14,14 @@
         'due_date' => $term['due_date'] ?? '',
     ], $rawTerms, array_keys($rawTerms))));
 
+    $rawTaxes = old('custom_taxes', $invoice?->normalized_custom_taxes ?: [
+        ['name' => 'PPN', 'rate' => (float) ($invoice?->tax_rate ?? 11), 'type' => 'addition'],
+    ]);
+    if (empty($rawTaxes)) {
+        $rawTaxes = [['name' => 'PPN', 'rate' => 11, 'type' => 'addition']];
+    }
+    $taxesJson = json_encode(array_values($rawTaxes));
+
     $defaultNotes = '';
     if (!$invoice) {
         $defaultNotes = "Terima kasih atas kerja sama Anda.\n\n";
@@ -29,7 +37,7 @@
         $defaultNotes = $invoice->notes;
     }
 @endphp
-<form method="POST" action="{{ $action }}" @submit="validateForm($event)" class="space-y-5 rounded-lg border border-gray-200 bg-white p-5" x-data="itemForm({ productData: {{ $productJson }}, existingItems: {{ $itemsJson }}, existingTerms: {{ $termsJson }} })">
+<form method="POST" action="{{ $action }}" @submit="validateForm($event)" class="space-y-5 rounded-lg border border-gray-200 bg-white p-5" x-data="itemForm({ productData: {{ $productJson }}, existingItems: {{ $itemsJson }}, existingTerms: {{ $termsJson }}, existingTaxes: {{ $taxesJson }} })">
     @csrf
     @method($method)
     <div class="grid gap-4 sm:grid-cols-2">
@@ -41,8 +49,8 @@
         <x-form.input name="number" label="Nomor" :value="$invoice?->number ?? 'INV-'.now()->format('Ymd-His')" />
         <x-form.input name="issue_date" label="Tanggal Terbit" type="date" :value="optional($invoice?->issue_date)->format('Y-m-d') ?? now()->toDateString()" />
         <x-form.input name="due_date" label="Jatuh Tempo" type="date" :value="optional($invoice?->due_date)->format('Y-m-d')" />
-        <x-form.input name="tax_rate" label="PPN (%)" type="number" step="0.01" :value="$invoice?->tax_rate ?? 0" />
-        <x-form.input name="pph_rate" label="PPh (%)" type="number" step="0.01" :value="$invoice?->pph_rate ?? 0" />
+        <input type="hidden" name="tax_rate" :value="taxRate">
+        <input type="hidden" name="pph_rate" :value="pphRate">
         
         @if($bankAccounts->count() > 1)
             <x-form.select name="bank_account_id" label="Rekening Bank (Pembayaran)">
@@ -106,6 +114,41 @@
         </template>
     </div>
 
+    <!-- Custom Taxes Section -->
+    <div class="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-white/[0.02]">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white/90">Pajak & Potongan (Custom Tax)</h2>
+                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Atur pajak penambahan (seperti PPN) atau potongan pajak (seperti PPh 23).</p>
+            </div>
+            <button type="button" x-on:click="addTax()" class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03]">+ Tambah Pajak / Potongan</button>
+        </div>
+
+        <template x-for="(tax, index) in customTaxes" :key="index">
+            <div>
+                <input type="hidden" x-bind:name="'custom_taxes[' + index + '][name]'" x-model="tax.name">
+                <input type="hidden" x-bind:name="'custom_taxes[' + index + '][rate]'" x-model="tax.rate">
+                <input type="hidden" x-bind:name="'custom_taxes[' + index + '][type]'" x-model="tax.type">
+                <div class="grid gap-3 rounded-md border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900 sm:grid-cols-[1fr_7rem_12rem_2rem]">
+                    <input x-model="tax.name" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" placeholder="Nama pajak (misal PPN, PPh 23)">
+                    <div class="relative flex items-center">
+                        <input type="number" step="0.01" min="0" max="100" x-model="tax.rate" class="w-full rounded-md border border-gray-300 bg-white pl-3 pr-7 py-2 text-sm text-right text-gray-800 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" placeholder="0">
+                        <span class="absolute right-2.5 text-xs font-bold text-gray-400">%</span>
+                    </div>
+                    <select x-model="tax.type" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-xs text-gray-800 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        <option value="addition">+ Penambahan Nilai (seperti PPN)</option>
+                        <option value="deduction">- Pengurangan Nilai (seperti PPh)</option>
+                    </select>
+                    <button type="button" x-on:click="removeTax(index)" class="flex items-center justify-center text-gray-400 hover:text-error-600" title="Hapus pajak">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+        </template>
+
+        @error('custom_taxes')<span class="block text-xs text-error-600">{{ $message }}</span>@enderror
+    </div>
+
     <div class="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-white/[0.02]">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -146,7 +189,7 @@
 document.addEventListener('alpine:init', () => {
     const fmt = (n) => new Intl.NumberFormat('id-ID').format(n || 0);
 
-    Alpine.data('itemForm', ({ productData, existingItems, existingTerms }) => ({
+    Alpine.data('itemForm', ({ productData, existingItems, existingTerms, existingTaxes }) => ({
         productData,
         items: (existingItems && existingItems.length > 0)
             ? existingItems
@@ -154,6 +197,9 @@ document.addEventListener('alpine:init', () => {
         paymentTerms: (existingTerms && existingTerms.length > 0)
             ? existingTerms
             : [],
+        customTaxes: (existingTaxes && existingTaxes.length > 0)
+            ? existingTaxes
+            : [{ name: 'PPN', rate: 11, type: 'addition' }],
 
         onSelect(index) {
             const pid = this.items[index].product_id;
@@ -177,6 +223,14 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
+        addTax() {
+            this.customTaxes.push({ name: 'Pajak', rate: 0, type: 'addition' });
+        },
+
+        removeTax(index) {
+            this.customTaxes.splice(index, 1);
+        },
+
         addTerm() {
             this.paymentTerms.push({
                 label: 'Termin ' + (this.paymentTerms.length + 1),
@@ -193,20 +247,42 @@ document.addEventListener('alpine:init', () => {
             return this.items.reduce((total, item) => total + (Number(item.quantity) * Number(item.unit_price)), 0);
         },
 
+        get calculatedTaxes() {
+            const subtotal = this.subtotal;
+            return this.customTaxes.map(tax => {
+                const name = tax.name || 'Pajak';
+                const rate = parseFloat(tax.rate) || 0;
+                const type = tax.type === 'deduction' ? 'deduction' : 'addition';
+                const amount = Math.round((subtotal * (rate / 100)) * 100) / 100;
+                return { name, rate, type, amount };
+            });
+        },
+
         get taxRate() {
-            return this.fixNum(document.querySelector('[name="tax_rate"]')?.value ?? 0);
+            const additionTaxes = this.customTaxes.filter(t => t.type !== 'deduction');
+            return additionTaxes.reduce((sum, t) => sum + (parseFloat(t.rate) || 0), 0);
         },
 
         get pphRate() {
-            return this.fixNum(document.querySelector('[name="pph_rate"]')?.value ?? 0);
+            const deductionTaxes = this.customTaxes.filter(t => t.type === 'deduction');
+            return deductionTaxes.reduce((sum, t) => sum + (parseFloat(t.rate) || 0), 0);
+        },
+
+        get totalAdditions() {
+            return this.calculatedTaxes
+                .filter(t => t.type === 'addition')
+                .reduce((sum, t) => sum + t.amount, 0);
+        },
+
+        get totalDeductions() {
+            return this.calculatedTaxes
+                .filter(t => t.type === 'deduction')
+                .reduce((sum, t) => sum + t.amount, 0);
         },
 
         get invoiceTotal() {
             const subtotal = this.subtotal;
-            const taxTotal = subtotal * (this.taxRate / 100);
-            const pphTotal = subtotal * (this.pphRate / 100);
-
-            return Math.max(subtotal + taxTotal - pphTotal, 0);
+            return Math.max(subtotal + this.totalAdditions - this.totalDeductions, 0);
         },
 
         termsTotalExcept(index) {

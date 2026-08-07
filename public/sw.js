@@ -2,14 +2,14 @@
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
-const CACHE_NAME = 'paperwork-pwa-v2';
+const CACHE_NAME = 'paperwork-pwa-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
-  '/images/logo/paperwork-logo.png',
-  '/img/logo/logo_white.png',
-  '/img/logo/logo.png',
-  '/favicon.ico'
+  '/favicon.png',
+  '/apple-touch-icon.png',
+  '/favicon.ico',
+  '/images/logo/paperwork-logo.png'
 ];
 
 // Initialize Firebase App in Service Worker if config exists

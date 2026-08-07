@@ -529,3 +529,131 @@ it('processes Pakasir POST webhook JSON payload and activates user subscription 
     expect($submission->refresh()->status)->toBe('confirmed');
     expect($user->company->refresh()->active_plan)->toBe('business');
 });
+
+it('allows superadmin to configure payment gateway to sumopod and processes sumopod webhook', function () {
+    $superadmin = paperworkUser('super_admin');
+
+    // 1. Test Superadmin settings view & update
+    $this->actingAs($superadmin)->get(route('super-admin.settings'))
+        ->assertOk()
+        ->assertSee('Pengaturan Payment Gateway Superadmin');
+
+    $this->actingAs($superadmin)->put(route('super-admin.settings.update'), [
+        'active_payment_gateway' => 'sumopod',
+        'sumopod_base_url' => 'https://api-pay-sandbox.sumopod.com/api/v1',
+        'sumopod_api_key' => 'test_sumopod_key_123',
+    ])->assertRedirect();
+
+    expect(\App\Models\SystemSetting::get('active_payment_gateway'))->toBe('sumopod');
+    expect(\App\Models\SystemSetting::get('sumopod_api_key'))->toBe('test_sumopod_key_123');
+
+    // 2. Test Sumopod Webhook execution
+    $user = paperworkUser();
+    $submission = BillingSubmission::create([
+        'company_id' => $user->company_id,
+        'package' => 'enterprise',
+        'billing_period' => 'yearly',
+        'amount' => 299000,
+        'payment_method' => 'qris',
+        'payment_gateway' => 'sumopod',
+        'payment_order_id' => 'PAPERWORK-SUMO-001',
+        'status' => 'pending',
+    ]);
+
+    $payload = [
+        'payment_id' => 'uuid-12345',
+        'order_id' => 'PAPERWORK-SUMO-001',
+        'amount' => 299000,
+        'status' => 'paid',
+        'payment_code' => '1308300301295957',
+        'payment_link_url' => 'https://pay.sumopod.com/pay/uuid-12345',
+    ];
+
+    $response = $this->postJson(route('webhooks.sumopod'), $payload);
+    $response->assertOk()
+        ->assertJson(['message' => 'Billing berhasil diaktifkan via Sumopod.']);
+
+    expect($submission->refresh()->status)->toBe('confirmed');
+    expect($user->company->refresh()->active_plan)->toBe('enterprise');
+
+    // 3. Test rendering billing show page with payment_link_url converted to QR Code
+    $submissionOnlyUrl = BillingSubmission::create([
+        'company_id' => $user->company_id,
+        'package' => 'business',
+        'billing_period' => 'monthly',
+        'amount' => 149000,
+        'payment_method' => 'qris',
+        'payment_gateway' => 'sumopod',
+        'payment_order_id' => 'PAPERWORK-SUMO-002',
+        'payment_url' => 'https://pay.sumopod.com/pay/uuid-67890',
+        'payment_payload' => [
+            'payment_id' => 'uuid-67890',
+            'payment_link_url' => 'https://pay.sumopod.com/pay/uuid-67890',
+            'status' => 'pending',
+        ],
+        'status' => 'pending',
+    ]);
+
+    $this->actingAs($user)->get(route('settings.billing.show', $submissionOnlyUrl))
+        ->assertOk()
+        ->assertSee('https://pay.sumopod.com/pay/uuid-67890')
+        ->assertSee('data:image/png;base64,');
+});
+
+it('supports custom taxes with addition and deduction types for invoices and quotations', function () {
+    $user = paperworkUser();
+    $client = Client::factory()->for($user->company)->create();
+
+    // 1. Create Invoice with custom taxes: PPN 11% (addition) & PPh 23 2% (deduction) & Service Charge 5% (addition)
+    $response = $this->actingAs($user)->post(route('invoices.store'), [
+        'client_id' => $client->id,
+        'number' => 'INV-TAX-CUSTOM-01',
+        'issue_date' => now()->toDateString(),
+        'items' => [
+            ['description' => 'Jasa Pembuatan Software', 'quantity' => 1, 'unit_price' => 1000000],
+        ],
+        'custom_taxes' => [
+            ['name' => 'PPN', 'rate' => 11, 'type' => 'addition'],
+            ['name' => 'Service Charge', 'rate' => 5, 'type' => 'addition'],
+            ['name' => 'PPh 23', 'rate' => 2, 'type' => 'deduction'],
+        ],
+    ]);
+
+    $invoice = Invoice::where('number', 'INV-TAX-CUSTOM-01')->first();
+    expect($invoice)->not->toBeNull();
+    $response->assertRedirect(route('invoices.show', $invoice));
+
+    // Subtotal = 1.000.000
+    // PPN (11%) = 110.000 (+)
+    // Service Charge (5%) = 50.000 (+)
+    // PPh 23 (2%) = 20.000 (-)
+    // Total = 1.000.000 + 110.000 + 50.000 - 20.000 = 1.140.000
+    expect((float) $invoice->subtotal)->toBe(1000000.0);
+    expect((float) $invoice->total)->toBe(1140000.0);
+    expect(count($invoice->normalized_custom_taxes))->toBe(3);
+
+    $this->actingAs($user)->get(route('invoices.show', $invoice))
+        ->assertOk()
+        ->assertSee('PPN (11%)')
+        ->assertSee('Service Charge (5%)')
+        ->assertSee('PPh 23 (2%)');
+
+    // 2. Create Quotation with custom taxes
+    $quoResponse = $this->actingAs($user)->post(route('quotations.store'), [
+        'client_id' => $client->id,
+        'number' => 'QUO-TAX-CUSTOM-01',
+        'issue_date' => now()->toDateString(),
+        'items' => [
+            ['description' => 'Konsultasi IT', 'quantity' => 2, 'unit_price' => 500000],
+        ],
+        'custom_taxes' => [
+            ['name' => 'Pajak Daerah', 'rate' => 10, 'type' => 'addition'],
+        ],
+    ]);
+
+    $quotation = Quotation::where('number', 'QUO-TAX-CUSTOM-01')->first();
+    expect($quotation)->not->toBeNull();
+    $quoResponse->assertRedirect(route('quotations.show', $quotation));
+    expect((float) $quotation->subtotal)->toBe(1000000.0);
+    expect((float) $quotation->total)->toBe(1100000.0);
+});

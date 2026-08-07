@@ -216,4 +216,41 @@ class SuperAdminController extends Controller
 
         return back()->with('success', "Pengajuan billing #{$id} berhasil dihapus.");
     }
+
+    public function settings()
+    {
+        $activeGateway = \App\Models\SystemSetting::get('active_payment_gateway', config('services.payment_gateway.active', 'pakasir'));
+        $sumopodBaseUrl = \App\Models\SystemSetting::get('sumopod_base_url', config('services.sumopod.base_url', 'https://api-pay-sandbox.sumopod.com/api/v1'));
+        $sumopodApiKey = \App\Models\SystemSetting::get('sumopod_api_key', config('services.sumopod.api_key', ''));
+
+        $pakasirProject = \App\Models\SystemSetting::get('pakasir_project', config('services.pakasir.project', 'paperwork'));
+        $pakasirApiKey = \App\Models\SystemSetting::get('pakasir_api_key', config('services.pakasir.api_key', ''));
+
+        return view('super-admin.settings', compact(
+            'activeGateway',
+            'sumopodBaseUrl',
+            'sumopodApiKey',
+            'pakasirProject',
+            'pakasirApiKey'
+        ));
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $data = $request->validate([
+            'active_payment_gateway' => ['required', 'in:pakasir,sumopod'],
+            'sumopod_base_url' => ['nullable', 'string'],
+            'sumopod_api_key' => ['nullable', 'string'],
+            'pakasir_project' => ['nullable', 'string'],
+            'pakasir_api_key' => ['nullable', 'string'],
+        ]);
+
+        \App\Models\SystemSetting::set('active_payment_gateway', $data['active_payment_gateway']);
+        \App\Models\SystemSetting::set('sumopod_base_url', $data['sumopod_base_url'] ?? 'https://api-pay-sandbox.sumopod.com/api/v1');
+        \App\Models\SystemSetting::set('sumopod_api_key', $data['sumopod_api_key'] ?? '');
+        \App\Models\SystemSetting::set('pakasir_project', $data['pakasir_project'] ?? '');
+        \App\Models\SystemSetting::set('pakasir_api_key', $data['pakasir_api_key'] ?? '');
+
+        return back()->with('success', 'Pengaturan Payment Gateway Superadmin berhasil disimpan.');
+    }
 }

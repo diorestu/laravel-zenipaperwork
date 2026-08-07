@@ -21,10 +21,11 @@ class InvoiceService
         return DB::transaction(function () use ($user, $data): Invoice {
             $taxRate = (float) ($data['tax_rate'] ?? 0);
             $pphRate = (float) ($data['pph_rate'] ?? 0);
-            $totals = $this->calculator->totals($data['items'], $taxRate);
+            $customTaxes = $data['custom_taxes'] ?? [];
+            $totals = $this->calculator->totals($data['items'], $taxRate, $pphRate, $customTaxes);
             $terms = $this->normalizePaymentTerms($data['payment_terms'] ?? []);
             $downPayment = (float) ($terms[0]['amount'] ?? ($data['down_payment_amount'] ?? 0));
-            $pphAmount = round($totals['subtotal'] * ($pphRate / 100), 2);
+            $pphAmount = $totals['pph_amount'];
             $isRecurring = $data['is_recurring'] ?? false;
             $recurringCycle = $data['recurring_cycle'] ?? null;
             $nextRecurrenceDate = null;
@@ -53,6 +54,7 @@ class InvoiceService
                 'tax_rate' => $taxRate,
                 'pph_rate' => $pphRate,
                 'pph_amount' => $pphAmount,
+                'custom_taxes' => $totals['custom_taxes'],
                 'subtotal' => $totals['subtotal'],
                 'tax_total' => $totals['tax_total'],
                 'total' => $totals['total'],
@@ -77,10 +79,11 @@ class InvoiceService
         return DB::transaction(function () use ($invoice, $data): Invoice {
             $taxRate = (float) ($data['tax_rate'] ?? 0);
             $pphRate = (float) ($data['pph_rate'] ?? 0);
-            $totals = $this->calculator->totals($data['items'], $taxRate);
+            $customTaxes = $data['custom_taxes'] ?? [];
+            $totals = $this->calculator->totals($data['items'], $taxRate, $pphRate, $customTaxes);
             $terms = $this->normalizePaymentTerms($data['payment_terms'] ?? []);
             $downPayment = (float) ($terms[0]['amount'] ?? ($data['down_payment_amount'] ?? 0));
-            $pphAmount = round($totals['subtotal'] * ($pphRate / 100), 2);
+            $pphAmount = $totals['pph_amount'];
             $isRecurring = $data['is_recurring'] ?? false;
             $recurringCycle = $data['recurring_cycle'] ?? null;
             $nextRecurrenceDate = null;
@@ -99,6 +102,7 @@ class InvoiceService
                 'tax_rate' => $taxRate,
                 'pph_rate' => $pphRate,
                 'pph_amount' => $pphAmount,
+                'custom_taxes' => $totals['custom_taxes'],
                 'subtotal' => $totals['subtotal'],
                 'tax_total' => $totals['tax_total'],
                 'total' => $totals['total'],

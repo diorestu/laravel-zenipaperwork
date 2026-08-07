@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBillingSubmissionRequest;
 use App\Models\BillingSubmission;
 use App\Services\PakasirPaymentGateway;
+use App\Services\PaymentGatewayResolver;
 use App\Support\BillingPlans;
 use Endroid\QrCode\Builder\Builder;
 
@@ -35,8 +36,11 @@ class BillingController extends Controller
         ));
     }
 
-    public function store(StoreBillingSubmissionRequest $request, PakasirPaymentGateway $pakasir)
+    public function store(StoreBillingSubmissionRequest $request, PaymentGatewayResolver $gatewayResolver)
     {
+        $gateway = $gatewayResolver->getActiveGateway();
+        $gatewayName = $gatewayResolver->getActiveGatewayName();
+
         $data = $request->validated();
         $company = $request->user()->company;
 
@@ -91,17 +95,17 @@ class BillingController extends Controller
 
         $submission = BillingSubmission::create($data + [
             'company_id' => $company->id,
-            'payment_gateway' => $data['payment_method'] === 'qris' ? 'pakasir' : null,
+            'payment_gateway' => $data['payment_method'] === 'qris' ? $gatewayName : null,
             'status' => 'pending',
         ]);
 
         if ($submission->payment_method === 'qris') {
             $submission->update(['payment_order_id' => $submission->payment_order_id ?: 'PAPERWORK-B'.str_pad((string) $submission->id, 5, '0', STR_PAD_LEFT)]);
-            $payload = rescue(fn () => $pakasir->createQris($submission->refresh()), [], false);
+            $payload = rescue(fn () => $gateway->createQris($submission->refresh()), [], false);
             if (! empty($payload)) {
                 $submission->update([
-                    'payment_number' => $payload['payment_number'] ?? $payload['number'] ?? null,
-                    'payment_url' => $payload['payment_url'] ?? $payload['checkout_url'] ?? $payload['url'] ?? null,
+                    'payment_number' => $payload['payment_number'] ?? $payload['payment_code'] ?? $payload['number'] ?? null,
+                    'payment_url' => $payload['payment_url'] ?? $payload['payment_link_url'] ?? $payload['checkout_url'] ?? $payload['url'] ?? null,
                     'payment_payload' => $payload,
                 ]);
             }
@@ -118,7 +122,7 @@ class BillingController extends Controller
         }
 
         if ($isMobile) {
-            return redirect()->route('mobile.billing.show', $submission)->with('success', 'Pembayaran QRIS Pakasir berhasil dibuat.');
+            return redirect()->route('mobile.billing.show', $submission)->with('success', 'Pembayaran QRIS '.strtoupper($gatewayName).' berhasil dibuat.');
         }
 
         return redirect()->route('settings.billing.show', $submission)->with('success', 'Pembayaran dibuat.');
@@ -149,21 +153,22 @@ class BillingController extends Controller
         ));
     }
 
-    public function show(BillingSubmission $billingSubmission, PakasirPaymentGateway $pakasir)
+    public function show(BillingSubmission $billingSubmission, PaymentGatewayResolver $gatewayResolver)
     {
         $this->authorize('view', $billingSubmission);
+        $gateway = $gatewayResolver->getActiveGateway();
 
         $submission = $billingSubmission->load('company');
-        if ($submission->payment_method === 'qris' && ! $submission->payment_number) {
-            $payload = rescue(fn () => $pakasir->detail($submission), [], false);
-            if (empty($payload['payment_number'])) {
-                $payload = rescue(fn () => $pakasir->createQris($submission), [], false);
+        if ($submission->payment_method === 'qris' && ! $submission->payment_number && ! $submission->payment_url) {
+            $payload = rescue(fn () => $gateway->detail($submission), [], false);
+            if (empty($payload['payment_number']) && empty($payload['payment_url']) && empty($payload['payment_code']) && empty($payload['payment_link_url'])) {
+                $payload = rescue(fn () => $gateway->createQris($submission), [], false);
             }
 
             if ($payload !== []) {
                 $submission->update([
-                    'payment_number' => $payload['payment_number'] ?? null,
-                    'payment_url' => $payload['payment_url'] ?? null,
+                    'payment_number' => $payload['payment_number'] ?? $payload['payment_code'] ?? null,
+                    'payment_url' => $payload['payment_url'] ?? $payload['payment_link_url'] ?? null,
                     'payment_payload' => $payload,
                 ]);
                 $submission->refresh()->load('company');
@@ -172,12 +177,14 @@ class BillingController extends Controller
 
         $paymentString = (string) (
             $submission->payment_number
+            ?? $submission->payment_url
+            ?? data_get($submission->payment_payload, 'payment_code')
+            ?? data_get($submission->payment_payload, 'payment_link_url')
             ?? data_get($submission->payment_payload, 'payment.payment_number')
             ?? data_get($submission->payment_payload, 'payment_number')
-            ?? $submission->payment_url
         );
 
-        if ($paymentString === '' && $submission->amount > 0) {
+        if ($paymentString === '' && $submission->amount > 0 && $gatewayResolver->getActiveGatewayName() === 'pakasir') {
             $webBaseUrl = str_replace('/api', '', rtrim((string) config('services.pakasir.base_url', 'https://app.pakasir.com/api'), '/'));
             $proj = config('services.pakasir.project') ?: 'paperwork';
             $paymentString = "{$webBaseUrl}/pay/{$proj}/".(int) $submission->amount.'?order_id='.($submission->payment_order_id ?? 'PAPERWORK-B'.str_pad((string) $submission->id, 5, '0', STR_PAD_LEFT)).'&qris_only=1';
@@ -190,28 +197,46 @@ class BillingController extends Controller
         return view('settings.billing-show', compact('submission', 'paymentQrCode'));
     }
 
-    public function mobileShow(BillingSubmission $billingSubmission, PakasirPaymentGateway $pakasir)
+    public function paymentResult(BillingSubmission $billingSubmission, string $status)
     {
         $this->authorize('view', $billingSubmission);
+        abort_unless(in_array($status, ['success', 'cancel'], true), 404);
+
+        return view('settings.billing-payment-result', [
+            'submission' => $billingSubmission->load('company'),
+            'status' => $status,
+        ]);
+    }
+
+    public function mobileShow(BillingSubmission $billingSubmission, PaymentGatewayResolver $gatewayResolver)
+    {
+        $this->authorize('view', $billingSubmission);
+        $gateway = $gatewayResolver->getActiveGateway();
 
         $submission = $billingSubmission->load('company');
-        if ($submission->payment_method === 'qris' && ! $submission->payment_number) {
-            $payload = rescue(fn () => $pakasir->detail($submission), [], false);
-            if (empty($payload['payment_number'])) {
-                $payload = rescue(fn () => $pakasir->createQris($submission), [], false);
+        if ($submission->payment_method === 'qris' && ! $submission->payment_number && ! $submission->payment_url) {
+            $payload = rescue(fn () => $gateway->detail($submission), [], false);
+            if (empty($payload['payment_number']) && empty($payload['payment_url']) && empty($payload['payment_code']) && empty($payload['payment_link_url'])) {
+                $payload = rescue(fn () => $gateway->createQris($submission), [], false);
             }
 
             if ($payload !== []) {
                 $submission->update([
-                    'payment_number' => $payload['payment_number'] ?? null,
-                    'payment_url' => $payload['payment_url'] ?? null,
+                    'payment_number' => $payload['payment_number'] ?? $payload['payment_code'] ?? null,
+                    'payment_url' => $payload['payment_url'] ?? $payload['payment_link_url'] ?? null,
                     'payment_payload' => $payload,
                 ]);
                 $submission->refresh()->load('company');
             }
         }
 
-        $paymentNumber = (string) ($submission->payment_number ?? data_get($submission->payment_payload, 'payment.payment_number'));
+        $paymentNumber = (string) (
+            $submission->payment_number
+            ?? $submission->payment_url
+            ?? data_get($submission->payment_payload, 'payment_code')
+            ?? data_get($submission->payment_payload, 'payment_link_url')
+            ?? data_get($submission->payment_payload, 'payment.payment_number')
+        );
         $paymentQrCode = $paymentNumber !== ''
             ? rescue(fn () => (new Builder)->build(data: $paymentNumber, size: 320, margin: 16)->getDataUri(), null, false)
             : null;
@@ -219,19 +244,20 @@ class BillingController extends Controller
         return view('mobile.billing-show', compact('submission', 'paymentQrCode'));
     }
 
-    public function checkStatus(BillingSubmission $billingSubmission, PakasirPaymentGateway $pakasir)
+    public function checkStatus(BillingSubmission $billingSubmission, PaymentGatewayResolver $gatewayResolver)
     {
         $this->authorize('view', $billingSubmission);
+        $gateway = $gatewayResolver->getActiveGateway();
 
         if ($billingSubmission->status === 'pending' && $billingSubmission->payment_method === 'qris') {
-            $payload = rescue(fn () => $pakasir->detail($billingSubmission), [], false);
+            $payload = rescue(fn () => $gateway->detail($billingSubmission), [], false);
             $detailStatus = strtolower((string) (
                 data_get($payload, 'payment.status')
                 ?? data_get($payload, 'transaction.status')
                 ?? data_get($payload, 'status')
             ));
 
-            if ($detailStatus === 'completed') {
+            if (in_array($detailStatus, ['completed', 'paid', 'success', 'settlement'])) {
                 BillingSubmission::forCompany($billingSubmission->company_id)
                     ->whereKeyNot($billingSubmission->id)
                     ->where('status', 'confirmed')

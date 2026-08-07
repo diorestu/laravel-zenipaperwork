@@ -496,12 +496,20 @@
                         <td class="totals-label">Subtotal</td>
                         <td class="totals-val"><x-money :amount="$invoice->subtotal" /></td>
                     </tr>
-                    @if ($invoice->tax_rate > 0)
-                        <tr>
-                            <td class="totals-label">Pajak ({{ $invoice->tax_rate }}%)</td>
-                            <td class="totals-val"><x-money :amount="$invoice->tax_total" /></td>
-                        </tr>
-                    @endif
+                    @foreach ($invoice->normalized_custom_taxes as $tax)
+                        @if ($tax['rate'] > 0 || $tax['amount'] > 0)
+                            <tr>
+                                <td class="totals-label">{{ $tax['name'] }} ({{ $tax['rate'] }}%)</td>
+                                <td class="totals-val">
+                                    @if ($tax['type'] === 'deduction')
+                                        (<x-money :amount="$tax['amount']" />)
+                                    @else
+                                        <x-money :amount="$tax['amount']" />
+                                    @endif
+                                </td>
+                            </tr>
+                        @endif
+                    @endforeach
                     @if ((float) $invoice->down_payment_amount > 0)
                         <tr>
                             <td class="totals-label">Uang Muka (DP)</td>

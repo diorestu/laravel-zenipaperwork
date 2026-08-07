@@ -42,6 +42,16 @@ return [
         'timeout' => env('PAKASIR_TIMEOUT', 15),
     ],
 
+    'sumopod' => [
+        'base_url' => env('SUMOPOD_BASE_URL', 'https://api-pay-sandbox.sumopod.com/api/v1'),
+        'api_key' => env('SUMOPOD_API_KEY', ''),
+        'timeout' => env('SUMOPOD_TIMEOUT', 15),
+    ],
+
+    'payment_gateway' => [
+        'active' => env('PAYMENT_GATEWAY_ACTIVE', 'pakasir'),
+    ],
+
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),

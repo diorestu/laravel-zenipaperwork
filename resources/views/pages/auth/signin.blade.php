@@ -13,15 +13,17 @@
 
             <!-- Main login card -->
             <div class="rounded-xl border border-[#EAEAEA] bg-white p-6 shadow-xs dark:border-white/10 dark:bg-white/[0.03] sm:p-8">
-                <div class="mb-8">
-                    <p class="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">
-                        Masuk
-                    </p>
+                <div class="mb-8 text-center sm:text-left">
+                    <div class="mb-3 flex items-center justify-center sm:justify-start gap-2">
+                        <span class="rounded-full bg-brand-50 px-2.5 py-0.5 text-[11px] font-bold text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                            paperwork.biz.id
+                        </span>
+                    </div>
                     <h2 class="text-2xl font-semibold tracking-tight text-gray-950 dark:text-white">
                         Selamat datang kembali
                     </h2>
                     <p class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
-                        Gunakan email dan kata sandi yang terdaftar.
+                        Masuk ke akun resmi Paperwork untuk mengelola invoice dan pembayaran.
                     </p>
                 </div>
 
@@ -98,8 +100,9 @@
             </div>
 
             <!-- Footer links under the card -->
-            <div class="mt-6 text-center text-xs text-gray-400 dark:text-gray-500">
-                Dengan masuk, Anda menyetujui <a href="{{ route('terms-of-service') }}" class="underline hover:text-gray-600 dark:hover:text-gray-400">Ketentuan Pelanggan</a> dan <a href="{{ route('privacy-policy') }}" class="underline hover:text-gray-600 dark:hover:text-gray-400">Kebijakan Privasi</a> kami.
+            <div class="mt-6 text-center text-xs text-gray-400 dark:text-gray-500 space-y-1">
+                <p>Dengan masuk, Anda menyetujui <a href="{{ route('terms-of-service') }}" class="underline hover:text-gray-600 dark:hover:text-gray-400">Ketentuan Pelanggan</a> dan <a href="{{ route('privacy-policy') }}" class="underline hover:text-gray-600 dark:hover:text-gray-400">Kebijakan Privasi</a> kami.</p>
+                <p class="text-[11px] text-gray-400 opacity-80">© {{ date('Y') }} Paperwork (paperwork.biz.id). Seluruh hak cipta dilindungi.</p>
             </div>
         </div>
     </main>

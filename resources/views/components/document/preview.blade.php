@@ -128,12 +128,20 @@
                 <span>Subtotal</span>
                 <span class="font-medium text-gray-900 dark:text-white"><x-money :amount="$document->subtotal" /></span>
             </div>
-            @if ($document->tax_rate > 0)
-                <div class="flex justify-between text-gray-500 dark:text-gray-400">
-                    <span>Pajak ({{ $document->tax_rate }}%)</span>
-                    <span class="font-medium text-gray-900 dark:text-white"><x-money :amount="$document->tax_total" /></span>
-                </div>
-            @endif
+            @foreach ($document->normalized_custom_taxes as $tax)
+                @if ($tax['rate'] > 0 || $tax['amount'] > 0)
+                    <div class="flex justify-between text-gray-500 dark:text-gray-400">
+                        <span>{{ $tax['name'] }} ({{ $tax['rate'] }}%)</span>
+                        <span class="font-medium {{ $tax['type'] === 'deduction' ? 'text-rose-600 dark:text-rose-400' : 'text-gray-900 dark:text-white' }}">
+                            @if ($tax['type'] === 'deduction')
+                                (<x-money :amount="$tax['amount']" />)
+                            @else
+                                <x-money :amount="$tax['amount']" />
+                            @endif
+                        </span>
+                    </div>
+                @endif
+            @endforeach
             <div class="flex justify-between border-t border-gray-200 pt-2 text-sm font-bold text-gray-900 dark:text-white dark:border-gray-800">
                 <span>Total</span>
                 <span><x-money :amount="$document->total" /></span>

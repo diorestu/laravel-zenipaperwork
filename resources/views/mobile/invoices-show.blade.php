@@ -115,18 +115,20 @@
                     <span>Subtotal</span>
                     <span>Rp {{ number_format((float) $invoice->subtotal, 0, ',', '.') }}</span>
                 </div>
-                @if($invoice->tax_rate > 0)
-                    <div class="flex justify-between text-gray-500 dark:text-gray-400">
-                        <span>PPN ({{ $invoice->tax_rate }}%)</span>
-                        <span>+ Rp {{ number_format((float) ($invoice->subtotal * ($invoice->tax_rate / 100)), 0, ',', '.') }}</span>
-                    </div>
-                @endif
-                @if($invoice->pph_rate > 0)
-                    <div class="flex justify-between text-gray-500 dark:text-gray-400">
-                        <span>PPh ({{ $invoice->pph_rate }}%)</span>
-                        <span>- Rp {{ number_format((float) ($invoice->subtotal * ($invoice->pph_rate / 100)), 0, ',', '.') }}</span>
-                    </div>
-                @endif
+                @foreach ($invoice->normalized_custom_taxes as $tax)
+                    @if ($tax['rate'] > 0 || $tax['amount'] > 0)
+                        <div class="flex justify-between text-gray-500 dark:text-gray-400">
+                            <span>{{ $tax['name'] }} ({{ $tax['rate'] }}%)</span>
+                            <span class="{{ $tax['type'] === 'deduction' ? 'text-rose-600 dark:text-rose-400' : '' }}">
+                                @if ($tax['type'] === 'deduction')
+                                    (Rp {{ number_format((float) $tax['amount'], 0, ',', '.') }})
+                                @else
+                                    Rp {{ number_format((float) $tax['amount'], 0, ',', '.') }}
+                                @endif
+                            </span>
+                        </div>
+                    @endif
+                @endforeach
                 <div class="flex justify-between font-extrabold text-sm text-gray-900 dark:text-white pt-2 border-t border-gray-100 dark:border-gray-800">
                     <span>Total Invoice</span>
                     <span class="text-brand-600 dark:text-brand-400">Rp {{ number_format((float) $invoice->total, 0, ',', '.') }}</span>

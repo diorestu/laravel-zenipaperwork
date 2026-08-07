@@ -41,6 +41,11 @@
                     <img src="{{ $paymentQrCode }}" alt="QRIS" class="mx-auto aspect-square w-full max-w-56 object-contain">
                 @elseif ($qrisImage)
                     <img src="{{ $qrisImage }}" alt="QRIS" class="mx-auto aspect-square w-full max-w-56 object-contain">
+                @elseif (data_get($payload, 'error'))
+                    <div class="py-4 text-center text-xs text-rose-600 dark:text-rose-400">
+                        <span class="font-bold block mb-1">Gagal Memuat QRIS</span>
+                        <p class="text-[11px] opacity-90">{{ data_get($payload, 'error') }}</p>
+                    </div>
                 @else
                     <div class="py-8 text-center text-xs text-gray-400" x-data x-init="setTimeout(() => window.location.reload(), 3000)">
                         Memuat QRIS...

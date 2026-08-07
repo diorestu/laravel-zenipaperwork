@@ -398,12 +398,20 @@
                         <td class="totals-label">Subtotal</td>
                         <td class="totals-val"><x-money :amount="$quotation->subtotal" /></td>
                     </tr>
-                    @if ($quotation->tax_rate > 0)
-                        <tr>
-                            <td class="totals-label">Pajak ({{ $quotation->tax_rate }}%)</td>
-                            <td class="totals-val"><x-money :amount="$quotation->tax_total" /></td>
-                        </tr>
-                    @endif
+                    @foreach ($quotation->normalized_custom_taxes as $tax)
+                        @if ($tax['rate'] > 0 || $tax['amount'] > 0)
+                            <tr>
+                                <td class="totals-label">{{ $tax['name'] }} ({{ $tax['rate'] }}%)</td>
+                                <td class="totals-val">
+                                    @if ($tax['type'] === 'deduction')
+                                        (<x-money :amount="$tax['amount']" />)
+                                    @else
+                                        <x-money :amount="$tax['amount']" />
+                                    @endif
+                                </td>
+                            </tr>
+                        @endif
+                    @endforeach
                     <tr class="totals-grand">
                         <td class="totals-label">Total</td>
                         <td class="totals-val"><x-money :amount="$quotation->total" /></td>

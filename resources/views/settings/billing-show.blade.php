@@ -58,7 +58,7 @@
 
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-lg font-semibold text-gray-900 dark:text-white/90">Pembayaran QRIS Pakasir</h1>
+            <h1 class="text-lg font-semibold text-gray-900 dark:text-white/90">Pembayaran QRIS</h1>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Pembayaran Paket {{ str($submission->package)->headline() }}</p>
         </div>
         <a href="{{ request()->has('from_mobile') || str_contains(request()->header('referer', ''), '/mobile') ? route('mobile.app') : route('settings.billing') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
@@ -108,7 +108,7 @@
             </dl>
 
             <div class="rounded-xl border border-blue-100 bg-blue-50/50 p-4 text-xs text-blue-800 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300">
-                <p class="font-bold text-sm mb-1">💡 Petunjuk Pembayaran QRIS Pakasir:</p>
+                <p class="font-bold text-sm mb-1">💡 Petunjuk Pembayaran QRIS:</p>
                 <ol class="list-decimal pl-4 space-y-1">
                     <li>Buka aplikasi mobile banking atau e-wallet (BCA, Mandiri, GoPay, OVO, Dana, ShopeePay, dll).</li>
                     <li>Pilih menu <strong>Scan / Pindai QRIS</strong> lalu arahkan kamera ke Kode QRIS di sebelah kanan.</li>
@@ -120,16 +120,21 @@
 
         <aside class="rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03] flex flex-col justify-between">
             <div>
-                <h2 class="text-base font-bold text-gray-900 dark:text-white text-center">Kode QRIS Pakasir</h2>
-                <p class="text-center text-xs text-gray-500 dark:text-gray-400 mt-1">Scan dengan E-Wallet / Bank Mandiri / BCA / Dana</p>
+                <h2 class="text-base font-bold text-gray-900 dark:text-white text-center">Kode QRIS</h2>
+                <p class="text-center text-xs text-gray-500 dark:text-gray-400 mt-1">Scan disini untuk melanjutkan pembayaran</p>
 
                 @if ($paymentQrCode)
                     <div class="mt-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700">
-                        <img src="{{ $paymentQrCode }}" alt="QRIS Pakasir" class="mx-auto aspect-square w-full max-w-64 object-contain">
+                        <img src="{{ $paymentQrCode }}" alt="QRIS" class="mx-auto aspect-square w-full max-w-64 object-contain">
                     </div>
                 @elseif ($qrisImage)
                     <div class="mt-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700">
-                        <img src="{{ $qrisImage }}" alt="QRIS Pakasir" class="mx-auto aspect-square w-full max-w-64 object-contain">
+                        <img src="{{ $qrisImage }}" alt="QRIS" class="mx-auto aspect-square w-full max-w-64 object-contain">
+                    </div>
+                @elseif (data_get($payload, 'error'))
+                    <div class="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-center text-xs text-rose-800 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300">
+                        <span class="font-bold block mb-1">Gagal Memuat QRIS</span>
+                        <p class="text-[11px] opacity-90">{{ data_get($payload, 'error') }}</p>
                     </div>
                 @else
                     <p class="mt-4 rounded-xl border border-gray-200 p-4 text-center text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">QRIS sedang dimuat...</p>
@@ -145,7 +150,7 @@
 
                 @if ($submission->payment_url)
                     <a href="{{ $submission->payment_url }}" target="_blank" class="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                        <span>Buka Halaman Pembayaran Pakasir</span>
+                        <span>Buka Halaman Pembayaran</span>
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                         </svg>

@@ -24,6 +24,7 @@ Route::view('/', 'landing')->name('landing');
 Route::get('/public/invoices/{token}', [PublicInvoiceController::class, 'show'])->name('public.invoices.show');
 Route::post('/public/invoices/{token}/pay', [PublicInvoiceController::class, 'pay'])->name('public.invoices.pay');
 Route::post('/webhooks/pakasir', PakasirWebhookController::class)->name('webhooks.pakasir');
+Route::post('/webhooks/sumopod', \App\Http\Controllers\SumopodWebhookController::class)->name('webhooks.sumopod');
 Route::view('/privacy-policy', 'pages.privacy-policy')->name('privacy-policy');
 Route::view('/terms-of-service', 'pages.terms-of-service')->name('terms-of-service');
 Route::view('/mobile', 'pwa.install')->name('pwa.install');
@@ -87,6 +88,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
         Route::get('/mobile/profile', [SettingsController::class, 'mobileCompany'])->name('mobile.profile');
         Route::get('/settings/billing', [BillingController::class, 'index'])->name('settings.billing');
+        Route::get('/settings/billing/{billingSubmission}/payment-result/{status}', [BillingController::class, 'paymentResult'])->name('settings.billing.payment-result');
         Route::get('/settings/billing/{billingSubmission}', [BillingController::class, 'show'])->name('settings.billing.show');
         Route::get('/settings/billing/{billingSubmission}/check-status', [BillingController::class, 'checkStatus'])->name('settings.billing.check-status');
         Route::get('/mobile/invoices/{invoice}', [InvoiceController::class, 'mobileShow'])->name('mobile.invoices.show');
@@ -108,6 +110,8 @@ Route::middleware('auth')->group(function () {
             Route::post('/users/{user}/revoke-bypass', [SuperAdminController::class, 'revokeBypass'])->name('users.revoke-bypass');
             Route::delete('/users/{user}', [SuperAdminController::class, 'destroyUser'])->name('users.destroy');
             Route::get('/reports', [SuperAdminController::class, 'reports'])->name('reports');
+            Route::get('/settings', [SuperAdminController::class, 'settings'])->name('settings');
+            Route::put('/settings', [SuperAdminController::class, 'updateSettings'])->name('settings.update');
             Route::post('/billing-submissions/{billingSubmission}/confirm', [SuperAdminController::class, 'confirmBilling'])->name('billing.confirm');
             Route::patch('/billing-submissions/{billingSubmission}/activate', [SuperAdminController::class, 'activateBilling'])->name('billing.activate');
             Route::patch('/billing-submissions/{billingSubmission}/stop', [SuperAdminController::class, 'stopBilling'])->name('billing.stop');

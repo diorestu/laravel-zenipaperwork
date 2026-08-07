@@ -14,7 +14,26 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Paperwork">
 
-    <title>{{ $title ?? 'Paperwork' }} | Paperwork</title>
+    <title>{{ $title ?? 'Masuk' }} | Paperwork (paperwork.biz.id)</title>
+
+    <meta name="description" content="Masuk ke Paperwork (paperwork.biz.id) - Platform manajemen invoice, penawaran resmi, dan pembayaran bisnis otomatis.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:site_name" content="Paperwork">
+    <meta property="og:title" content="{{ $title ?? 'Masuk' }} | Paperwork (paperwork.biz.id)">
+    <meta property="og:description" content="Masuk ke Paperwork (paperwork.biz.id) - Platform manajemen invoice, penawaran resmi, dan pembayaran bisnis otomatis.">
+    <meta property="og:image" content="{{ asset('images/logo/og-share.png') }}">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ url()->current() }}">
+    <meta name="twitter:title" content="{{ $title ?? 'Masuk' }} | Paperwork (paperwork.biz.id)">
+    <meta name="twitter:description" content="Masuk ke Paperwork (paperwork.biz.id) - Platform manajemen invoice, penawaran resmi, dan pembayaran bisnis otomatis.">
+    <meta name="twitter:image" content="{{ asset('images/logo/og-share.png') }}">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";

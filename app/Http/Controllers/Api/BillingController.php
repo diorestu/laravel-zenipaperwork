@@ -40,8 +40,11 @@ class BillingController extends Controller
         return BillingSubmissionResource::collection($submissions);
     }
 
-    public function store(Request $request, PakasirPaymentGateway $pakasir): BillingSubmissionResource
+    public function store(Request $request, \App\Services\PaymentGatewayResolver $gatewayResolver): BillingSubmissionResource
     {
+        $gateway = $gatewayResolver->getActiveGateway();
+        $gatewayName = $gatewayResolver->getActiveGatewayName();
+
         $data = $request->validate([
             'package' => ['required', 'string', Rule::in(collect(BillingPlans::all())->pluck('slug')->all())],
             'billing_period' => ['required', 'string', 'in:monthly,yearly'],
@@ -62,13 +65,13 @@ class BillingController extends Controller
 
         $submission = BillingSubmission::create($data + [
             'company_id' => $request->user()->company_id,
-            'payment_gateway' => $data['payment_method'] === 'qris' ? 'pakasir' : null,
+            'payment_gateway' => $data['payment_method'] === 'qris' ? $gatewayName : null,
             'status' => 'pending',
         ]);
 
         if ($submission->payment_method === 'qris') {
             $submission->update(['payment_order_id' => $submission->payment_order_id ?: 'PAPERWORK-B'.str_pad((string) $submission->id, 5, '0', STR_PAD_LEFT)]);
-            $payload = rescue(fn () => $pakasir->createQris($submission->refresh()), [], false);
+            $payload = rescue(fn () => $gateway->createQris($submission->refresh()), [], false);
             if (! empty($payload)) {
                 $submission->update([
                     'payment_number' => $payload['payment_number'] ?? $payload['number'] ?? data_get($payload, 'payment.payment_number'),
@@ -81,14 +84,15 @@ class BillingController extends Controller
         return new BillingSubmissionResource($submission->refresh());
     }
 
-    public function show(Request $request, BillingSubmission $billingSubmission, PakasirPaymentGateway $pakasir): BillingSubmissionResource
+    public function show(Request $request, BillingSubmission $billingSubmission, \App\Services\PaymentGatewayResolver $gatewayResolver): BillingSubmissionResource
     {
         $this->authorize('view', $billingSubmission);
+        $gateway = $gatewayResolver->getActiveGateway();
 
         if ($billingSubmission->payment_method === 'qris' && ! $billingSubmission->payment_number) {
-            $payload = rescue(fn () => $pakasir->detail($billingSubmission), [], false);
+            $payload = rescue(fn () => $gateway->detail($billingSubmission), [], false);
             if (empty($payload['payment_number'])) {
-                $payload = rescue(fn () => $pakasir->createQris($billingSubmission), [], false);
+                $payload = rescue(fn () => $gateway->createQris($billingSubmission), [], false);
             }
 
             if ($payload !== []) {

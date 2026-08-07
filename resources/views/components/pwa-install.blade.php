@@ -15,9 +15,8 @@
     <!-- Toast Header & App Icon -->
     <div class="flex items-start justify-between gap-3">
         <div class="flex items-center gap-3">
-            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gray-900 p-2 shadow-sm dark:bg-white/10">
-                <img src="{{ asset('images/logo/paperwork-logo.png') }}" alt="Paperwork App" class="h-7 w-7 object-contain dark:hidden">
-                <img src="{{ asset('img/logo/logo_white.png') }}" alt="Paperwork App" class="hidden h-7 w-7 object-contain dark:block">
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gray-900 p-1.5 shadow-sm dark:bg-white/10">
+                <img src="{{ asset('favicon.png') }}" alt="Paperwork App" class="h-8 w-8 object-contain rounded-lg">
             </div>
             <div>
                 <h3 class="text-sm font-bold text-gray-950 dark:text-white">Pasang Aplikasi Paperwork</h3>
@@ -75,39 +74,33 @@ function pwaInstaller() {
             const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
             if (isStandalone) return;
 
-            // Check if user permanently dismissed
-            if (localStorage.getItem('pwa_dismissed') === 'true') return;
-
-            // Detect Mobile
+            // Detect Mobile & iOS
             const ua = window.navigator.userAgent;
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || window.innerWidth < 768;
             this.isIOS = /iPhone|iPad|iPod/i.test(ua);
 
-            if (isMobile) {
-                // Register Service Worker
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('/sw.js').then((reg) => {
-                        console.log('[SW] Service Worker registered successfully:', reg.scope);
-                    }).catch(err => console.error('[SW] Registration Error:', err));
-                }
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').then((reg) => {
+                    console.log('[SW] Service Worker registered successfully:', reg.scope);
+                }).catch(err => console.error('[SW] Registration Error:', err));
+            }
 
-                window.__paperworkVapidPublicKey = this.vapidPublicKey;
-                this.setupWebPushSubscription();
+            window.__paperworkVapidPublicKey = this.vapidPublicKey;
+            this.setupWebPushSubscription();
 
-                // Listen for Android beforeinstallprompt
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    this.deferredPrompt = e;
-                    this.showBanner = true;
-                    if (window.toast) {
-                        window.toast('info', 'Aplikasi Paperwork siap dipasang ke Layar Utama HP Anda.');
-                    }
-                });
+            // Listen for Android/Chrome beforeinstallprompt
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                this.deferredPrompt = e;
+                this.showBanner = true;
+            });
 
-                // Show for iOS or general mobile after small delay
+            // Always show prompt banner on mobile after 1.5s unless dismissed
+            if (isMobile && localStorage.getItem('pwa_dismissed') !== 'true') {
                 setTimeout(() => {
                     this.showBanner = true;
-                }, 2000);
+                }, 1500);
             }
         },
 

@@ -18,7 +18,7 @@ class Invoice extends Model
     protected $fillable = [
         'company_id', 'client_id', 'quotation_id', 'number', 'public_token',
         'issue_date', 'due_date', 'sent_at', 'last_reminder_at', 'status',
-        'subtotal', 'tax_rate', 'tax_total', 'pph_rate', 'pph_amount',
+        'subtotal', 'tax_rate', 'tax_total', 'pph_rate', 'pph_amount', 'custom_taxes',
         'total', 'down_payment_amount', 'expense_total', 'profit_total',
         'amount_paid', 'credit_note_total', 'balance_due', 'notes',
         'is_recurring', 'recurring_cycle', 'next_recurrence_date', 'parent_invoice_id',
@@ -37,6 +37,7 @@ class Invoice extends Model
             'tax_total' => 'decimal:2',
             'pph_rate' => 'decimal:2',
             'pph_amount' => 'decimal:2',
+            'custom_taxes' => 'array',
             'total' => 'decimal:2',
             'down_payment_amount' => 'decimal:2',
             'expense_total' => 'decimal:2',
@@ -189,6 +190,44 @@ class Invoice extends Model
         return $query->unpaid()
             ->whereNotNull('due_date')
             ->whereDate('due_date', '<', now()->toDateString());
+    }
+
+    public function getNormalizedCustomTaxesAttribute(): array
+    {
+        $taxes = $this->custom_taxes;
+        if (is_array($taxes) && count($taxes) > 0) {
+            return collect($taxes)->map(function ($tax) {
+                $subtotal = (float) $this->subtotal;
+                $rate = (float) ($tax['rate'] ?? 0);
+                return [
+                    'name' => (string) ($tax['name'] ?? 'Pajak'),
+                    'rate' => $rate,
+                    'type' => (string) ($tax['type'] ?? 'addition'),
+                    'amount' => (float) ($tax['amount'] ?? round($subtotal * ($rate / 100), 2)),
+                ];
+            })->all();
+        }
+
+        $fallback = [];
+        $subtotal = (float) $this->subtotal;
+        if ((float) $this->tax_rate > 0) {
+            $fallback[] = [
+                'name' => 'PPN',
+                'rate' => (float) $this->tax_rate,
+                'type' => 'addition',
+                'amount' => (float) ($this->tax_total ?? round($subtotal * ($this->tax_rate / 100), 2)),
+            ];
+        }
+        if ((float) $this->pph_rate > 0) {
+            $fallback[] = [
+                'name' => 'PPh',
+                'rate' => (float) $this->pph_rate,
+                'type' => 'deduction',
+                'amount' => (float) ($this->pph_amount ?? round($subtotal * ($this->pph_rate / 100), 2)),
+            ];
+        }
+
+        return $fallback;
     }
 
     public function scopeDueForReminder(Builder $query): Builder
