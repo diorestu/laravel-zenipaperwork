@@ -497,3 +497,35 @@ it('customizes invoice numbering template and auto-generates sequential invoice 
     expect($generated)->toBe($expected);
     expect($user->company->refresh()->invoice_next_number)->toBe(11);
 });
+
+it('processes Pakasir POST webhook JSON payload and activates user subscription automatically', function () {
+    config(['services.pakasir.project' => 'depodomain']);
+
+    $user = paperworkUser();
+    $submission = BillingSubmission::create([
+        'company_id' => $user->company_id,
+        'package' => 'business',
+        'billing_period' => 'monthly',
+        'amount' => 22000,
+        'payment_method' => 'qris',
+        'payment_gateway' => 'pakasir',
+        'payment_order_id' => 'PAPERWORK-B00099',
+        'status' => 'pending',
+    ]);
+
+    $payload = [
+        'amount' => 22000,
+        'order_id' => 'PAPERWORK-B00099',
+        'project' => 'depodomain',
+        'status' => 'completed',
+        'payment_method' => 'qris',
+        'completed_at' => '2024-09-10T08:07:02.819+07:00',
+    ];
+
+    $response = $this->postJson(route('webhooks.pakasir'), $payload);
+    $response->assertOk()
+        ->assertJson(['message' => 'Billing berhasil diaktifkan.']);
+
+    expect($submission->refresh()->status)->toBe('confirmed');
+    expect($user->company->refresh()->active_plan)->toBe('business');
+});

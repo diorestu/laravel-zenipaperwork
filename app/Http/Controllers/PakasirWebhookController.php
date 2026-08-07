@@ -85,22 +85,26 @@ class PakasirWebhookController extends Controller
             return response()->json(['message' => 'Nominal tidak valid.'], 422);
         }
 
-        $detailPayload = $pakasir->detail($submission);
+        $completedAt = $request->input('completed_at');
+
+        $detailPayload = rescue(fn () => $pakasir->detail($submission), [], false);
         $detailStatus = strtolower((string) (
             data_get($detailPayload, 'payment.status')
             ?? data_get($detailPayload, 'transaction.status')
             ?? data_get($detailPayload, 'status')
+            ?? $status
         ));
 
         $combinedPayload = array_replace_recursive($submission->payment_payload ?? [], [
             'webhook' => $payload,
             'detail' => $detailPayload,
+            'completed_at' => $completedAt,
         ]);
 
-        if ($status !== 'completed' || $detailStatus !== 'completed') {
+        if ($status !== 'completed' && $detailStatus !== 'completed') {
             $submission->update(['payment_payload' => $combinedPayload]);
 
-            return response()->json(['message' => 'Webhook diterima, transaksi belum complete.']);
+            return response()->json(['message' => 'Webhook diterima, transaksi belum completed.'], 200);
         }
 
         BillingSubmission::forCompany($submission->company_id)
