@@ -22,26 +22,32 @@
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="{{ url()->current() }}">
 
-    <!-- Favicon & Icons -->
-    <link rel="icon" type="image/png" href="{{ asset('images/logo/sq_white.png') }}">
-    <link rel="shortcut icon" href="{{ asset('images/logo/sq_white.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/logo/sq_white.png') }}">
+    <!-- Favicon & Google Favicon Tags -->
+    <link rel="icon" type="image/png" sizes="32x32" href="https://paperwork.biz.id/favicon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://paperwork.biz.id/images/logo/sq_white.png">
+    <link rel="shortcut icon" href="https://paperwork.biz.id/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://paperwork.biz.id/apple-touch-icon.png">
 
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:url" content="https://paperwork.biz.id/">
     <meta property="og:site_name" content="Paperwork">
     <meta property="og:title" content="Paperwork - Solusi Invoice, Penawaran & Billing Bisnis Otomatis">
     <meta property="og:description" content="Paperwork membantu bisnis Anda membuat invoice profesional, penawaran harga resmi, serta kelola tagihan secara otomatis. Coba Gratis 30 Hari!">
-    <meta property="og:image" content="{{ asset('images/logo/logo-header.png') }}">
+    <meta property="og:image" content="https://paperwork.biz.id/images/logo/og-share.png">
+    <meta property="og:image:secure_url" content="https://paperwork.biz.id/images/logo/og-share.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Paperwork Logo">
     <meta property="og:locale" content="id_ID">
 
     <!-- Twitter Card -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:url" content="https://paperwork.biz.id/">
     <meta property="twitter:title" content="Paperwork - Solusi Invoice, Penawaran & Billing Bisnis Otomatis">
     <meta property="twitter:description" content="Paperwork membantu bisnis Anda membuat invoice profesional, penawaran harga resmi, serta kelola tagihan secara otomatis. Coba Gratis 30 Hari!">
-    <meta property="twitter:image" content="{{ asset('images/logo/logo-header.png') }}">
+    <meta property="twitter:image" content="https://paperwork.biz.id/images/logo/og-share.png">
 
     <!-- Structured Data (JSON-LD Schema.org) -->
     <script type="application/ld+json">
