@@ -218,4 +218,43 @@ class BillingController extends Controller
 
         return view('mobile.billing-show', compact('submission', 'paymentQrCode'));
     }
+
+    public function checkStatus(BillingSubmission $billingSubmission, PakasirPaymentGateway $pakasir)
+    {
+        $this->authorize('view', $billingSubmission);
+
+        if ($billingSubmission->status === 'pending' && $billingSubmission->payment_method === 'qris') {
+            $payload = rescue(fn () => $pakasir->detail($billingSubmission), [], false);
+            $detailStatus = strtolower((string) (
+                data_get($payload, 'payment.status')
+                ?? data_get($payload, 'transaction.status')
+                ?? data_get($payload, 'status')
+            ));
+
+            if ($detailStatus === 'completed') {
+                BillingSubmission::forCompany($billingSubmission->company_id)
+                    ->whereKeyNot($billingSubmission->id)
+                    ->where('status', 'confirmed')
+                    ->update(['status' => 'stopped']);
+
+                $billingSubmission->update(['status' => 'confirmed']);
+
+                $company = $billingSubmission->company;
+                $endsAt = $billingSubmission->billing_period === 'yearly' ? now()->addYear() : now()->addMonth();
+                $company->update([
+                    'active_plan' => $billingSubmission->package,
+                    'subscription_ends_at' => $endsAt,
+                ]);
+            }
+        }
+
+        $billingSubmission->refresh();
+
+        return response()->json([
+            'status' => $billingSubmission->status,
+            'is_confirmed' => $billingSubmission->status === 'confirmed',
+            'package' => $billingSubmission->package,
+            'message' => $billingSubmission->status === 'confirmed' ? 'Pembayaran berhasil diverifikasi!' : 'Menunggu pembayaran...',
+        ]);
+    }
 }

@@ -1,7 +1,197 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-6"
+     x-data="{
+        showOnboarding: false,
+        step: 1,
+        maxSteps: 4,
+        storageKey: 'paperwork_onboarding_user_' + @js(auth()->id()),
+        init() {
+            if (!localStorage.getItem(this.storageKey)) {
+                setTimeout(() => { this.showOnboarding = true; }, 500);
+            }
+        },
+        closeOnboarding() {
+            this.showOnboarding = false;
+            localStorage.setItem(this.storageKey, 'completed');
+        },
+        openOnboarding() {
+            this.step = 1;
+            this.showOnboarding = true;
+        }
+     }"
+>
+    <!-- Header Dashboard dengan Tombol Ulangi Onboarding -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-white">Selamat Datang, {{ auth()->user()->name }}! 👋</h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Kelola ringkasan kinerja, invoice, penawaran, dan pembayaran perusahaan {{ auth()->user()->company?->name }}.</p>
+        </div>
+        <div>
+            <button @click="openOnboarding()" type="button" class="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-xs hover:bg-gray-50 hover:border-brand-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                <span>💡 Panduan Onboarding</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Onboarding User Baru -->
+    <div x-show="showOnboarding" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-sm"
+         style="display: none;"
+    >
+        <div @click.away="closeOnboarding()" 
+             class="relative w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900 dark:border dark:border-gray-800"
+        >
+            <!-- Top Gradient Header -->
+            <div class="bg-gradient-to-r from-brand-600 to-indigo-600 px-6 py-6 text-white relative">
+                <button @click="closeOnboarding()" type="button" class="absolute top-4 right-4 rounded-full bg-white/10 p-1.5 text-white/80 hover:bg-white/20 hover:text-white transition">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+
+                <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-200 mb-1">
+                    <span>Langkah <span x-text="step"></span> dari <span x-text="maxSteps"></span></span>
+                </div>
+                <h2 class="text-xl font-extrabold" x-show="step === 1">Selamat Datang di Paperwork! 🚀</h2>
+                <h2 class="text-xl font-extrabold" x-show="step === 2" style="display: none;">Penomoran Invoice Kustom ⚙️</h2>
+                <h2 class="text-xl font-extrabold" x-show="step === 3" style="display: none;">Pembayaran QRIS & Notifikasi 💳</h2>
+                <h2 class="text-xl font-extrabold" x-show="step === 4" style="display: none;">Panduan Mulai Cepat 🏁</h2>
+                <p class="text-xs text-white/80 mt-1" x-show="step === 1">Platform manajemen invoice, penawaran, dan pembayaran profesional untuk bisnis Anda.</p>
+                <p class="text-xs text-white/80 mt-1" x-show="step === 2" style="display: none;">Atur template nomor invoice otomatis sesuai identitas standar perusahaan Anda.</p>
+                <p class="text-xs text-white/80 mt-1" x-show="step === 3" style="display: none;">Terima pembayaran QRIS Pakasir instan dengan verifikasi otomatis tanpa perlu cek manual.</p>
+                <p class="text-xs text-white/80 mt-1" x-show="step === 4" style="display: none;">Empat langkah mudah untuk mulai menerbitkan invoice pertama Anda.</p>
+            </div>
+
+            <!-- Slide Content Container -->
+            <div class="p-6">
+                <!-- Slide 1: Welcome -->
+                <div x-show="step === 1" class="space-y-4">
+                    <div class="rounded-xl border border-gray-100 bg-gray-50/70 p-4 dark:border-gray-800 dark:bg-gray-850/50 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600 dark:bg-brand-500/20 dark:text-brand-400">
+                                📄
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Kelola Invoice & Penawaran</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Buat dokumen invoice dan quotation profesional dengan ekspor PDF siap cetak.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 border-t border-gray-200/60 dark:border-gray-800 pt-3">
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+                                📊
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Pantau Kinerja & Piutang Real-Time</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Grafik analisis pendapatan, pelacakan invoice jatuh tempo, dan statistik transaksi.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Numbering Template -->
+                <div x-show="step === 2" style="display: none;" class="space-y-4">
+                    <div class="rounded-xl border border-indigo-100 bg-indigo-50/50 p-4 dark:border-indigo-500/20 dark:bg-indigo-500/10 space-y-2">
+                        <span class="text-xs font-semibold text-indigo-700 dark:text-indigo-300">Format Template Nomor Invoice:</span>
+                        <p class="font-mono text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-900 px-3 py-2 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                            INV/2026/08/0001
+                        </p>
+                        <p class="text-xs text-gray-600 dark:text-gray-300">Gunakan tag dinamis seperti <code class="text-brand-600 font-bold">{PREFIX}</code>, <code class="text-brand-600 font-bold">{YYYY}</code>, <code class="text-brand-600 font-bold">{MM}</code>, <code class="text-brand-600 font-bold">{ROMAN}</code>, dan <code class="text-brand-600 font-bold">{NUMBER}</code> untuk menyesuaikan skema penomoran invoice perusahaan Anda di menu Pengaturan Perusahaan.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3: QRIS & Payments -->
+                <div x-show="step === 3" style="display: none;" class="space-y-4">
+                    <div class="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4 dark:border-emerald-500/20 dark:bg-emerald-500/10 space-y-3">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">📱</span>
+                            <div>
+                                <h3 class="text-sm font-bold text-gray-900 dark:text-white">QRIS Pakasir Automated Webhook</h3>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-0.5">Pelanggan bayar via QRIS ➔ Webhook verifikasi otomatis ➔ Status transaksi langsung Lunas.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 border-t border-emerald-200/60 dark:border-emerald-800/60 pt-3">
+                            <span class="text-2xl">📱</span>
+                            <div>
+                                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Akses PWA Mobile App</h3>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-0.5">Gunakan Paperwork langsung dari HP Android / iPhone Anda kapan saja.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Quick Start Checklist -->
+                <div x-show="step === 4" style="display: none;" class="space-y-3">
+                    <div class="space-y-2">
+                        <a href="{{ route('settings.company') }}" class="flex items-center justify-between rounded-xl border border-gray-200 p-3 hover:border-brand-500 hover:bg-brand-50/30 transition dark:border-gray-800 dark:hover:bg-gray-800/50">
+                            <div class="flex items-center gap-3">
+                                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">1</span>
+                                <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">Lengkapi Profil & Format Invoice</span>
+                            </div>
+                            <span class="text-xs font-bold text-brand-600 dark:text-brand-400">Buka →</span>
+                        </a>
+
+                        <a href="{{ route('settings.bank-accounts') }}" class="flex items-center justify-between rounded-xl border border-gray-200 p-3 hover:border-brand-500 hover:bg-brand-50/30 transition dark:border-gray-800 dark:hover:bg-gray-800/50">
+                            <div class="flex items-center gap-3">
+                                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">2</span>
+                                <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">Atur Rekening Pembayaran Bank</span>
+                            </div>
+                            <span class="text-xs font-bold text-brand-600 dark:text-brand-400">Buka →</span>
+                        </a>
+
+                        <a href="{{ route('clients.index') }}" class="flex items-center justify-between rounded-xl border border-gray-200 p-3 hover:border-brand-500 hover:bg-brand-50/30 transition dark:border-gray-800 dark:hover:bg-gray-800/50">
+                            <div class="flex items-center gap-3">
+                                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">3</span>
+                                <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">Tambah Data Klien Pertama</span>
+                            </div>
+                            <span class="text-xs font-bold text-brand-600 dark:text-brand-400">Buka →</span>
+                        </a>
+
+                        <a href="{{ route('invoices.index', ['modal' => 'create']) }}" class="flex items-center justify-between rounded-xl border border-brand-200 bg-brand-50/50 p-3 hover:border-brand-500 transition dark:border-brand-500/20 dark:bg-brand-500/10">
+                            <div class="flex items-center gap-3">
+                                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-500 text-xs font-bold text-white">4</span>
+                                <span class="text-xs font-bold text-brand-700 dark:text-brand-300">Buat Invoice Pertama Anda</span>
+                            </div>
+                            <span class="text-xs font-bold text-brand-600 dark:text-brand-400">Buat Sekarang →</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Footer Navigation Controls -->
+                <div class="mt-6 flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-800">
+                    <!-- Dots Pagination -->
+                    <div class="flex items-center gap-1.5">
+                        <template x-for="i in maxSteps" :key="i">
+                            <button type="button" @click="step = i" 
+                                    class="h-2 rounded-full transition-all duration-300"
+                                    :class="step === i ? 'w-6 bg-brand-500' : 'w-2 bg-gray-300 dark:bg-gray-700'"
+                            ></button>
+                        </template>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button x-show="step > 1" @click="step--" type="button" class="rounded-xl border border-gray-200 px-3.5 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                            Kembali
+                        </button>
+                        <button x-show="step < maxSteps" @click="step++" type="button" class="rounded-xl bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-600 transition shadow-sm">
+                            Lanjut →
+                        </button>
+                        <button x-show="step === maxSteps" @click="closeOnboarding()" type="button" class="rounded-xl bg-emerald-500 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-600 transition shadow-sm">
+                            Mulai Gunakan Paperwork 🚀
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <section id="dashboard-stats-grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         @foreach ($stats as $stat)
             @php

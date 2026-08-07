@@ -20,6 +20,7 @@ use App\Http\Controllers\SuperAdminController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
+Route::view('/', 'landing')->name('landing');
 Route::get('/public/invoices/{token}', [PublicInvoiceController::class, 'show'])->name('public.invoices.show');
 Route::post('/public/invoices/{token}/pay', [PublicInvoiceController::class, 'pay'])->name('public.invoices.pay');
 Route::post('/webhooks/pakasir', PakasirWebhookController::class)->name('webhooks.pakasir');
@@ -54,7 +55,7 @@ Route::middleware('auth')->group(function () {
     })->middleware('signed')->name('verification.verify');
 
     Route::middleware(['company.context', 'subscription.active', 'redirect.mobile'])->group(function () {
-        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/mobile/app', [MobileWorkspaceController::class, 'index'])->name('mobile.app');
         Route::get('/mobile/stats', [MobileWorkspaceController::class, 'stats'])->name('mobile.stats');
 
@@ -87,6 +88,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/mobile/profile', [SettingsController::class, 'mobileCompany'])->name('mobile.profile');
         Route::get('/settings/billing', [BillingController::class, 'index'])->name('settings.billing');
         Route::get('/settings/billing/{billingSubmission}', [BillingController::class, 'show'])->name('settings.billing.show');
+        Route::get('/settings/billing/{billingSubmission}/check-status', [BillingController::class, 'checkStatus'])->name('settings.billing.check-status');
         Route::get('/mobile/invoices/{invoice}', [InvoiceController::class, 'mobileShow'])->name('mobile.invoices.show');
         Route::get('/mobile/billing', [BillingController::class, 'mobileIndex'])->name('mobile.billing');
         Route::get('/mobile/billing/{billingSubmission}', [BillingController::class, 'mobileShow'])->name('mobile.billing.show');

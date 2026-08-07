@@ -10,7 +10,7 @@ class MenuHelper
             [
                 'icon' => 'dashboard',
                 'name' => 'Dasbor',
-                'path' => '/',
+                'path' => '/dashboard',
             ],
             [
                 'icon' => 'user-profile',

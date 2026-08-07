@@ -14,7 +14,48 @@
         ?? data_get($payload, 'data.qris_image');
 @endphp
 
-<div class="space-y-6">
+<div class="space-y-6"
+     x-data="{
+        status: @js($submission->status),
+        checking: false,
+        timer: null,
+        isConfirmed: @js($submission->status === 'confirmed'),
+        init() {
+            if (this.isConfirmed) return;
+            this.timer = setInterval(() => {
+                this.checkStatusDebounced();
+            }, 5000);
+        },
+        async checkStatusDebounced() {
+            if (this.checking || this.isConfirmed) return;
+            this.checking = true;
+            try {
+                let res = await fetch(@js(route('settings.billing.check-status', $submission)));
+                let data = await res.json();
+                if (data.is_confirmed) {
+                    this.isConfirmed = true;
+                    this.status = 'confirmed';
+                    clearInterval(this.timer);
+                    setTimeout(() => window.location.reload(), 1000);
+                }
+            } catch (e) {}
+            this.checking = false;
+        }
+     }"
+>
+    <!-- Alert Banner Status Verification -->
+    <template x-if="isConfirmed">
+        <div class="rounded-xl border border-success-200 bg-success-50 p-4 text-sm text-success-800 dark:border-success-500/20 dark:bg-success-500/10 dark:text-success-300 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-2 font-semibold">
+                <svg class="h-5 w-5 text-success-600 dark:text-success-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Pembayaran Berhasil Diverifikasi! Paket {{ str($submission->package)->headline() }} Telah Aktif.</span>
+            </div>
+            <span class="text-xs opacity-75">Memuat ulang data...</span>
+        </div>
+    </template>
+
     <div class="flex items-center justify-between">
         <div>
             <h1 class="text-lg font-semibold text-gray-900 dark:text-white/90">Pembayaran QRIS Pakasir</h1>
@@ -47,7 +88,18 @@
                 </div>
                 <div class="rounded-xl border border-gray-100 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-900/50">
                     <dt class="text-gray-500 dark:text-gray-400">Status Transaksi</dt>
-                    <dd class="mt-1"><x-status-badge :status="$submission->status" /></dd>
+                    <dd class="mt-1 flex items-center gap-2">
+                        <template x-if="isConfirmed">
+                            <span class="inline-flex items-center gap-1 rounded-full bg-success-50 px-2.5 py-0.5 text-xs font-semibold text-success-700 dark:bg-success-500/10 dark:text-success-400">
+                                <span class="h-1.5 w-1.5 rounded-full bg-success-500"></span> Terkonfirmasi
+                            </span>
+                        </template>
+                        <template x-if="!isConfirmed">
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                                <span class="h-1.5 w-1.5 animate-ping rounded-full bg-amber-500"></span> Menunggu Pembayaran
+                            </span>
+                        </template>
+                    </dd>
                 </div>
                 <div class="rounded-xl border border-gray-100 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-900/50">
                     <dt class="text-gray-500 dark:text-gray-400">ID Pesanan Transaksi</dt>
@@ -61,7 +113,7 @@
                     <li>Buka aplikasi mobile banking atau e-wallet (BCA, Mandiri, GoPay, OVO, Dana, ShopeePay, dll).</li>
                     <li>Pilih menu <strong>Scan / Pindai QRIS</strong> lalu arahkan kamera ke Kode QRIS di sebelah kanan.</li>
                     <li>Pastikan nama merchant dan nominal sesuai dengan jumlah di atas.</li>
-                    <li>Selesaikan pembayaran. Sistem akan mendeteksi status terbayar secara otomatis.</li>
+                    <li>Selesaikan pembayaran. Sistem mengecek status verifikasi secara otomatis tiap 5 detik.</li>
                 </ol>
             </div>
         </div>
@@ -85,6 +137,12 @@
             </div>
 
             <div class="mt-6 space-y-2">
+                <!-- Status Auto Check Indicator -->
+                <div class="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400 py-1" x-show="!isConfirmed">
+                    <span class="h-2 w-2 rounded-full bg-brand-500 animate-ping"></span>
+                    <span>Pemeriksaan otomatis background (setiap 5 detik)</span>
+                </div>
+
                 @if ($submission->payment_url)
                     <a href="{{ $submission->payment_url }}" target="_blank" class="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
                         <span>Buka Halaman Pembayaran Pakasir</span>

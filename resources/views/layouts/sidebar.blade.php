@@ -59,14 +59,11 @@
     @mouseenter="if (!$store.sidebar.isExpanded) $store.sidebar.setHovered(true)"
     @mouseleave="$store.sidebar.setHovered(false)">
     <!-- Logo Section -->
-    <div class="shrink-0 pt-5 pb-4 flex"
-        :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ?
-        'xl:justify-center' :
-        'justify-start'">
-        <a href="/" class="flex h-10 items-center overflow-hidden">
+    <div class="shrink-0 pt-5 pb-4 flex justify-center items-center w-full">
+        <a href="/" class="flex h-10 items-center justify-center overflow-hidden mx-auto">
             <img
                 x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                src="{{ asset('images/logo/paperwork-logo.png') }}"
+                src="{{ asset('images/logo/logo-header.png') }}"
                 alt="Paperwork"
                 class="h-9 w-auto dark:hidden"
             >
@@ -82,7 +79,7 @@
                 aria-label="Paperwork"
             >
                 <img
-                    src="{{ asset('images/logo/paperwork-logo.png') }}"
+                    src="{{ asset('images/logo/logo-header.png') }}"
                     alt=""
                     class="h-9 w-[158px] max-w-none dark:hidden"
                 >
