@@ -1,2 +1,10 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /dashboard
+Disallow: /settings/
+Disallow: /super-admin/
+Disallow: /login
+Disallow: /register
+Disallow: /webhooks/
+
+Sitemap: https://paperwork.biz.id/sitemap.xml

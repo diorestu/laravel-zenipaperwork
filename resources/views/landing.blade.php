@@ -1,10 +1,71 @@
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KXX3GD2W00"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-KXX3GD2W00');
+    </script>
+
+    <!-- Primary Meta Tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Paperwork - Platform Manajemen Invoice, Penawaran, Klien & Pembayaran QRIS Otomatis Terlengkap di Indonesia.">
-    <title>Paperwork - Solusi Invoice & Billing Otomatis Bisnis Anda</title>
+    <title>Paperwork - Solusi Invoice, Penawaran & Billing Bisnis Otomatis</title>
+    <meta name="title" content="Paperwork - Solusi Invoice, Penawaran & Billing Bisnis Otomatis">
+    <meta name="description" content="Paperwork membantu bisnis Anda membuat invoice profesional, dokumen penawaran harga, mengelola klien, dan mengotomatisasi sistem pembayaran tagihan dengan mudah dan rapi.">
+    <meta name="keywords" content="aplikasi invoice, buat invoice online, aplikasi penawaran harga, software billing indonesia, kelola tagihan bisnis, aplikasi kasir & billing, paperwork">
+    <meta name="author" content="PT Numa Teknologi Nusantara">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/sq_white.png') }}">
+    <link rel="shortcut icon" href="{{ asset('images/logo/sq_white.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/sq_white.png') }}">
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:site_name" content="Paperwork">
+    <meta property="og:title" content="Paperwork - Solusi Invoice, Penawaran & Billing Bisnis Otomatis">
+    <meta property="og:description" content="Paperwork membantu bisnis Anda membuat invoice profesional, penawaran harga resmi, serta kelola tagihan secara otomatis. Coba Gratis 30 Hari!">
+    <meta property="og:image" content="{{ asset('images/logo/logo-header.png') }}">
+    <meta property="og:locale" content="id_ID">
+
+    <!-- Twitter Card -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="Paperwork - Solusi Invoice, Penawaran & Billing Bisnis Otomatis">
+    <meta property="twitter:description" content="Paperwork membantu bisnis Anda membuat invoice profesional, penawaran harga resmi, serta kelola tagihan secara otomatis. Coba Gratis 30 Hari!">
+    <meta property="twitter:image" content="{{ asset('images/logo/logo-header.png') }}">
+
+    <!-- Structured Data (JSON-LD Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "SoftwareApplication",
+      "name": "Paperwork",
+      "operatingSystem": "All",
+      "applicationCategory": "BusinessApplication",
+      "offers": {
+        "@@type": "AggregateOffer",
+        "priceCurrency": "IDR",
+        "lowPrice": "0",
+        "highPrice": "299000",
+        "offerCount": "3"
+      },
+      "description": "Platform Manajemen Invoice, Penawaran Harga, Klien & Billing Perusahaan Otomatis di Indonesia.",
+      "publisher": {
+        "@@type": "Organization",
+        "name": "PT Numa Teknologi Nusantara",
+        "logo": "{{ asset('images/logo/logo-header.png') }}"
+      }
+    }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,14 +120,40 @@
         
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
             <div class="mx-auto max-w-4xl space-y-6">
-                <!-- Badge -->
-                <div class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-4 py-1.5 text-xs font-bold text-brand-700 shadow-sm dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300">
-                    <span class="flex h-2 w-2 rounded-full bg-brand-500 animate-pulse"></span>
-                    <span class="font-bold">Platform Billing & Invoice #1 di Indonesia</span>
-                </div>
-
                 <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl dark:text-white leading-[1.15]">
-                    Kelola Invoice & Penawaran Bisnis Anda <span class="bg-gradient-to-r from-brand-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">Otomatis & Tanpa Ribet</span>
+                    Kelola Invoice & Penawaran Bisnis Anda 
+                    <span x-data="{
+                        words: ['Otomatis & Tanpa Ribet', 'Cepat & Serba Praktis', 'Profesional & Terorganisir'],
+                        currentWordIndex: 0,
+                        currentCharIndex: 0,
+                        isDeleting: false,
+                        text: '',
+                        type() {
+                            let currentFullWord = this.words[this.currentWordIndex];
+                            if (this.isDeleting) {
+                                this.text = currentFullWord.substring(0, this.currentCharIndex - 1);
+                                this.currentCharIndex--;
+                            } else {
+                                this.text = currentFullWord.substring(0, this.currentCharIndex + 1);
+                                this.currentCharIndex++;
+                            }
+
+                            let typeSpeed = this.isDeleting ? 40 : 80;
+
+                            if (!this.isDeleting && this.currentCharIndex === currentFullWord.length) {
+                                typeSpeed = 2200;
+                                this.isDeleting = true;
+                            } else if (this.isDeleting && this.currentCharIndex === 0) {
+                                this.isDeleting = false;
+                                this.currentWordIndex = (this.currentWordIndex + 1) % this.words.length;
+                                typeSpeed = 400;
+                            }
+
+                            setTimeout(() => this.type(), typeSpeed);
+                        }
+                    }" x-init="type()" class="text-brand-600 dark:text-brand-400 inline-block min-h-[1.2em]">
+                        <span x-text="text"></span><span class="animate-pulse text-brand-600 dark:text-brand-400">|</span>
+                    </span>
                 </h1>
 
                 <p class="mx-auto max-w-2xl text-base font-medium text-gray-600 sm:text-lg dark:text-gray-300 leading-relaxed">
@@ -82,6 +169,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                             </svg>
                         </a>
+                        <a href="https://wa.me/628811841064?text=Halo%20Paperwork,%20saya%20ingin%20bertanya%20mengenai%20layanan%20Paperwork." target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex h-12 items-center justify-center rounded-xl border border-gray-300 bg-white px-8 text-base font-bold text-gray-800 shadow-sm transition hover:bg-gray-50 hover:border-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800">
+                            <span>Hubungi Kami</span>
+                        </a>
                     @else
                         <a href="{{ route('register') }}" class="w-full sm:w-auto inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-brand-600 px-8 text-base font-bold text-white shadow-theme-md transition hover:bg-brand-700 active:scale-[0.98]">
                             <span>Coba Uji Coba Gratis 30 Hari</span>
@@ -89,8 +179,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                             </svg>
                         </a>
-                        <a href="#fitur" class="w-full sm:w-auto inline-flex h-12 items-center justify-center rounded-xl border border-gray-300 bg-white px-7 text-base font-bold text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800">
-                            Lihat Fitur Lengkap
+                        <a href="https://wa.me/628811841064?text=Halo%20Paperwork,%20saya%20ingin%20bertanya%20mengenai%20layanan%20Paperwork." target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex h-12 items-center justify-center rounded-xl border border-gray-300 bg-white px-8 text-base font-bold text-gray-800 shadow-sm transition hover:bg-gray-50 hover:border-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800">
+                            <span>Hubungi Kami</span>
                         </a>
                     @endauth
                 </div>
@@ -102,33 +192,72 @@
                 </div>
             </div>
 
-            <!-- Hero Mockup Card -->
-            <div class="mt-14 relative mx-auto max-w-5xl rounded-2xl border border-gray-200/80 bg-white/70 p-3 shadow-2xl backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900/70">
-                <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-900">
-                    <div class="flex items-center gap-2 px-4 py-3 bg-gray-950 border-b border-gray-800">
-                        <span class="h-3 w-3 rounded-full bg-red-500"></span>
-                        <span class="h-3 w-3 rounded-full bg-yellow-500"></span>
-                        <span class="h-3 w-3 rounded-full bg-green-500"></span>
-                        <span class="ml-2 font-mono text-xs text-gray-400 font-medium">https://paperwork.my.id/dashboard</span>
+            <!-- Hero 4 Floating Stats Counter Items -->
+            <div x-data="{
+                clientCount: 0,
+                invoiceCount: 0,
+                revenueCount: 0,
+                satisfactionCount: 0,
+                animated: false,
+                init() {
+                    let observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting && !this.animated) {
+                                this.animated = true;
+                                this.animateValues();
+                            }
+                        });
+                    }, { threshold: 0.2 });
+                    observer.observe(this.$el);
+                },
+                animateValues() {
+                    let duration = 2000;
+                    let startTime = null;
+                    let step = (timestamp) => {
+                        if (!startTime) startTime = timestamp;
+                        let progress = Math.min((timestamp - startTime) / duration, 1);
+                        let easeProgress = 1 - Math.pow(1 - progress, 3);
+                        this.clientCount = Math.floor(easeProgress * 500);
+                        this.invoiceCount = Math.floor(easeProgress * 12500);
+                        this.revenueCount = (easeProgress * 2.8).toFixed(1);
+                        this.satisfactionCount = (easeProgress * 99.8).toFixed(1);
+                        if (progress < 1) {
+                            window.requestAnimationFrame(step);
+                        }
+                    };
+                    window.requestAnimationFrame(step);
+                }
+            }" class="mt-14 relative mx-auto max-w-5xl">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+                    <!-- Item 1: Total Klien -->
+                    <div class="flex flex-col items-center justify-center text-center p-6 rounded-2xl bg-white/80 dark:bg-gray-900/80 border border-gray-200/80 dark:border-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-brand-500/40">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Total Klien Aktif</span>
+                        <div class="text-3xl sm:text-4xl font-extrabold text-brand-600 dark:text-brand-400 mt-2">
+                            <span x-text="clientCount">0</span>+
+                        </div>
                     </div>
-                    <div class="p-6 text-left space-y-6 bg-[#F7F6F3] dark:bg-gray-950">
-                        <div class="grid gap-4 sm:grid-cols-4">
-                            <div class="rounded-xl border border-sky-100 bg-sky-50 p-4 dark:border-sky-500/20 dark:bg-sky-500/10">
-                                <span class="text-xs font-bold text-sky-700 dark:text-sky-300">Total Invoice</span>
-                                <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">128 Dokumen</p>
-                            </div>
-                            <div class="rounded-xl border border-violet-100 bg-violet-50 p-4 dark:border-violet-500/20 dark:bg-violet-500/10">
-                                <span class="text-xs font-bold text-violet-700 dark:text-violet-300">Nilai Diterbitkan</span>
-                                <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">Rp 148.500.000</p>
-                            </div>
-                            <div class="rounded-xl border border-emerald-100 bg-emerald-50 p-4 dark:border-emerald-500/20 dark:bg-emerald-500/10">
-                                <span class="text-xs font-bold text-emerald-700 dark:text-emerald-300">Pendapatan Diterima</span>
-                                <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">Rp 132.000.000</p>
-                            </div>
-                            <div class="rounded-xl border border-amber-100 bg-amber-50 p-4 dark:border-amber-500/20 dark:bg-amber-500/10">
-                                <span class="text-xs font-bold text-amber-700 dark:text-amber-300">Piutang Aktif</span>
-                                <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">Rp 16.500.000</p>
-                            </div>
+
+                    <!-- Item 2: Invoice Diterbitkan -->
+                    <div class="flex flex-col items-center justify-center text-center p-6 rounded-2xl bg-white/80 dark:bg-gray-900/80 border border-gray-200/80 dark:border-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-indigo-500/40">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Invoice Diterbitkan</span>
+                        <div class="text-3xl sm:text-4xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-2">
+                            <span x-text="invoiceCount.toLocaleString('id-ID')">0</span>+
+                        </div>
+                    </div>
+
+                    <!-- Item 3: Transaksi Diproses -->
+                    <div class="flex flex-col items-center justify-center text-center p-6 rounded-2xl bg-white/80 dark:bg-gray-900/80 border border-gray-200/80 dark:border-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-emerald-500/40">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Nilai Transaksi</span>
+                        <div class="text-3xl sm:text-4xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-2">
+                            Rp <span x-text="revenueCount">0</span>M+
+                        </div>
+                    </div>
+
+                    <!-- Item 4: Kepuasan Pengguna -->
+                    <div class="flex flex-col items-center justify-center text-center p-6 rounded-2xl bg-white/80 dark:bg-gray-900/80 border border-gray-200/80 dark:border-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-violet-500/40">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Kepuasan Pengguna</span>
+                        <div class="text-3xl sm:text-4xl font-extrabold text-violet-600 dark:text-violet-400 mt-2">
+                            <span x-text="satisfactionCount">0</span>%
                         </div>
                     </div>
                 </div>
@@ -349,6 +478,26 @@
                     </button>
                     <div x-show="open === 3" class="mt-3 text-xs font-medium text-gray-600 dark:text-gray-400 leading-relaxed" style="display: none;">
                         Bisa sekali! Anda dapat menentukan Prefix, format tanggal/tahun/bulan romawi, serta jumlah digit nomor urut di menu Pengaturan Perusahaan.
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+                    <button @click="open = open === 4 ? null : 4" class="flex w-full items-center justify-between text-left text-sm font-bold text-gray-900 dark:text-white">
+                        <span>Bagaimana cara mengunduh dan mencetak dokumen Invoice / Penawaran?</span>
+                        <span class="text-lg font-bold" x-text="open === 4 ? '−' : '+'">+</span>
+                    </button>
+                    <div x-show="open === 4" class="mt-3 text-xs font-medium text-gray-600 dark:text-gray-400 leading-relaxed" style="display: none;">
+                        Setiap dokumen invoice dan penawaran dapat langsung diunduh dalam format PDF berkualitas tinggi atau dicetak secara instan hanya dengan 1 kali klik dari dashboard Anda.
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+                    <button @click="open = open === 5 ? null : 5" class="flex w-full items-center justify-between text-left text-sm font-bold text-gray-900 dark:text-white">
+                        <span>Apakah Paperwork dapat diakses dari perangkat HP / Smartphone?</span>
+                        <span class="text-lg font-bold" x-text="open === 5 ? '−' : '+'">+</span>
+                    </button>
+                    <div x-show="open === 5" class="mt-3 text-xs font-medium text-gray-600 dark:text-gray-400 leading-relaxed" style="display: none;">
+                        Ya! Paperwork telah mendukung teknologi Progressive Web App (PWA), sehingga Anda dapat meng-install dan mengakses aplikasi secara langsung melalui HP Android maupun iOS tanpa perlu mengunduh dari toko aplikasi.
                     </div>
                 </div>
             </div>
