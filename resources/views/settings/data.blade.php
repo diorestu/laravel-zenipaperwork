@@ -2,6 +2,8 @@
 
 @section('content')
 <div class="space-y-6">
+    @include('settings.partials.settings-nav')
+
     <div class="flex items-center justify-between">
         <div>
             <h1 class="text-xl font-bold text-gray-900 dark:text-white">Kelola & Impor Data</h1>

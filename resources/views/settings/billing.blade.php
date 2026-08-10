@@ -2,6 +2,8 @@
 
 @section('content')
 <div class="space-y-6">
+    @include('settings.partials.settings-nav')
+
     <div class="flex items-center justify-between">
         <h1 class="text-lg font-semibold text-gray-900 dark:text-white/90">Tagihan & Langganan</h1>
         @if (request()->has('from_mobile') || str_contains(request()->header('referer', ''), '/mobile'))

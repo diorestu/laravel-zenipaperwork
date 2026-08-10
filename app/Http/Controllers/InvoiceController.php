@@ -231,6 +231,7 @@ class InvoiceController extends Controller
             'clients' => Client::forCompany($companyId)->orderBy('name')->get(),
             'products' => Product::forCompany($companyId)->orderBy('name')->get(),
             'bankAccounts' => BankAccount::forCompany($companyId)->where('is_active', true)->get(),
+            'parentInvoices' => Invoice::forCompany($companyId)->latest()->get(),
         ];
     }
 }

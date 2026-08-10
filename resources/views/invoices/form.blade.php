@@ -77,6 +77,57 @@
         @endif
     </div>
 
+    <!-- Tipe Invoice & Referensi DP -->
+    <div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4 dark:border-gray-800 dark:bg-white/[0.02]"
+         x-data="{
+             invoiceType: @js(old('invoice_type', $invoice?->invoice_type ?? request('invoice_type', 'standard'))),
+             parentId: @js((string) old('parent_invoice_id', $invoice?->parent_invoice_id ?? request('parent_invoice_id', '')))
+         }">
+        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-2">Tipe Invoice</label>
+        <div class="grid gap-3 sm:grid-cols-3 mb-3">
+            <label class="flex items-center gap-2.5 rounded-lg border p-3 cursor-pointer transition"
+                   :class="invoiceType === 'standard' ? 'border-brand-500 bg-brand-50/50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-300 font-semibold' : 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 text-gray-700 dark:text-gray-300'">
+                <input type="radio" name="invoice_type" value="standard" x-model="invoiceType" class="text-brand-600 focus:ring-brand-600">
+                <div>
+                    <span class="block text-xs font-semibold">Standard</span>
+                    <span class="block text-[11px] text-gray-500 dark:text-gray-400">Tagihan Biasa</span>
+                </div>
+            </label>
+
+            <label class="flex items-center gap-2.5 rounded-lg border p-3 cursor-pointer transition"
+                   :class="invoiceType === 'down_payment' ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 font-semibold' : 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 text-gray-700 dark:text-gray-300'">
+                <input type="radio" name="invoice_type" value="down_payment" x-model="invoiceType" class="text-amber-600 focus:ring-amber-600">
+                <div>
+                    <span class="block text-xs font-semibold">Uang Muka (DP)</span>
+                    <span class="block text-[11px] text-gray-500 dark:text-gray-400">Hanya Nominal DP</span>
+                </div>
+            </label>
+
+            <label class="flex items-center gap-2.5 rounded-lg border p-3 cursor-pointer transition"
+                   :class="invoiceType === 'settlement' ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-semibold' : 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 text-gray-700 dark:text-gray-300'">
+                <input type="radio" name="invoice_type" value="settlement" x-model="invoiceType" class="text-indigo-600 focus:ring-indigo-600">
+                <div>
+                    <span class="block text-xs font-semibold">Pelunasan / Lanjutan</span>
+                    <span class="block text-[11px] text-gray-500 dark:text-gray-400">Referensi DP Sebelumnya</span>
+                </div>
+            </label>
+        </div>
+
+        <div x-show="invoiceType === 'settlement' || parentId !== ''" class="mt-3">
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Pilih Referensi Invoice DP Sebelumnya</label>
+            <select name="parent_invoice_id" x-model="parentId" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-800 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                <option value="">— Tidak Ada Referensi Invoice —</option>
+                @foreach ($parentInvoices ?? [] as $pInv)
+                    @if (!$invoice || $pInv->id !== $invoice->id)
+                        <option value="{{ $pInv->id }}" @selected((int) old('parent_invoice_id', $invoice?->parent_invoice_id ?? request('parent_invoice_id')) === $pInv->id)>
+                            {{ $pInv->number }} — {{ $pInv->client?->name }} (Rp {{ number_format((float) $pInv->total, 0, ',', '.') }} - {{ strtoupper($pInv->status) }})
+                        </option>
+                    @endif
+                @endforeach
+            </select>
+        </div>
+    </div>
+
     <!-- Recurring Invoice Settings -->
     <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-white/[0.02]" x-data="{ isRecurring: {{ old('is_recurring', $invoice?->is_recurring ? 'true' : 'false') }} }">
         <label class="flex items-center gap-2 cursor-pointer">

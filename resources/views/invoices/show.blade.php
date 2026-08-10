@@ -3,6 +3,13 @@
 @section('content')
 <div class="mb-4 flex flex-wrap items-center gap-2">
     <a href="{{ route('invoices.pdf', $invoice) }}" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">Unduh PDF</a>
+
+    @if ($invoice->invoice_type === 'down_payment')
+        <a href="{{ route('invoices.index', ['modal' => 'create', 'invoice_type' => 'settlement', 'parent_invoice_id' => $invoice->id, 'client_id' => $invoice->client_id]) }}" class="inline-flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            ⚡ Buat Invoice Pelunasan
+        </a>
+    @endif
     
     <!-- Share Button (Dropdown/Popover via Alpine.js) -->
     <div x-data="{ open: false }" class="relative inline-block text-left" @click.outside="open = false">

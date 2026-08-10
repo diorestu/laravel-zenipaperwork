@@ -771,3 +771,52 @@ it('supports exporting and importing JSON backup data', function () {
         $importResponse->assertRedirect()->assertSessionHas('success');
     }
 });
+
+it('supports creating down payment invoice and settlement invoice with parent reference', function () {
+    $user = paperworkUser();
+    $client = Client::factory()->for($user->company)->create();
+
+    // 1. Create Down Payment (DP) Invoice for Rp 1.000.000
+    $this->actingAs($user)->post(route('invoices.store'), [
+        'client_id' => $client->id,
+        'number' => 'INV-DP-001',
+        'issue_date' => now()->toDateString(),
+        'invoice_type' => 'down_payment',
+        'items' => [
+            ['description' => 'DP Pembuatan Website 50%', 'quantity' => 1, 'unit_price' => 1000000],
+        ],
+    ]);
+
+    $dpInvoice = Invoice::where('number', 'INV-DP-001')->first();
+    expect($dpInvoice)->not->toBeNull();
+    expect($dpInvoice->invoice_type)->toBe('down_payment');
+    expect((float) $dpInvoice->total)->toBe(1000000.0);
+
+    $this->actingAs($user)->get(route('invoices.show', $dpInvoice))
+        ->assertOk()
+        ->assertSee('INVOICE UANG MUKA (DP)')
+        ->assertSee('Buat Invoice Pelunasan');
+
+    // 2. Create Settlement Invoice referencing the DP Invoice
+    $this->actingAs($user)->post(route('invoices.store'), [
+        'client_id' => $client->id,
+        'number' => 'INV-SETTLE-001',
+        'issue_date' => now()->toDateString(),
+        'invoice_type' => 'settlement',
+        'parent_invoice_id' => $dpInvoice->id,
+        'items' => [
+            ['description' => 'Pelunasan Pembuatan Website 50%', 'quantity' => 1, 'unit_price' => 1000000],
+        ],
+    ]);
+
+    $settleInvoice = Invoice::where('number', 'INV-SETTLE-001')->first();
+    expect($settleInvoice)->not->toBeNull();
+    expect($settleInvoice->invoice_type)->toBe('settlement');
+    expect($settleInvoice->parent_invoice_id)->toBe($dpInvoice->id);
+
+    $this->actingAs($user)->get(route('invoices.show', $settleInvoice))
+        ->assertOk()
+        ->assertSee('INVOICE PELUNASAN')
+        ->assertSee('Referensi Invoice Uang Muka (DP):')
+        ->assertSee('INV-DP-001');
+});

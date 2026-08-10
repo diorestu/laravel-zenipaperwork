@@ -1,12 +1,19 @@
 @props(['document'])
 @php
     $isQuotation = $document instanceof \App\Models\Quotation;
-    $title = $isQuotation ? 'SURAT PENAWARAN' : 'INVOICE';
+    $title = $isQuotation ? 'SURAT PENAWARAN' : ($document->invoice_type === 'down_payment' ? 'INVOICE UANG MUKA (DP)' : ($document->invoice_type === 'settlement' ? 'INVOICE PELUNASAN' : 'INVOICE'));
     $company = $document->company;
     $client = $document->client;
 @endphp
 
 <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+    @if (!$isQuotation && $document->parentInvoice)
+        <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50/70 p-3 text-xs text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-300">
+            <span class="font-bold">🔗 Referensi Invoice Uang Muka (DP):</span>
+            <a href="{{ route('invoices.show', $document->parentInvoice) }}" class="font-semibold underline hover:text-emerald-900 dark:hover:text-emerald-200">{{ $document->parentInvoice->number }}</a>
+            — Nominal DP: <span class="font-bold"><x-money :amount="$document->parentInvoice->total" /></span>
+        </div>
+    @endif
     <!-- Top Header: Logo & Company Info vs Doc Title & Metadata -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between border-b border-gray-100 pb-5 dark:border-gray-800">
         <!-- Company Logo & Details -->

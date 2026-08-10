@@ -2,6 +2,8 @@
 
 @section('content')
 <div class="space-y-5">
+    @include('settings.partials.settings-nav')
+
     <div class="flex items-center justify-between">
         <h1 class="text-lg font-semibold text-gray-900 dark:text-white/90">Rekening Bank</h1>
         <button type="button" @click="$dispatch('open-modal', 'create-bank-account')" class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">Tambah Rekening Bank</button>

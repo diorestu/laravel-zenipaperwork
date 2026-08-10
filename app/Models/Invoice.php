@@ -17,7 +17,7 @@ class Invoice extends Model
 
     protected $fillable = [
         'company_id', 'client_id', 'quotation_id', 'number', 'public_token',
-        'issue_date', 'due_date', 'sent_at', 'last_reminder_at', 'status',
+        'issue_date', 'due_date', 'sent_at', 'last_reminder_at', 'status', 'invoice_type',
         'subtotal', 'tax_rate', 'tax_total', 'pph_rate', 'pph_amount', 'custom_taxes',
         'discount_type', 'discount_rate', 'discount_amount',
         'total', 'down_payment_amount', 'expense_total', 'profit_total',
@@ -123,11 +123,6 @@ class Invoice extends Model
         return $this->hasMany(CreditNote::class);
     }
 
-    public function expenses(): HasMany
-    {
-        return $this->hasMany(InvoiceExpense::class);
-    }
-
     public function parentInvoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class, 'parent_invoice_id');
@@ -136,6 +131,11 @@ class Invoice extends Model
     public function childInvoices(): HasMany
     {
         return $this->hasMany(Invoice::class, 'parent_invoice_id');
+    }
+
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(InvoiceExpense::class);
     }
 
     public function bankAccount(): BelongsTo

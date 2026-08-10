@@ -22,6 +22,8 @@ class StoreInvoiceRequest extends FormRequest
             'issue_date' => ['required', 'date'],
             'due_date' => ['nullable', 'date', 'after_or_equal:issue_date'],
             'status' => ['nullable', Rule::in(['draft', 'sent', 'partial', 'paid', 'void'])],
+            'invoice_type' => ['nullable', 'string', Rule::in(['standard', 'down_payment', 'settlement'])],
+            'parent_invoice_id' => ['nullable', Rule::exists('invoices', 'id')->where('company_id', $companyId)],
             'tax_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'pph_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'custom_taxes' => ['nullable', 'array', 'max:10'],

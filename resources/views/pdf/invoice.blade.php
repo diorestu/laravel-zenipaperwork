@@ -317,8 +317,14 @@
             
             <!-- Right: Doc Title & Metadata -->
             <td class="text-right" style="width: 280px;">
-                <h1 class="doc-title">INVOICE TAGIHAN</h1>
+                <h1 class="doc-title">{{ $invoice->invoice_type === 'down_payment' ? 'INVOICE UANG MUKA (DP)' : ($invoice->invoice_type === 'settlement' ? 'INVOICE PELUNASAN' : 'INVOICE TAGIHAN') }}</h1>
                 <div class="doc-number">{{ $invoice->number }}</div>
+
+                @if ($invoice->parentInvoice)
+                    <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 6px 10px; border-radius: 6px; margin: 6px 0; font-size: 10px; color: #166534; text-align: right;">
+                        <strong>Ref Invoice DP:</strong> {{ $invoice->parentInvoice->number }} (Rp {{ number_format((float) $invoice->parentInvoice->total, 0, ',', '.') }})
+                    </div>
+                @endif
                 
                 <table style="width: 100%; border-collapse: collapse;">
                     <tr>

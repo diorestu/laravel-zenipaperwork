@@ -2,6 +2,8 @@
 
 @section('content')
 <div class="max-w-4xl space-y-6">
+    @include('settings.partials.settings-nav')
+
     <section class="rounded-lg border border-gray-200 bg-white p-5 shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03]">
         <h1 class="text-lg font-semibold text-gray-900 dark:text-white/90">Profil Perusahaan</h1>
         <form method="POST" action="{{ route('settings.company.update') }}" enctype="multipart/form-data" class="mt-4 grid gap-4">

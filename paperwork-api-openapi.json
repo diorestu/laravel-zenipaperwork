@@ -4442,6 +4442,24 @@
                             null
                         ]
                     },
+                    "invoice_type": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "enum": [
+                            "standard",
+                            "down_payment",
+                            "settlement",
+                            null
+                        ]
+                    },
+                    "parent_invoice_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
                     "tax_rate": {
                         "type": [
                             "number",
