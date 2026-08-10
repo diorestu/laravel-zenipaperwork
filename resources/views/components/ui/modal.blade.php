@@ -23,7 +23,7 @@
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
     @if ($name) @open-modal.window="if ($event.detail === '{{ $name }}') open = true" @endif
-    class="modal fixed inset-0 z-99999 flex items-center justify-center overflow-y-auto p-5"
+    class="modal fixed inset-0 z-99999 flex items-center justify-center overflow-hidden p-3 sm:p-5"
     {{ $attributes->except('class') }}>
 
     <!-- Backdrop -->
@@ -33,8 +33,8 @@
         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
     </div>
 
-    <!-- Modal Content -->
-    <div x-show="open" @click.stop class="relative w-full rounded-xl border border-gray-200 bg-white shadow-theme-xl dark:border-gray-800 dark:bg-gray-900 {{ $attributes->get('class') }}"
+    <!-- Modal Content Box -->
+    <div x-show="open" @click.stop class="relative flex flex-col w-full max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2.5rem)] rounded-xl border border-gray-200 bg-white shadow-theme-xl dark:border-gray-800 dark:bg-gray-900 overflow-hidden {{ $attributes->get('class') }}"
         x-transition:enter="transition ease-out duration-200"
         x-transition:enter-start="opacity-0 translate-y-2 scale-95"
         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
@@ -55,8 +55,8 @@
             </button>
         @endif
 
-        <!-- Modal Body -->
-        <div>
+        <!-- Modal Body (Inner Scrollable Area) -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar">
             {{ $slot }}
         </div>
     </div>

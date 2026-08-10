@@ -100,6 +100,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings/bank-accounts', [SettingsController::class, 'storeBankAccount'])->name('settings.bank-accounts.store');
         Route::put('/settings/bank-accounts/{bankAccount}', [SettingsController::class, 'updateBankAccount'])->name('settings.bank-accounts.update');
 
+        Route::get('/settings/data', [\App\Http\Controllers\DataManagementController::class, 'index'])->name('settings.data');
+        Route::post('/settings/data/import', [\App\Http\Controllers\DataManagementController::class, 'import'])->name('settings.data.import');
+        Route::get('/settings/data/export', [\App\Http\Controllers\DataManagementController::class, 'export'])->name('settings.data.export');
+
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
 

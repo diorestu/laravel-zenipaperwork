@@ -745,3 +745,29 @@ it('supports optional discount when creating invoices and quotations', function 
     expect((float) $quotation->discount_amount)->toBe(50000.0);
     expect((float) $quotation->total)->toBe(450000.0);
 });
+
+it('supports exporting and importing JSON backup data', function () {
+    $user = paperworkUser();
+
+    // 1. Export JSON data
+    $response = $this->actingAs($user)->get(route('settings.data.export'));
+    $response->assertOk();
+
+    // 2. Import JSON backup file
+    $jsonPath = '/Users/user/Downloads/paperwork-account-4 (1).json';
+    if (file_exists($jsonPath)) {
+        $file = new \Illuminate\Http\UploadedFile(
+            $jsonPath,
+            'backup.json',
+            'application/json',
+            null,
+            true
+        );
+
+        $importResponse = $this->actingAs($user)->post(route('settings.data.import'), [
+            'json_file' => $file,
+        ]);
+
+        $importResponse->assertRedirect()->assertSessionHas('success');
+    }
+});

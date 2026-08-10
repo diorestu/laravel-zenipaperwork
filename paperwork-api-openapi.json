@@ -1456,6 +1456,355 @@
                 }
             }
         },
+        "/v1/expenses": {
+            "get": {
+                "operationId": "expenses.index",
+                "tags": [
+                    "Expense"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Expense"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "expenses.store",
+                "tags": [
+                    "Expense"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "category": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "minimum": 0
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "description": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "receipt": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "binary",
+                                        "contentMediaType": "application/octet-stream",
+                                        "description": "Maximum file size: 2048 kilobytes."
+                                    }
+                                },
+                                "required": [
+                                    "category",
+                                    "amount",
+                                    "date"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Expense"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/expenses/{expense}": {
+            "get": {
+                "operationId": "expenses.show",
+                "tags": [
+                    "Expense"
+                ],
+                "parameters": [
+                    {
+                        "name": "expense",
+                        "in": "path",
+                        "required": true,
+                        "description": "The expense ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Expense"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "expenses.update",
+                "tags": [
+                    "Expense"
+                ],
+                "parameters": [
+                    {
+                        "name": "expense",
+                        "in": "path",
+                        "required": true,
+                        "description": "The expense ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "category": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "minimum": 0
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "description": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "receipt": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "binary",
+                                        "contentMediaType": "application/octet-stream",
+                                        "description": "Maximum file size: 2048 kilobytes."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Expense"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "expenses.destroy",
+                "tags": [
+                    "Expense"
+                ],
+                "parameters": [
+                    {
+                        "name": "expense",
+                        "in": "path",
+                        "required": true,
+                        "description": "The expense ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "Expense deleted"
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/invoices": {
             "get": {
                 "operationId": "invoices.index",
@@ -2584,7 +2933,8 @@
                                                     "type": "object",
                                                     "required": [
                                                         "client",
-                                                        "items"
+                                                        "items",
+                                                        "payment_terms"
                                                     ]
                                                 }
                                             ]
@@ -2710,7 +3060,8 @@
                                                     "type": "object",
                                                     "required": [
                                                         "client",
-                                                        "items"
+                                                        "items",
+                                                        "payment_terms"
                                                     ]
                                                 }
                                             ]
@@ -3238,6 +3589,30 @@
                             "null"
                         ],
                         "format": "date-time"
+                    },
+                    "pakasir_project_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "pakasir_api_key": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "invoice_number_prefix": {
+                        "type": "string"
+                    },
+                    "invoice_number_format": {
+                        "type": "string"
+                    },
+                    "invoice_number_padding": {
+                        "type": "integer"
+                    },
+                    "invoice_next_number": {
+                        "type": "integer"
                     }
                 },
                 "required": [
@@ -3258,9 +3633,74 @@
                     "bank_account_name",
                     "bank_account_number",
                     "created_at",
-                    "updated_at"
+                    "updated_at",
+                    "pakasir_project_id",
+                    "pakasir_api_key",
+                    "invoice_number_prefix",
+                    "invoice_number_format",
+                    "invoice_number_padding",
+                    "invoice_next_number"
                 ],
                 "title": "Company"
+            },
+            "Expense": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "company_id": {
+                        "type": "integer"
+                    },
+                    "category": {
+                        "type": "string"
+                    },
+                    "amount": {
+                        "type": "string"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "receipt_path": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "id",
+                    "company_id",
+                    "category",
+                    "amount",
+                    "date",
+                    "description",
+                    "receipt_path",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "Expense"
             },
             "InvoiceResource": {
                 "type": "object",
@@ -3305,6 +3745,18 @@
                         "type": "number"
                     },
                     "pph_amount": {
+                        "type": "number"
+                    },
+                    "custom_taxes": {
+                        "type": "string"
+                    },
+                    "discount_type": {
+                        "type": "string"
+                    },
+                    "discount_rate": {
+                        "type": "number"
+                    },
+                    "discount_amount": {
                         "type": "number"
                     },
                     "total": {
@@ -3483,6 +3935,10 @@
                     "tax_total",
                     "pph_rate",
                     "pph_amount",
+                    "custom_taxes",
+                    "discount_type",
+                    "discount_rate",
+                    "discount_amount",
                     "total",
                     "down_payment_amount",
                     "amount_paid",
@@ -3623,6 +4079,18 @@
                     "tax_total": {
                         "type": "number"
                     },
+                    "custom_taxes": {
+                        "type": "string"
+                    },
+                    "discount_type": {
+                        "type": "string"
+                    },
+                    "discount_rate": {
+                        "type": "number"
+                    },
+                    "discount_amount": {
+                        "type": "number"
+                    },
                     "total": {
                         "type": "number"
                     },
@@ -3675,6 +4143,39 @@
                             ]
                         }
                     },
+                    "payment_terms": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "term_number": {
+                                    "type": "integer"
+                                },
+                                "label": {
+                                    "type": "string"
+                                },
+                                "amount": {
+                                    "type": "number"
+                                },
+                                "due_date": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "term_number",
+                                "label",
+                                "amount",
+                                "due_date"
+                            ]
+                        }
+                    },
                     "created_at": {
                         "type": [
                             "string",
@@ -3698,6 +4199,10 @@
                     "subtotal",
                     "tax_rate",
                     "tax_total",
+                    "custom_taxes",
+                    "discount_type",
+                    "discount_rate",
+                    "discount_amount",
                     "total",
                     "notes",
                     "pdf_url",
@@ -3953,6 +4458,70 @@
                         "minimum": 0,
                         "maximum": 100
                     },
+                    "custom_taxes": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "maxLength": 100
+                                },
+                                "rate": {
+                                    "type": [
+                                        "number",
+                                        "null"
+                                    ],
+                                    "minimum": 0,
+                                    "maximum": 100
+                                },
+                                "type": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "enum": [
+                                        "addition",
+                                        "deduction",
+                                        null
+                                    ]
+                                }
+                            }
+                        },
+                        "maxItems": 10
+                    },
+                    "discount_type": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "enum": [
+                            "fixed",
+                            "percentage",
+                            null
+                        ]
+                    },
+                    "discount_rate": {
+                        "type": [
+                            "number",
+                            "null"
+                        ],
+                        "minimum": 0,
+                        "maximum": 100
+                    },
+                    "discount_amount": {
+                        "type": [
+                            "number",
+                            "null"
+                        ],
+                        "minimum": 0
+                    },
                     "down_payment_amount": {
                         "type": [
                             "number",
@@ -3963,6 +4532,26 @@
                     "notes": {
                         "type": [
                             "string",
+                            "null"
+                        ]
+                    },
+                    "is_recurring": {
+                        "type": "boolean"
+                    },
+                    "recurring_cycle": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "enum": [
+                            "monthly",
+                            "yearly",
+                            null
+                        ]
+                    },
+                    "bank_account_id": {
+                        "type": [
+                            "integer",
                             "null"
                         ]
                     },
@@ -4117,11 +4706,101 @@
                         "minimum": 0,
                         "maximum": 100
                     },
-                    "notes": {
+                    "custom_taxes": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "maxLength": 100
+                                },
+                                "rate": {
+                                    "type": [
+                                        "number",
+                                        "null"
+                                    ],
+                                    "minimum": 0,
+                                    "maximum": 100
+                                },
+                                "type": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "enum": [
+                                        "addition",
+                                        "deduction",
+                                        null
+                                    ]
+                                }
+                            }
+                        },
+                        "maxItems": 10
+                    },
+                    "discount_type": {
                         "type": [
                             "string",
                             "null"
+                        ],
+                        "enum": [
+                            "fixed",
+                            "percentage",
+                            null
                         ]
+                    },
+                    "discount_rate": {
+                        "type": [
+                            "number",
+                            "null"
+                        ],
+                        "minimum": 0,
+                        "maximum": 100
+                    },
+                    "discount_amount": {
+                        "type": [
+                            "number",
+                            "null"
+                        ],
+                        "minimum": 0
+                    },
+                    "payment_terms": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "label": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "maxLength": 100
+                                },
+                                "amount": {
+                                    "type": [
+                                        "number",
+                                        "null"
+                                    ],
+                                    "minimum": 0.01
+                                },
+                                "due_date": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "format": "date-time"
+                                }
+                            }
+                        }
                     },
                     "items": {
                         "type": "array",
@@ -4229,6 +4908,35 @@
                             "null"
                         ],
                         "maxLength": 50
+                    },
+                    "invoice_number_prefix": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 20
+                    },
+                    "invoice_number_format": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 100
+                    },
+                    "invoice_number_padding": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "minimum": 1,
+                        "maximum": 10
+                    },
+                    "invoice_next_number": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "minimum": 1
                     }
                 },
                 "required": [
