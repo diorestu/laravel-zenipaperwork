@@ -3652,6 +3652,12 @@
                     "company_id": {
                         "type": "integer"
                     },
+                    "invoice_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
                     "category": {
                         "type": "string"
                     },
@@ -3692,6 +3698,7 @@
                 "required": [
                     "id",
                     "company_id",
+                    "invoice_id",
                     "category",
                     "amount",
                     "date",

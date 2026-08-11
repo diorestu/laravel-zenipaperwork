@@ -66,7 +66,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/bank-accounts', [BankAccountController::class, 'store'])->name('api.bank-accounts.store');
             Route::put('/bank-accounts/{bankAccount}', [BankAccountController::class, 'update'])->name('api.bank-accounts.update');
 
-            Route::apiResource('expenses', \App\Http\Controllers\ExpenseController::class);
+            Route::apiResource('expenses', \App\Http\Controllers\ExpenseController::class)->names('api.expenses');
 
             Route::match(['put', 'post'], '/company', [CompanyController::class, 'update'])->name('api.company.update');
 

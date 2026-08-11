@@ -820,3 +820,89 @@ it('supports creating down payment invoice and settlement invoice with parent re
         ->assertSee('Referensi Invoice Uang Muka (DP):')
         ->assertSee('INV-DP-001');
 });
+
+it('supports expense management web CRUD operations', function () {
+    $user = paperworkUser();
+
+    // 1. Store expense
+    $response = $this->actingAs($user)->post(route('expenses.store'), [
+        'category' => 'Operasional',
+        'amount' => 150000,
+        'date' => now()->toDateString(),
+        'description' => 'Beli Kertas HVS & Tinta Printer',
+    ]);
+    $response->assertRedirect(route('expenses.index'));
+
+    $expense = \App\Models\Expense::where('category', 'Operasional')->first();
+    expect($expense)->not->toBeNull();
+    expect((float) $expense->amount)->toBe(150000.0);
+
+    // 2. View datatable list
+    $this->actingAs($user)->get(route('expenses.index', ['datatable' => 1]))
+        ->assertOk()
+        ->assertJsonFragment(['category' => '<span class="inline-flex items-center rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-800 dark:bg-white/10 dark:text-gray-200">Operasional</span>']);
+
+    // 3. Update expense
+    $this->actingAs($user)->put(route('expenses.update', $expense), [
+        'category' => 'Sewa & Utilitas',
+        'amount' => 200000,
+        'date' => now()->toDateString(),
+        'description' => 'Bayar Tagihan Listrik',
+    ])->assertRedirect(route('expenses.index'));
+
+    expect($expense->refresh()->category)->toBe('Sewa & Utilitas');
+    expect((float) $expense->amount)->toBe(200000.0);
+
+    // 4. Delete expense
+    $this->actingAs($user)->delete(route('expenses.destroy', $expense))
+        ->assertRedirect(route('expenses.index'));
+    expect(\App\Models\Expense::find($expense->id))->toBeNull();
+});
+
+it('renders financial reports and exports csv and pdf', function () {
+    $user = paperworkUser();
+
+    // 1. Render Reports page for each tab
+    foreach (['cash-flow', 'profit-loss', 'aging-ar', 'tax-summary'] as $tab) {
+        $this->actingAs($user)->get(route('reports.index', ['tab' => $tab]))
+            ->assertOk();
+    }
+
+    // 2. Export CSV
+    $csvResponse = $this->actingAs($user)->get(route('reports.export', ['type' => 'tax-summary']));
+    $csvResponse->assertOk();
+    expect($csvResponse->headers->get('content-type'))->toContain('text/csv');
+
+    // 3. Export PDF
+    $pdfResponse = $this->actingAs($user)->get(route('reports.pdf', ['type' => 'profit-loss']));
+    $pdfResponse->assertOk();
+    expect($pdfResponse->headers->get('content-type'))->toContain('application/pdf');
+});
+
+it('renders security settings page and updates user password', function () {
+    $user = paperworkUser();
+    $user->update(['password' => \Illuminate\Support\Facades\Hash::make('oldpassword123')]);
+
+    // 1. Render security page
+    $this->actingAs($user)->get(route('settings.security'))
+        ->assertOk()
+        ->assertSee('Ubah Kata Sandi')
+        ->assertSee('Akses Perangkat & Token Aplikasi', false);
+
+    // 2. Change password with incorrect current password
+    $this->actingAs($user)->put(route('settings.security.password'), [
+        'current_password' => 'wrongpassword',
+        'password' => 'newpassword123',
+        'password_confirmation' => 'newpassword123',
+    ])->assertSessionHasErrors('current_password');
+
+    // 3. Change password with correct current password
+    $this->actingAs($user)->put(route('settings.security.password'), [
+        'current_password' => 'oldpassword123',
+        'password' => 'newpassword123',
+        'password_confirmation' => 'newpassword123',
+    ])->assertRedirect(route('settings.security'))
+      ->assertSessionHas('success');
+
+    expect(\Illuminate\Support\Facades\Hash::check('newpassword123', $user->refresh()->password))->toBeTrue();
+});

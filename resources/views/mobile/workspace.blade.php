@@ -111,30 +111,36 @@
             <!-- Quick Access Grid -->
             <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
                 <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Quick Access</h2>
-                <div class="mt-3.5 grid grid-cols-4 gap-2 text-center">
-                    <button @click="openCreateInvoiceModal()" class="group flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 shadow-theme-xs dark:bg-brand-500/10 dark:text-brand-400">
+                <div class="mt-3.5 grid grid-cols-5 gap-1 text-center">
+                    <button @click="openCreateInvoiceModal()" class="group flex flex-col items-center gap-1 rounded-xl p-1 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 shadow-theme-xs dark:bg-brand-500/10 dark:text-brand-400">
                             <x-heroicon-o-document-text class="h-5 w-5" />
                         </div>
-                        <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">Invoice</span>
+                        <span class="text-[10px] font-medium text-gray-800 dark:text-gray-200">Invoice</span>
                     </button>
-                    <button @click="openCreateQuotationModal()" class="group flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 text-violet-600 shadow-theme-xs dark:bg-violet-500/10 dark:text-violet-400">
+                    <button @click="openCreateQuotationModal()" class="group flex flex-col items-center gap-1 rounded-xl p-1 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-600 shadow-theme-xs dark:bg-violet-500/10 dark:text-violet-400">
                             <x-heroicon-o-document-plus class="h-5 w-5" />
                         </div>
-                        <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">Penawaran</span>
+                        <span class="text-[10px] font-medium text-gray-800 dark:text-gray-200">Penawaran</span>
                     </button>
-                    <button @click="openCreateClientModal()" class="group flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shadow-theme-xs dark:bg-emerald-500/10 dark:text-emerald-400">
+                    <button @click="openCreateExpenseModal()" class="group flex flex-col items-center gap-1 rounded-xl p-1 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600 shadow-theme-xs dark:bg-red-500/10 dark:text-red-400">
+                            <x-heroicon-o-banknotes class="h-5 w-5" />
+                        </div>
+                        <span class="text-[10px] font-medium text-gray-800 dark:text-gray-200">Expense</span>
+                    </button>
+                    <button @click="openCreateClientModal()" class="group flex flex-col items-center gap-1 rounded-xl p-1 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shadow-theme-xs dark:bg-emerald-500/10 dark:text-emerald-400">
                             <x-heroicon-o-user-plus class="h-5 w-5" />
                         </div>
-                        <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">Klien</span>
+                        <span class="text-[10px] font-medium text-gray-800 dark:text-gray-200">Klien</span>
                     </button>
-                    <button @click="openCreateProductModal()" class="group flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-600 shadow-theme-xs dark:bg-amber-500/10 dark:text-amber-400">
+                    <button @click="openCreateProductModal()" class="group flex flex-col items-center gap-1 rounded-xl p-1 transition hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-95">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 shadow-theme-xs dark:bg-amber-500/10 dark:text-amber-400">
                             <x-heroicon-o-archive-box class="h-5 w-5" />
                         </div>
-                        <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">Produk</span>
+                        <span class="text-[10px] font-medium text-gray-800 dark:text-gray-200">Produk</span>
                     </button>
                 </div>
             </div>
@@ -146,7 +152,7 @@
                     <button @click="activeTab = 'invoices'" class="text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400">Lihat Semua</button>
                 </div>
                 <div class="divide-y divide-gray-100 dark:divide-gray-800">
-                    @forelse ($recentInvoices as $invoice)
+                    @forelse ($recentInvoices->take(5) as $invoice)
                         <div class="flex items-center justify-between py-3">
                             <div class="space-y-0.5">
                                 <a href="{{ route('mobile.invoices.show', $invoice) }}" class="text-xs font-bold text-brand-600 hover:underline dark:text-brand-400">
@@ -197,27 +203,47 @@
 
             <!-- Sub-tab 1: Invoices List -->
             <div x-show="docType === 'invoices'" class="space-y-2.5">
-                @forelse($recentInvoices as $invoice)
+                <template x-for="invoice in invoicesList" :key="invoice.id">
                     <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900 space-y-2">
                         <div class="flex items-center justify-between">
-                            <a href="{{ route('mobile.invoices.show', $invoice) }}" class="font-semibold text-sm text-brand-600 hover:underline dark:text-brand-400">{{ $invoice->number }}</a>
-                            <x-status-badge :status="$invoice->status" />
+                            <a :href="invoice.show_url" class="font-semibold text-sm text-brand-600 hover:underline dark:text-brand-400" x-text="invoice.number"></a>
+                            <span class="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                                :class="{
+                                    'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400': invoice.status === 'paid',
+                                    'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400': invoice.status === 'sent',
+                                    'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400': invoice.status === 'partial',
+                                    'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400': invoice.status === 'overdue',
+                                    'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300': ['draft', 'void'].includes(invoice.status)
+                                }"
+                                x-text="invoice.status">
+                            </span>
                         </div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $invoice->client?->name }} • {{ $invoice->issue_date?->format('d M Y') }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400" x-text="invoice.client_name + ' • ' + invoice.issue_date_formatted"></p>
                         <div class="flex items-center justify-between border-t border-gray-100 pt-2 dark:border-gray-800">
-                            <span class="font-semibold text-sm text-gray-900 dark:text-white">Rp {{ number_format((float) $invoice->total, 0, ',', '.') }}</span>
+                            <span class="font-semibold text-sm text-gray-900 dark:text-white" x-text="invoice.total_formatted"></span>
                             <div class="flex gap-2 text-xs">
-                                <a href="{{ route('mobile.invoices.show', $invoice) }}" class="rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">Detail</a>
-                                <a href="{{ route('invoices.pdf', $invoice) }}" class="rounded-lg border border-sky-200 bg-sky-50 px-2.5 py-1 font-medium text-sky-700 hover:bg-sky-100 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300">PDF</a>
+                                <a :href="invoice.show_url" class="rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">Detail</a>
+                                <a :href="invoice.pdf_url" class="rounded-lg border border-sky-200 bg-sky-50 px-2.5 py-1 font-medium text-sky-700 hover:bg-sky-100 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300">PDF</a>
                             </div>
                         </div>
                     </div>
-                @empty
-                    <div class="rounded-xl border border-dashed border-gray-200 bg-white p-6 text-center shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
-                        <img src="{{ asset('images/empty/datatable-empty.png') }}" class="mx-auto h-24 w-auto opacity-90 dark:opacity-75" alt="Belum ada data">
-                        <p class="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">Belum ada invoice dibuat.</p>
-                    </div>
-                @endforelse
+                </template>
+
+                <div x-show="invoicesList.length === 0" class="rounded-xl border border-dashed border-gray-200 bg-white p-6 text-center shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
+                    <img src="{{ asset('images/empty/datatable-empty.png') }}" class="mx-auto h-24 w-auto opacity-90 dark:opacity-75" alt="Belum ada data">
+                    <p class="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">Belum ada invoice dibuat.</p>
+                </div>
+
+                <!-- Load More Button (+10 items) -->
+                <div x-show="invoicesHasMore" class="pt-2 text-center">
+                    <button @click="loadMoreInvoices()" :disabled="loadingMoreInvoices" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-xs font-semibold text-gray-700 shadow-theme-xs transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 active:scale-[0.98]">
+                        <span x-show="!loadingMoreInvoices">⚡ Tampilkan Data Lainnya (+10)</span>
+                        <span x-show="loadingMoreInvoices" class="inline-flex items-center gap-1.5" style="display: none;">
+                            <svg class="h-4 w-4 animate-spin text-brand-600" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                            Memuat data...
+                        </span>
+                    </button>
+                </div>
             </div>
 
             <!-- Sub-tab 2: Quotations List -->
@@ -802,6 +828,89 @@
         </div>
     </div>
 
+    <!-- CREATE EXPENSE MODAL FOR MOBILE -->
+    <div
+        x-show="showExpenseModal"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-xs sm:items-center"
+        style="display: none;"
+    >
+        <div
+            x-show="showExpenseModal"
+            x-transition:enter="transition ease-out duration-300 transform"
+            x-transition:enter-start="opacity-0 translate-y-full sm:translate-y-4 sm:scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+            x-transition:leave="transition ease-in duration-200 transform"
+            x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+            x-transition:leave-end="opacity-0 translate-y-full sm:translate-y-4 sm:scale-95"
+            class="flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-2xl border border-gray-200 bg-white shadow-theme-md dark:border-gray-800 dark:bg-gray-900 sm:rounded-2xl"
+        >
+            <div class="flex shrink-0 items-center justify-between border-b border-gray-100 bg-white px-5 py-4 dark:border-gray-800 dark:bg-gray-900">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white">Catat Pengeluaran Baru</h3>
+                <button @click="showExpenseModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">✕</button>
+            </div>
+
+            <form method="POST" action="{{ route('expenses.store') }}" enctype="multipart/form-data" class="flex flex-1 flex-col overflow-hidden">
+                @csrf
+                <div class="flex-1 space-y-3 overflow-y-auto p-5 text-xs">
+                    <div>
+                        <label class="mb-1 block font-medium text-gray-700 dark:text-gray-300">Tanggal Pengeluaran</label>
+                        <input type="date" name="date" value="{{ now()->toDateString() }}" required class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none dark:border-gray-800 dark:bg-gray-900 dark:text-white">
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block font-medium text-gray-700 dark:text-gray-300">Kategori</label>
+                        <select name="category" required class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none dark:border-gray-800 dark:bg-gray-900 dark:text-white">
+                            <option value="Operasional">Operasional</option>
+                            <option value="Gaji & Honor">Gaji & Honor</option>
+                            <option value="Sewa & Utilitas">Sewa & Utilitas</option>
+                            <option value="Peralatan & Perlengkapan">Peralatan & Perlengkapan</option>
+                            <option value="Marketing & Iklan">Marketing & Iklan</option>
+                            <option value="Modal Proyek">Modal Proyek</option>
+                            <option value="Lain-lain">Lain-lain</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block font-medium text-gray-700 dark:text-gray-300">Nominal (Rp)</label>
+                        <input type="number" step="0.01" min="0" name="amount" required placeholder="Contoh: 150000" class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none dark:border-gray-800 dark:bg-gray-900 dark:text-white">
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block font-medium text-gray-700 dark:text-gray-300">Hubungkan ke Invoice Proyek (Opsional)</label>
+                        <select name="invoice_id" class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none dark:border-gray-800 dark:bg-gray-900 dark:text-white">
+                            <option value="">— Tidak Ada Invoice —</option>
+                            @foreach ($recentInvoices as $inv)
+                                <option value="{{ $inv->id }}">{{ $inv->number }} ({{ $inv->client?->name }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block font-medium text-gray-700 dark:text-gray-300">Deskripsi / Keterangan</label>
+                        <textarea name="description" rows="2" placeholder="Keterangan pengeluaran..." class="w-full rounded-lg border border-gray-200 bg-transparent p-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none dark:border-gray-800 dark:bg-gray-900 dark:text-white"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block font-medium text-gray-700 dark:text-gray-300">Foto / File Bukti Nota (Opsional)</label>
+                        <input type="file" name="receipt" accept="image/*,.pdf" class="w-full rounded-lg border border-gray-200 bg-transparent px-3 py-2 text-xs text-gray-800 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900 dark:text-white">
+                    </div>
+                </div>
+
+                <div class="shrink-0 border-t border-gray-100 bg-white/95 p-4 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/95">
+                    <button type="submit" class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-medium text-white shadow-theme-xs hover:bg-red-700 active:scale-[0.98]">
+                        Simpan Pengeluaran
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MOBILE SETTINGS MODAL -->
     <div
         x-show="showSettingsModal"
@@ -1159,6 +1268,7 @@ function mobileAppWorkspace() {
         activeTab: 'home',
         showInvoiceModal: false,
         showQuotationModal: false,
+        showExpenseModal: false,
         showClientModal: false,
         showProductModal: false,
         showSettingsModal: false,
@@ -1171,6 +1281,32 @@ function mobileAppWorkspace() {
             revenue_formatted: 'Rp {{ number_format($stats["revenue_this_month"], 0, ",", ".") }}',
             unpaid_balance_formatted: 'Rp {{ number_format($stats["unpaid_balance"], 0, ",", ".") }}',
             overdue_count: {{ $stats['overdue_count'] }},
+        },
+
+        // Invoices incremental pagination state
+        invoicesList: {!! json_encode($initialInvoices) !!},
+        invoicesOffset: {{ $recentInvoices->count() }},
+        invoicesHasMore: {{ $totalInvoicesCount > $recentInvoices->count() ? 'true' : 'false' }},
+        loadingMoreInvoices: false,
+
+        async loadMoreInvoices() {
+            if (this.loadingMoreInvoices || !this.invoicesHasMore) return;
+            this.loadingMoreInvoices = true;
+            try {
+                const res = await fetch(`{{ route('mobile.invoices.load-more') }}?offset=${this.invoicesOffset}&limit=10`, {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    this.invoicesList = [...this.invoicesList, ...data.data];
+                    this.invoicesOffset = data.next_offset;
+                    this.invoicesHasMore = data.has_more;
+                }
+            } catch (e) {
+                console.error('Failed to load more invoices:', e);
+            } finally {
+                this.loadingMoreInvoices = false;
+            }
         },
 
         async fetchStats() {
@@ -1195,6 +1331,9 @@ function mobileAppWorkspace() {
         },
         openCreateQuotationModal() {
             this.showQuotationModal = true;
+        },
+        openCreateExpenseModal() {
+            this.showExpenseModal = true;
         },
         openCreateClientModal() {
             this.showClientModal = true;

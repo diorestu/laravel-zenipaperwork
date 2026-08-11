@@ -15,10 +15,18 @@ use App\Http\Controllers\PakasirWebhookController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PublicInvoiceController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\ExpenseWebController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SuperAdminController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+
+if (env('DOCS_DOMAIN')) {
+    Route::domain(env('DOCS_DOMAIN'))->group(function () {
+        Route::get('/', fn() => redirect('/docs/api'));
+    });
+}
 
 Route::view('/', 'landing')->name('landing');
 Route::get('/public/invoices/{token}', [PublicInvoiceController::class, 'show'])->name('public.invoices.show');
@@ -59,6 +67,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/mobile/app', [MobileWorkspaceController::class, 'index'])->name('mobile.app');
         Route::get('/mobile/stats', [MobileWorkspaceController::class, 'stats'])->name('mobile.stats');
+        Route::get('/mobile/invoices/load-more', [MobileWorkspaceController::class, 'loadMoreInvoices'])->name('mobile.invoices.load-more');
 
         Route::resource('clients', ClientController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::resource('products', ProductController::class)->only(['index', 'store', 'update', 'destroy']);
@@ -79,6 +88,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/invoices/{invoice}/receipt', [InvoiceController::class, 'receipt'])->name('invoices.receipt');
         Route::post('/invoices/{invoice}/expenses', [InvoiceExpenseController::class, 'store'])->name('invoices.expenses.store');
         Route::delete('/invoices/{invoice}/expenses/{expense}', [InvoiceExpenseController::class, 'destroy'])->name('invoices.expenses.destroy');
+
+        Route::resource('expenses', ExpenseWebController::class)->except(['create', 'edit', 'show']);
+
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/export/{type}', [ReportController::class, 'exportCsv'])->name('reports.export');
+        Route::get('/reports/pdf/{type}', [ReportController::class, 'pdf'])->name('reports.pdf');
         Route::post('/invoices/{invoice}/credit-notes', [CreditNoteController::class, 'store'])->name('invoices.credit-notes.store');
         Route::get('/credit-notes/{creditNote}', [CreditNoteController::class, 'show'])->name('credit-notes.show');
         Route::patch('/credit-notes/{creditNote}/void', [CreditNoteController::class, 'void'])->name('credit-notes.void');
@@ -95,7 +110,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/mobile/billing', [BillingController::class, 'mobileIndex'])->name('mobile.billing');
         Route::get('/mobile/billing/{billingSubmission}', [BillingController::class, 'mobileShow'])->name('mobile.billing.show');
         Route::post('/billing', [BillingController::class, 'store'])->name('billing.store');
-        Route::view('/settings/security', 'settings.security')->name('settings.security');
+        Route::get('/settings/security', [SettingsController::class, 'security'])->name('settings.security');
+        Route::put('/settings/security/password', [SettingsController::class, 'updatePassword'])->name('settings.security.password');
+        Route::delete('/settings/security/tokens/{token}', [SettingsController::class, 'revokeToken'])->name('settings.security.tokens.revoke');
         Route::get('/settings/bank-accounts', [SettingsController::class, 'bankAccounts'])->name('settings.bank-accounts');
         Route::post('/settings/bank-accounts', [SettingsController::class, 'storeBankAccount'])->name('settings.bank-accounts.store');
         Route::put('/settings/bank-accounts/{bankAccount}', [SettingsController::class, 'updateBankAccount'])->name('settings.bank-accounts.update');

@@ -97,4 +97,52 @@ class SettingsController extends Controller
 
         return redirect()->route('settings.bank-accounts')->with('success', 'Rekening bank diperbarui.');
     }
+
+    public function security(Request $request)
+    {
+        $user = $request->user();
+        $tokens = $user->tokens()->latest()->get();
+
+        return view('settings.security', compact('user', 'tokens'));
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user = $request->user();
+
+        $rules = [
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ];
+
+        if ($user->password) {
+            $rules['current_password'] = ['required', 'string'];
+        }
+
+        $request->validate($rules);
+
+        if ($user->password && ! \Illuminate\Support\Facades\Hash::check($request->input('current_password'), $user->password)) {
+            return back()->withErrors(['current_password' => 'Kata sandi saat ini tidak sesuai.']);
+        }
+
+        $user->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($request->input('password')),
+        ]);
+
+        \App\Support\ActivityNotifier::record($user, 'Kata Sandi Diperbarui', 'Kata sandi akun Anda telah berhasil diperbarui.');
+
+        return redirect()->route('settings.security')->with('success', 'Kata sandi Anda berhasil diperbarui.');
+    }
+
+    public function revokeToken(Request $request, $tokenId)
+    {
+        $user = $request->user();
+        $token = $user->tokens()->find($tokenId);
+
+        if ($token) {
+            $token->delete();
+            return redirect()->route('settings.security')->with('success', 'Akses perangkat berhasil dicabut.');
+        }
+
+        return redirect()->route('settings.security')->with('error', 'Token tidak ditemukan.');
+    }
 }

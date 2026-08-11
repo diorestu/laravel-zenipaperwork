@@ -249,7 +249,7 @@
     <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03]">
         <h2 class="text-base font-semibold text-gray-900 dark:text-white/90">Aktivitas Terbaru</h2>
         <div class="mt-4 divide-y divide-gray-100 dark:divide-gray-800">
-            @forelse ($recentInvoices as $invoice)
+            @forelse ($recentInvoices->take(5) as $invoice)
                 <a href="{{ route('invoices.show', $invoice) }}" class="flex justify-between py-3 text-sm text-gray-700 hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-400 transition-colors">
                     <span class="font-medium">{{ $invoice->number }} - {{ $invoice->client->name }}</span>
                     <x-status-badge :status="$invoice->status" />

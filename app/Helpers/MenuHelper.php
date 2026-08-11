@@ -36,6 +36,16 @@ class MenuHelper
                 ],
             ],
             [
+                'icon' => 'task',
+                'name' => 'Pengeluaran',
+                'path' => '/expenses',
+            ],
+            [
+                'icon' => 'charts',
+                'name' => 'Laporan Keuangan',
+                'path' => '/reports',
+            ],
+            [
                 'name' => 'Pengaturan',
                 'icon' => 'pages',
                 'subItems' => [
