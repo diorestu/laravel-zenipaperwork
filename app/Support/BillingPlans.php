@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use App\Models\SystemSetting;
+
 class BillingPlans
 {
     public static function all(): array
@@ -10,7 +12,7 @@ class BillingPlans
             [
                 'slug' => 'starter',
                 'name' => 'Starter',
-                'amount' => 25000,
+                'amount' => (int) SystemSetting::get('plan_price_starter', 25000),
                 'features' => [
                     'Kelola hingga 100 klien',
                     'Kelola hingga 100 produk atau layanan',
@@ -22,7 +24,7 @@ class BillingPlans
             [
                 'slug' => 'business',
                 'name' => 'Business',
-                'amount' => 99000,
+                'amount' => (int) SystemSetting::get('plan_price_business', 99000),
                 'features' => [
                     'Kelola hingga 500 klien',
                     'Kelola hingga 500 produk atau layanan',
@@ -36,7 +38,7 @@ class BillingPlans
             [
                 'slug' => 'enterprise',
                 'name' => 'Enterprise',
-                'amount' => 299000,
+                'amount' => (int) SystemSetting::get('plan_price_enterprise', 299000),
                 'features' => [
                     'Klien, produk, penawaran, dan invoice tanpa batas',
                     'Semua fitur Business',

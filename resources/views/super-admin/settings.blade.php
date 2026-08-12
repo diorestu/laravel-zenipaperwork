@@ -146,9 +146,47 @@
             </div>
         </div>
 
+        <!-- Package Pricing Settings Card -->
+        <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900/60 space-y-4">
+            <div class="flex items-center gap-2">
+                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-100 text-amber-700 text-xs font-bold dark:bg-amber-500/20 dark:text-amber-300">Rp</span>
+                <div>
+                    <h3 class="text-sm font-bold text-gray-900 dark:text-white">Pengaturan Harga Paket Berlangganan</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Atur harga langganan bulanan paket Starter, Business, dan Enterprise secara dinamis di database.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Paket Starter (Rp/bulan)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-xs text-gray-500 font-semibold">Rp</span>
+                        <input type="number" name="plan_price_starter" value="{{ old('plan_price_starter', $priceStarter) }}" min="0" step="1000" class="w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-3.5 py-2.5 text-xs font-bold text-gray-900 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-800 dark:text-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Paket Business (Rp/bulan)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-xs text-gray-500 font-semibold">Rp</span>
+                        <input type="number" name="plan_price_business" value="{{ old('plan_price_business', $priceBusiness) }}" min="0" step="1000" class="w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-3.5 py-2.5 text-xs font-bold text-gray-900 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-800 dark:text-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Paket Enterprise (Rp/bulan)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-xs text-gray-500 font-semibold">Rp</span>
+                        <input type="number" name="plan_price_enterprise" value="{{ old('plan_price_enterprise', $priceEnterprise) }}" min="0" step="1000" class="w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-3.5 py-2.5 text-xs font-bold text-gray-900 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-800 dark:text-white">
+                    </div>
+                </div>
+            </div>
+            <p class="text-[11px] text-gray-400">Catatan: Diskon langganan tahunan (10%) akan dihitung secara otomatis berdasarkan nominal harga di atas.</p>
+        </div>
+
         <div class="flex items-center justify-end gap-3 pt-2">
             <button type="submit" class="inline-flex h-10 items-center justify-center rounded-xl bg-brand-600 px-6 text-xs font-bold text-white shadow-theme-xs transition hover:bg-brand-700 active:scale-[0.98]">
-                Simpan Pengaturan Gateway
+                Simpan Seluruh Pengaturan Superadmin
             </button>
         </div>
     </form>

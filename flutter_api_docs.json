@@ -23,7 +23,7 @@
     "ios_reversed_client_id": "com.googleusercontent.apps.949071865390-v62v3etr1mm2dhp3rc9sd68j2rqghg0a",
     "android_app_id": "1:949071865390:android:d710280602fb77114b21bf",
     "ios_app_id": "1:949071865390:ios:29afb5ff39de9c3f4b21bf",
-    "api_key": "AIzaSyAlknZyGJa4i74evIMWG3tubRVUWl84jYY",
+    "api_key": "YOUR_FIREBASE_API_KEY",
     "storage_bucket": "paperwork-cc867.firebasestorage.app"
   },
   "flutter_setup_guide": {
