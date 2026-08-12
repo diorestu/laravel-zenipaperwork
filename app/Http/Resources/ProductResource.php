@@ -18,8 +18,8 @@ class ProductResource extends JsonResource
             'is_active' => (bool) $this->is_active,
             'invoice_items_count' => $this->whenCounted('invoiceItems'),
             'quotation_items_count' => $this->whenCounted('quotationItems'),
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
         ];
     }
 }

@@ -19,8 +19,8 @@ class ClientResource extends JsonResource
             'tax_number' => $this->tax_number,
             'invoices_count' => $this->whenCounted('invoices'),
             'quotations_count' => $this->whenCounted('quotations'),
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
         ];
     }
 }

@@ -42,8 +42,8 @@ class QuotationResource extends JsonResource
                 'amount' => (float) $term->amount,
                 'due_date' => $term->due_date?->toDateString(),
             ])),
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
         ];
     }
 }

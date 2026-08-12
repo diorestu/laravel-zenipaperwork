@@ -162,10 +162,11 @@ class DataImportService
                             $oldProdId = $quotItem['product_id'] ?? null;
                             $productId = $oldProdId && isset($productIdMap[$oldProdId]) ? $productIdMap[$oldProdId] : null;
 
+                            $desc = ! empty($quotItem['description']) && is_string($quotItem['description']) ? trim($quotItem['description']) : 'Item';
                             QuotationItem::create([
                                 'quotation_id' => $quotation->id,
                                 'product_id' => $productId,
-                                'description' => $quotItem['description'] ?? 'Item',
+                                'description' => $desc,
                                 'quantity' => (float) ($quotItem['quantity'] ?? 1),
                                 'unit_price' => (float) ($quotItem['unit_price'] ?? 0),
                                 'line_total' => (float) ($quotItem['subtotal'] ?? $quotItem['line_total'] ?? 0),
@@ -258,10 +259,11 @@ class DataImportService
                             $oldProdId = $invItem['product_id'] ?? null;
                             $productId = $oldProdId && isset($productIdMap[$oldProdId]) ? $productIdMap[$oldProdId] : null;
 
+                            $desc = ! empty($invItem['description']) && is_string($invItem['description']) ? trim($invItem['description']) : 'Item';
                             InvoiceItem::create([
                                 'invoice_id' => $invoice->id,
                                 'product_id' => $productId,
-                                'description' => $invItem['description'] ?? 'Item',
+                                'description' => $desc,
                                 'quantity' => (float) ($invItem['quantity'] ?? 1),
                                 'unit_price' => (float) ($invItem['unit_price'] ?? 0),
                                 'line_total' => (float) ($invItem['subtotal'] ?? $invItem['line_total'] ?? 0),
@@ -300,7 +302,7 @@ class DataImportService
                 'name' => $p->name,
                 'price' => number_format((float) $p->price, 2, '.', ''),
                 'description' => $p->description,
-                'created_at' => $p->created_at?->toISOString(),
+                'created_at' => $p->created_at?->toIso8601String(),
             ])->toArray(),
             'clients' => $clients->map(fn ($c) => [
                 'id' => $c->id,
@@ -309,7 +311,7 @@ class DataImportService
                 'phone' => $c->phone,
                 'company' => $c->company_name,
                 'address' => $c->address,
-                'created_at' => $c->created_at?->toISOString(),
+                'created_at' => $c->created_at?->toIso8601String(),
             ])->toArray(),
             'quotations' => $quotations->map(fn ($q) => [
                 'id' => $q->id,

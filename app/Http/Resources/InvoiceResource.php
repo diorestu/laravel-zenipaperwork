@@ -60,8 +60,8 @@ class InvoiceResource extends JsonResource
                 'reference' => $payment->reference,
                 'notes' => $payment->notes,
             ])),
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
         ];
     }
 }
