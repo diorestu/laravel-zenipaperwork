@@ -12,6 +12,20 @@
       "Authorization": "Bearer {YOUR_SANCTUM_TOKEN}"
     }
   },
+  "firebase_app_credentials": {
+    "project_id": "paperwork-cc867",
+    "project_number": "949071865390",
+    "android_package_name": "com.zeni.paperwork",
+    "ios_bundle_id": "com.zeni.paperwork",
+    "google_web_client_id": "949071865390-12lqo96plkug0fpfc3mm5ntdu4n8vep5.apps.googleusercontent.com",
+    "google_android_client_id": "949071865390-9ukuo83qb4haemdpego1ib6qtvjsncav.apps.googleusercontent.com",
+    "google_ios_client_id": "949071865390-v62v3etr1mm2dhp3rc9sd68j2rqghg0a.apps.googleusercontent.com",
+    "ios_reversed_client_id": "com.googleusercontent.apps.949071865390-v62v3etr1mm2dhp3rc9sd68j2rqghg0a",
+    "android_app_id": "1:949071865390:android:d710280602fb77114b21bf",
+    "ios_app_id": "1:949071865390:ios:29afb5ff39de9c3f4b21bf",
+    "api_key": "AIzaSyAlknZyGJa4i74evIMWG3tubRVUWl84jYY",
+    "storage_bucket": "paperwork-cc867.firebasestorage.app"
+  },
   "flutter_setup_guide": {
     "recommended_packages": [
       {
@@ -54,6 +68,34 @@
             "email": "budi@example.com",
             "role": "owner",
             "company_id": 1
+          }
+        }
+      },
+      {
+        "name": "Sign In / Sign Up via Google SSO",
+        "method": "POST",
+        "path": "/auth/google",
+        "auth_required": false,
+        "request_body": {
+          "id_token": "google_id_token_from_google_sign_in_sdk",
+          "access_token": "optional_google_access_token",
+          "device_name": "Flutter Google Auth"
+        },
+        "response_success_200": {
+          "token_type": "Bearer",
+          "access_token": "3|sanctum_token_string_here",
+          "user": {
+            "id": 1,
+            "name": "Budi Santoso",
+            "email": "budi@gmail.com",
+            "role": "owner",
+            "google_id": "109876543210",
+            "email_verified_at": "2026-08-12T16:22:20.000000Z",
+            "company": {
+              "id": 1,
+              "name": "Perusahaan Budi Santoso",
+              "subscription_status": "trialing"
+            }
           }
         }
       },

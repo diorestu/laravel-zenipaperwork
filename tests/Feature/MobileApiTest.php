@@ -22,6 +22,12 @@ function apiUser(): User
     ]);
 }
 
+it('validates google login token requirement via API', function () {
+    $this->postJson(route('api.auth.google'), [])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['id_token']);
+});
+
 it('returns mobile dashboard metrics and recent invoices via API', function () {
     $user = apiUser();
     $client = Client::factory()->for($user->company)->create();

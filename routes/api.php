@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('api.register');
     Route::post('/login', [AuthController::class, 'login'])->name('api.login');
+    Route::post('/auth/google', [AuthController::class, 'googleLogin'])->name('api.auth.google');
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me'])->name('api.me');

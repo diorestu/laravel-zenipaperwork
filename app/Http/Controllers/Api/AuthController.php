@@ -67,6 +67,92 @@ class AuthController extends Controller
         return $this->tokenResponse($user->load('company'), $data['device_name'] ?? 'mobile-app');
     }
 
+    public function googleLogin(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'id_token' => ['nullable', 'string'],
+            'access_token' => ['nullable', 'string'],
+            'device_name' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        if (empty($data['id_token']) && empty($data['access_token'])) {
+            throw ValidationException::withMessages([
+                'id_token' => ['id_token atau access_token dari Google Sign-In wajib diisi.'],
+            ]);
+        }
+
+        $email = null;
+        $name = null;
+        $googleId = null;
+
+        if (! empty($data['id_token'])) {
+            $response = \Illuminate\Support\Facades\Http::get('https://oauth2.googleapis.com/tokeninfo', [
+                'id_token' => $data['id_token'],
+            ]);
+
+            if (! $response->successful()) {
+                throw ValidationException::withMessages([
+                    'id_token' => ['Token Google ID tidak valid atau telah kadaluarsa.'],
+                ]);
+            }
+
+            $payload = $response->json();
+            $email = $payload['email'] ?? null;
+            $name = $payload['name'] ?? $payload['given_name'] ?? null;
+            $googleId = $payload['sub'] ?? null;
+        } elseif (! empty($data['access_token'])) {
+            try {
+                $socialiteUser = \Laravel\Socialite\Facades\Socialite::driver('google')->userFromToken($data['access_token']);
+                $email = $socialiteUser->getEmail();
+                $name = $socialiteUser->getName();
+                $googleId = $socialiteUser->getId();
+            } catch (\Throwable $e) {
+                throw ValidationException::withMessages([
+                    'access_token' => ['Token akses Google tidak valid.'],
+                ]);
+            }
+        }
+
+        if (! $email) {
+            throw ValidationException::withMessages([
+                'email' => ['Gagal mengidentifikasi email pengguna dari Google.'],
+            ]);
+        }
+
+        $user = User::where('google_id', $googleId)
+            ->orWhere('email', $email)
+            ->first();
+
+        if (! $user) {
+            $user = DB::transaction(function () use ($name, $email, $googleId): User {
+                $company = Company::create([
+                    'name' => $name ? 'Perusahaan '.$name : 'Perusahaan Saya',
+                    'email' => $email,
+                    'trial_ends_at' => now()->addDays(14),
+                ]);
+
+                return User::create([
+                    'company_id' => $company->id,
+                    'name' => $name ?: \Illuminate\Support\Str::before($email, '@'),
+                    'email' => $email,
+                    'password' => Hash::make(\Illuminate\Support\Str::random(24)),
+                    'role' => 'owner',
+                    'google_id' => $googleId,
+                    'email_verified_at' => now(),
+                ]);
+            });
+        } else {
+            if (! $user->google_id && $googleId) {
+                $user->update(['google_id' => $googleId]);
+            }
+            if (! $user->email_verified_at) {
+                $user->update(['email_verified_at' => now()]);
+            }
+        }
+
+        return $this->tokenResponse($user->load('company'), $data['device_name'] ?? 'google-auth');
+    }
+
     public function me(Request $request): JsonResponse
     {
         return response()->json([
