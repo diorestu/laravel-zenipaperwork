@@ -47,6 +47,7 @@ Route::prefix('v1')->group(function () {
                 'update' => 'api.invoices.update',
                 'destroy' => 'api.invoices.destroy',
             ]);
+            Route::patch('/invoices/{invoice}/status', [InvoiceController::class, 'updateStatus'])->name('api.invoices.status.update');
             Route::post('/invoices/{invoice}/payments', [InvoiceController::class, 'recordPayment'])->name('api.invoices.payments.store');
             Route::post('/invoices/{invoice}/expenses', [InvoiceController::class, 'recordExpense'])->name('api.invoices.expenses.store');
             Route::delete('/invoices/{invoice}/expenses/{expense}', [InvoiceController::class, 'deleteExpense'])->name('api.invoices.expenses.destroy');

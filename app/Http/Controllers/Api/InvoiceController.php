@@ -145,6 +145,21 @@ class InvoiceController extends Controller
         ]);
     }
 
+    public function updateStatus(Request $request, Invoice $invoice): JsonResponse
+    {
+        $this->authorize('update', $invoice);
+        $data = $request->validate([
+            'status' => ['required', \Illuminate\Validation\Rule::in(['draft', 'sent', 'partial', 'paid', 'void'])],
+        ]);
+
+        $invoice->update(['status' => $data['status']]);
+
+        return response()->json([
+            'message' => 'Status invoice berhasil diperbarui.',
+            'invoice' => new InvoiceResource($invoice->refresh()),
+        ]);
+    }
+
     public function pdf(Invoice $invoice)
     {
         $this->authorize('view', $invoice);
