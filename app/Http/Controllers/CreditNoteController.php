@@ -45,8 +45,9 @@ class CreditNoteController extends Controller
     {
         $this->authorize('view', $creditNote);
         $creditNote->load(['company', 'client', 'invoice']);
+        $filename = str_replace(['/', '\\'], '-', $creditNote->number) . '.pdf';
 
         return Pdf::loadView('pdf.credit-note', ['note' => $creditNote])
-            ->download($creditNote->number.'.pdf');
+            ->download($filename);
     }
 }

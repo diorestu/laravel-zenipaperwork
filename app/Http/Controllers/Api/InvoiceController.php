@@ -150,8 +150,9 @@ class InvoiceController extends Controller
         $this->authorize('view', $invoice);
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.invoice', ['invoice' => $invoice->load(['company', 'client', 'items.product', 'payments', 'paymentTerms', 'creditNotes', 'expenses'])]);
+        $filename = str_replace(['/', '\\'], '-', $invoice->number) . '.pdf';
 
-        return $pdf->download($invoice->number.'.pdf');
+        return $pdf->download($filename);
     }
 
     private function perPage(Request $request): int

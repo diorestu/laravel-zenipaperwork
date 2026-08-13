@@ -137,17 +137,19 @@ class InvoiceController extends Controller
     public function pdf(Invoice $invoice)
     {
         $this->authorize('view', $invoice);
+        $filename = str_replace(['/', '\\'], '-', $invoice->number) . '.pdf';
 
         return Pdf::loadView('pdf.invoice', ['invoice' => $invoice->load(['company', 'client', 'items.product', 'payments', 'paymentTerms', 'creditNotes', 'expenses'])])
-            ->download($invoice->number.'.pdf');
+            ->download($filename);
     }
 
     public function receipt(Invoice $invoice)
     {
         $this->authorize('view', $invoice);
+        $filename = str_replace(['/', '\\'], '-', $invoice->number) . '-receipt.pdf';
 
         return Pdf::loadView('pdf.receipt', ['invoice' => $invoice->load(['company', 'client', 'payments', 'paymentTerms'])])
-            ->download($invoice->number.'-receipt.pdf');
+            ->download($filename);
     }
 
     public function status(Request $request, Invoice $invoice)

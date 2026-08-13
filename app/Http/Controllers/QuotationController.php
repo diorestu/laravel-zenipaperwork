@@ -134,9 +134,10 @@ class QuotationController extends Controller
     public function pdf(Quotation $quotation)
     {
         $this->authorize('view', $quotation);
+        $filename = str_replace(['/', '\\'], '-', $quotation->number) . '.pdf';
 
         return Pdf::loadView('pdf.quotation', ['quotation' => $quotation->load(['company', 'client', 'items.product'])])
-            ->download($quotation->number.'.pdf');
+            ->download($filename);
     }
 
     public function destroy(Quotation $quotation)

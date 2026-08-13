@@ -96,8 +96,9 @@ class QuotationController extends Controller
         $this->authorize('view', $quotation);
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.quotation', ['quotation' => $quotation->load(['company', 'client', 'items.product'])]);
+        $filename = str_replace(['/', '\\'], '-', $quotation->number) . '.pdf';
 
-        return $pdf->download($quotation->number.'.pdf');
+        return $pdf->download($filename);
     }
 
     private function perPage(Request $request): int

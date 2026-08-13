@@ -941,3 +941,17 @@ it('auto generates invoice and quotation numbers when number field is left empty
     expect($quotation->number)->not->toBeEmpty();
     $quoResponse->assertRedirect(route('quotations.show', $quotation));
 });
+
+it('downloads PDF correctly even when document number contains slash characters', function () {
+    $user = paperworkUser();
+    $client = Client::factory()->create(['company_id' => $user->company_id]);
+    $invoice = Invoice::factory()->create([
+        'company_id' => $user->company_id,
+        'client_id' => $client->id,
+        'number' => 'INV/2026/08/0001',
+    ]);
+
+    $response = $this->actingAs($user)->get(route('invoices.pdf', $invoice));
+    $response->assertOk();
+    $response->assertHeader('content-disposition', 'attachment; filename=INV-2026-08-0001.pdf');
+});
