@@ -81,7 +81,7 @@
                     <input type="text" x-model="clientSearch" @click.stop placeholder="Ketik nama / perusahaan klien..." class="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-900 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white mb-2">
 
                     <template x-for="c in filteredClients" :key="c.id">
-                        <div @click="selectClient(c)" class="cursor-pointer rounded px-3 py-2 text-xs hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-500/20 dark:hover:text-brand-300 flex items-center justify-between" :class="selectedClientId === c.id ? 'bg-brand-50 text-brand-700 font-bold dark:bg-brand-500/20 dark:text-brand-300' : 'text-gray-700 dark:text-gray-300'">
+                        <div @click.stop="selectClient(c)" class="cursor-pointer rounded px-3 py-2 text-xs hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-500/20 dark:hover:text-brand-300 flex items-center justify-between" :class="selectedClientId === c.id ? 'bg-brand-50 text-brand-700 font-bold dark:bg-brand-500/20 dark:text-brand-300' : 'text-gray-700 dark:text-gray-300'">
                             <span x-text="c.name + (c.company ? ' (' + c.company + ')' : '')"></span>
                             <span x-show="selectedClientId === c.id" class="text-brand-600 dark:text-brand-400">✓</span>
                         </div>
@@ -131,12 +131,12 @@
                         <div x-show="openProd" x-transition class="absolute z-50 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900 max-h-56 overflow-auto p-2 space-y-1">
                             <input type="text" x-model="prodSearch" @click.stop placeholder="Ketik nama produk..." class="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-900 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white mb-1">
 
-                            <div @click="item.product_id = ''; openProd = false" class="cursor-pointer rounded px-2.5 py-1.5 text-xs text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-800 mb-1">
+                            <div @click.stop="item.product_id = ''; openProd = false" class="cursor-pointer rounded px-2.5 py-1.5 text-xs text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-800 mb-1">
                                 <em>— Item Manual (Input Deskripsi Bebas) —</em>
                             </div>
 
                             <template x-for="p in filterProducts(prodSearch)" :key="p.id">
-                                <div @click="selectProductItem(index, p); openProd = false; prodSearch = ''" class="cursor-pointer rounded px-2.5 py-1.5 text-xs hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-500/20 dark:hover:text-brand-300 flex items-center justify-between" :class="item.product_id == p.id ? 'bg-brand-50 text-brand-700 font-bold dark:bg-brand-500/20 dark:text-brand-300' : 'text-gray-700 dark:text-gray-300'">
+                                <div @click.stop="selectProductItem(index, p); openProd = false; prodSearch = ''" class="cursor-pointer rounded px-2.5 py-1.5 text-xs hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-500/20 dark:hover:text-brand-300 flex items-center justify-between" :class="item.product_id == p.id ? 'bg-brand-50 text-brand-700 font-bold dark:bg-brand-500/20 dark:text-brand-300' : 'text-gray-700 dark:text-gray-300'">
                                     <span x-text="p.name"></span>
                                     <span class="font-mono text-[11px] text-gray-500 dark:text-gray-400" x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(p.price)"></span>
                                 </div>
