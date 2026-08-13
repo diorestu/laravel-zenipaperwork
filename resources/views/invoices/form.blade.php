@@ -44,11 +44,53 @@
     @csrf
     @method($method)
     <div class="grid gap-4 sm:grid-cols-2">
-        <x-form.select name="client_id" label="Klien" :value="$invoice?->client_id">
-            @foreach ($clients as $client)
-                <option value="{{ $client->id }}" @selected((int) old('client_id', $invoice?->client_id) === $client->id)>{{ $client->name }}</option>
-            @endforeach
-        </x-form.select>
+        <!-- Searchable Client Select -->
+        <div x-data="{
+            openClient: false,
+            clientSearch: '',
+            selectedClientId: @js((string) old('client_id', $invoice?->client_id ?? '')),
+            selectedClientName: '',
+            clientsList: @js($clients->map(fn($c) => ['id' => (string) $c->id, 'name' => $c->name, 'company' => $c->company_name ?? ''])->values()),
+            init() {
+                const found = this.clientsList.find(c => c.id === this.selectedClientId);
+                if (found) { this.selectedClientName = found.name + (found.company ? ' (' + found.company + ')' : ''); }
+            },
+            get filteredClients() {
+                if (!this.clientSearch) return this.clientsList;
+                return this.clientsList.filter(c => c.name.toLowerCase().includes(this.clientSearch.toLowerCase()) || c.company.toLowerCase().includes(this.clientSearch.toLowerCase()));
+            },
+            selectClient(c) {
+                this.selectedClientId = c.id;
+                this.selectedClientName = c.name + (c.company ? ' (' + c.company + ')' : '');
+                this.openClient = false;
+                this.clientSearch = '';
+            }
+        }" class="relative">
+            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Klien <span class="text-error-500">*</span></label>
+            <input type="hidden" name="client_id" :value="selectedClientId" required>
+
+            <div @click="openClient = !openClient" @click.away="openClient = false" class="relative cursor-pointer">
+                <div class="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-sm text-gray-900 focus:border-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white flex items-center justify-between shadow-sm">
+                    <span x-text="selectedClientName || '— Cari & Pilih Klien —'" :class="!selectedClientName ? 'text-gray-400' : ''"></span>
+                    <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+
+                <div x-show="openClient" x-transition class="absolute z-50 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900 max-h-60 overflow-auto p-2 space-y-1">
+                    <input type="text" x-model="clientSearch" @click.stop placeholder="Ketik nama / perusahaan klien..." class="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-900 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white mb-2">
+
+                    <template x-for="c in filteredClients" :key="c.id">
+                        <div @click="selectClient(c)" class="cursor-pointer rounded px-3 py-2 text-xs hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-500/20 dark:hover:text-brand-300 flex items-center justify-between" :class="selectedClientId === c.id ? 'bg-brand-50 text-brand-700 font-bold dark:bg-brand-500/20 dark:text-brand-300' : 'text-gray-700 dark:text-gray-300'">
+                            <span x-text="c.name + (c.company ? ' (' + c.company + ')' : '')"></span>
+                            <span x-show="selectedClientId === c.id" class="text-brand-600 dark:text-brand-400">✓</span>
+                        </div>
+                    </template>
+                    <div x-show="filteredClients.length === 0" class="px-3 py-2 text-xs text-gray-400 text-center">
+                        Klien tidak ditemukan
+                    </div>
+                </div>
+            </div>
+            @error('client_id')<span class="block text-xs text-error-600 mt-1">{{ $message }}</span>@enderror
+        </div>
 
         @if ($invoice)
             <x-form.input name="number" label="Nomor Invoice" :value="$invoice->number" />
@@ -99,24 +141,24 @@
                 <input type="radio" name="invoice_type" value="down_payment" x-model="invoiceType" class="text-amber-600 focus:ring-amber-600">
                 <div>
                     <span class="block text-xs font-semibold">Uang Muka (DP)</span>
-                    <span class="block text-[11px] text-gray-500 dark:text-gray-400">Hanya Nominal DP</span>
+                    <span class="block text-[11px] text-gray-500 dark:text-gray-400">Invoice Uang Muka</span>
                 </div>
             </label>
 
             <label class="flex items-center gap-2.5 rounded-lg border p-3 cursor-pointer transition"
-                   :class="invoiceType === 'settlement' ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-semibold' : 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 text-gray-700 dark:text-gray-300'">
+                   :class="invoiceType === 'settlement' ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-500/10 text-indigo-800 dark:text-indigo-300 font-semibold' : 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 text-gray-700 dark:text-gray-300'">
                 <input type="radio" name="invoice_type" value="settlement" x-model="invoiceType" class="text-indigo-600 focus:ring-indigo-600">
                 <div>
-                    <span class="block text-xs font-semibold">Pelunasan / Lanjutan</span>
-                    <span class="block text-[11px] text-gray-500 dark:text-gray-400">Referensi DP Sebelumnya</span>
+                    <span class="block text-xs font-semibold">Pelunasan</span>
+                    <span class="block text-[11px] text-gray-500 dark:text-gray-400">Pelunasan dari DP</span>
                 </div>
             </label>
         </div>
 
-        <div x-show="invoiceType === 'settlement' || parentId !== ''" class="mt-3">
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Pilih Referensi Invoice DP Sebelumnya</label>
-            <select name="parent_invoice_id" x-model="parentId" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-800 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                <option value="">— Tidak Ada Referensi Invoice —</option>
+        <div x-show="invoiceType === 'settlement'" x-collapse class="mt-3">
+            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Pilih Invoice DP Referensi <span class="text-error-500">*</span></label>
+            <select name="parent_invoice_id" x-model="parentId" class="w-full rounded-md border border-gray-300 bg-white py-2 px-3 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                <option value="">— Pilih Invoice DP Terkait —</option>
                 @foreach ($parentInvoices ?? [] as $pInv)
                     @if (!$invoice || $pInv->id !== $invoice->id)
                         <option value="{{ $pInv->id }}" @selected((int) old('parent_invoice_id', $invoice?->parent_invoice_id ?? request('parent_invoice_id')) === $pInv->id)>
@@ -157,15 +199,35 @@
                 <input type="hidden" x-bind:name="'items[' + index + '][description]'" x-model="item.description">
                 <input type="hidden" x-bind:name="'items[' + index + '][quantity]'" x-model="item.quantity">
                 <input type="hidden" x-bind:name="'items[' + index + '][unit_price]'" x-model="item.unit_price">
-                <div class="grid gap-3 rounded-md border border-gray-200 p-3 sm:grid-cols-[1fr_7rem_9rem_2rem]">
-                    <select x-model="item.product_id" x-on:change="onSelect(index)" class="w-full appearance-none rounded-md border border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-gray-900 focus:outline-none bg-white bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20fill=%27none%27%20viewBox=%270%200%2024%2024%27%20stroke-width=%271.5%27%20stroke=%27%239ca3af%27%3E%3Cpath%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%20d=%27m19.5%208.25-7.5%207.5-7.5-7.5%27%20/%3E%3C/svg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.75rem_center] bg-no-repeat">
-                        <option value="">— Pilih Produk —</option>
-                        <template x-for="p in productData" :key="p.id">
-                            <option :value="p.id" x-text="p.name + ' (Rp ' + new Intl.NumberFormat('id-ID').format(p.price) + ')'"></option>
-                        </template>
-                    </select>
-                    <input x-on:focus="$el.value = item.quantity; $el.select()" x-on:blur="item.quantity = fixNum($el.value); $el.value = fmt(item.quantity)" x-on:input="item.quantity = fixNum($el.value)" class="rounded-md border border-gray-300 px-3 py-2 text-sm text-right" x-bind:value="fmt(item.quantity)" placeholder="Jumlah">
-                    <input x-on:focus="if(!$el.readOnly){ $el.value = item.unit_price; $el.select() }" x-on:blur="if(!$el.readOnly){ item.unit_price = fixNum($el.value); $el.value = fmt(item.unit_price) }" x-bind:readonly="!!item.product_id" x-bind:class="!!item.product_id ? 'rounded-md border border-gray-300 px-3 py-2 text-sm text-right bg-gray-50 text-gray-600' : 'rounded-md border border-gray-300 px-3 py-2 text-sm text-right bg-white'" x-bind:value="fmt(item.unit_price)" placeholder="Harga">
+                <div class="grid gap-3 rounded-md border border-gray-200 p-3 sm:grid-cols-[1fr_7rem_9rem_2rem]" x-data="{ openProd: false, prodSearch: '' }">
+                    <!-- Searchable Product Dropdown -->
+                    <div class="relative" @click.away="openProd = false">
+                        <div @click="openProd = !openProd" class="w-full cursor-pointer rounded-md border border-gray-300 bg-white py-2 pl-3 pr-8 text-sm text-gray-900 focus:border-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white flex items-center justify-between shadow-sm">
+                            <span x-text="getProductName(item.product_id) || item.description || '— Cari / Pilih Produk Master —'" :class="!getProductName(item.product_id) && !item.description ? 'text-gray-400' : ''" class="truncate"></span>
+                            <svg class="h-4 w-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+
+                        <div x-show="openProd" x-transition class="absolute z-50 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900 max-h-56 overflow-auto p-2 space-y-1">
+                            <input type="text" x-model="prodSearch" @click.stop placeholder="Ketik nama produk..." class="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-900 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white mb-1">
+
+                            <div @click="item.product_id = ''; openProd = false" class="cursor-pointer rounded px-2.5 py-1.5 text-xs text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-800 mb-1">
+                                <em>— Item Manual (Input Deskripsi Bebas) —</em>
+                            </div>
+
+                            <template x-for="p in filterProducts(prodSearch)" :key="p.id">
+                                <div @click="selectProductItem(index, p); openProd = false; prodSearch = ''" class="cursor-pointer rounded px-2.5 py-1.5 text-xs hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-500/20 dark:hover:text-brand-300 flex items-center justify-between" :class="item.product_id == p.id ? 'bg-brand-50 text-brand-700 font-bold dark:bg-brand-500/20 dark:text-brand-300' : 'text-gray-700 dark:text-gray-300'">
+                                    <span x-text="p.name"></span>
+                                    <span class="font-mono text-[11px] text-gray-500 dark:text-gray-400" x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(p.price)"></span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="mt-2" x-show="!item.product_id">
+                            <input type="text" x-model="item.description" class="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white" placeholder="Ketik uraian / deskripsi item manual...">
+                        </div>
+                    </div>
+
+                    <input x-on:focus="$el.value = item.quantity; $el.select()" x-on:blur="item.quantity = fixNum($el.value); $el.value = fmt(item.quantity)" x-on:input="item.quantity = fixNum($el.value)" class="rounded-md border border-gray-300 px-3 py-2 text-sm text-right h-10" x-bind:value="fmt(item.quantity)" placeholder="Jumlah">
+                    <input x-on:focus="if(!$el.readOnly){ $el.value = item.unit_price; $el.select() }" x-on:blur="if(!$el.readOnly){ item.unit_price = fixNum($el.value); $el.value = fmt(item.unit_price) }" x-bind:readonly="!!item.product_id" x-bind:class="!!item.product_id ? 'rounded-md border border-gray-300 px-3 py-2 text-sm text-right bg-gray-50 text-gray-600 h-10' : 'rounded-md border border-gray-300 px-3 py-2 text-sm text-right bg-white h-10'" x-bind:value="fmt(item.unit_price)" placeholder="Harga">
                     <button type="button" x-on:click="removeRow(index)" x-show="items.length > 1" class="flex items-center justify-center text-gray-400 hover:text-error-600" title="Hapus">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
@@ -296,6 +358,23 @@ document.addEventListener('alpine:init', () => {
         discountType: discountType || 'fixed',
         discountRate: discountRate || 0,
         discountAmount: discountAmount || 0,
+
+        filterProducts(search) {
+            if (!search) return this.productData;
+            return this.productData.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+        },
+
+        getProductName(id) {
+            if (!id) return '';
+            const p = this.productData.find(prod => String(prod.id) === String(id));
+            return p ? p.name + ' (Rp ' + fmt(p.price) + ')' : '';
+        },
+
+        selectProductItem(index, p) {
+            this.items[index].product_id = String(p.id);
+            this.items[index].description = p.description || p.name;
+            this.items[index].unit_price = p.price;
+        },
 
         onSelect(index) {
             const pid = this.items[index].product_id;

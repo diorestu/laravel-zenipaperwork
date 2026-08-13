@@ -18,7 +18,7 @@ class StoreInvoiceRequest extends FormRequest
 
         return [
             'client_id' => ['required', Rule::exists('clients', 'id')->where('company_id', $companyId)],
-            'number' => ['required', 'string', 'max:100'],
+            'number' => ['nullable', 'string', 'max:100'],
             'issue_date' => ['required', 'date'],
             'due_date' => ['nullable', 'date', 'after_or_equal:issue_date'],
             'status' => ['nullable', Rule::in(['draft', 'sent', 'partial', 'paid', 'void'])],

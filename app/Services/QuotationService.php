@@ -31,10 +31,14 @@ class QuotationService
             );
             $terms = $this->normalizePaymentTerms($data['payment_terms'] ?? []);
 
+            $number = ! empty($data['number'])
+                ? $data['number']
+                : 'QUO-'.now()->format('Ymd-His');
+
             $quotation = Quotation::create([
                 'company_id' => $user->company_id,
                 'client_id' => $data['client_id'],
-                'number' => $data['number'],
+                'number' => $number,
                 'issue_date' => $data['issue_date'],
                 'valid_until' => $data['valid_until'] ?? null,
                 'status' => $data['status'] ?? 'draft',

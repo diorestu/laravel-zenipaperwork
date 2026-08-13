@@ -906,3 +906,38 @@ it('renders security settings page and updates user password', function () {
 
     expect(\Illuminate\Support\Facades\Hash::check('newpassword123', $user->refresh()->password))->toBeTrue();
 });
+
+it('auto generates invoice and quotation numbers when number field is left empty', function () {
+    $user = paperworkUser();
+    $client = Client::factory()->create(['company_id' => $user->company_id]);
+
+    // 1. Store invoice with empty number
+    $invResponse = $this->actingAs($user)->post(route('invoices.store'), [
+        'client_id' => $client->id,
+        'number' => '', // Left empty
+        'issue_date' => now()->toDateString(),
+        'items' => [
+            ['description' => 'Produk Auto Numbering', 'quantity' => 1, 'unit_price' => 150000],
+        ],
+    ]);
+
+    $invoice = Invoice::where('company_id', $user->company_id)->latest('id')->first();
+    expect($invoice)->not->toBeNull();
+    expect($invoice->number)->not->toBeEmpty();
+    $invResponse->assertRedirect(route('invoices.show', $invoice));
+
+    // 2. Store quotation with empty number
+    $quoResponse = $this->actingAs($user)->post(route('quotations.store'), [
+        'client_id' => $client->id,
+        'number' => '', // Left empty
+        'issue_date' => now()->toDateString(),
+        'items' => [
+            ['description' => 'Penawaran Auto Numbering', 'quantity' => 1, 'unit_price' => 200000],
+        ],
+    ]);
+
+    $quotation = Quotation::where('company_id', $user->company_id)->latest('id')->first();
+    expect($quotation)->not->toBeNull();
+    expect($quotation->number)->not->toBeEmpty();
+    $quoResponse->assertRedirect(route('quotations.show', $quotation));
+});
