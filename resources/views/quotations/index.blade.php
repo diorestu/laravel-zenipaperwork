@@ -62,7 +62,7 @@
                     <thead class="bg-gray-50 dark:bg-gray-900">
                         <tr>
                             <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                                <input type="checkbox" class="rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700" @change="document.querySelectorAll('.dt-checkbox').forEach(c => c.checked = $event.target.checked); hasSelection = document.querySelectorAll('.dt-checkbox:checked').length > 0">
+                                <input type="checkbox" class="size-4 cursor-pointer rounded border-gray-300 bg-gray-50 text-brand-600 shadow-theme-xs transition-colors focus:ring-2 focus:ring-brand-500/20 focus:ring-offset-0 dark:border-gray-700 dark:bg-gray-900" @change="document.querySelectorAll('.dt-checkbox').forEach(c => c.checked = $event.target.checked); hasSelection = document.querySelectorAll('.dt-checkbox:checked').length > 0">
                             </th>
                             <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Nomor</th>
                             <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Klien</th>
