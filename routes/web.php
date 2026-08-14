@@ -69,7 +69,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/mobile/stats', [MobileWorkspaceController::class, 'stats'])->name('mobile.stats');
         Route::get('/mobile/invoices/load-more', [MobileWorkspaceController::class, 'loadMoreInvoices'])->name('mobile.invoices.load-more');
 
+        Route::post('/clients/bulk-delete', [ClientController::class, 'bulkDestroy'])->name('clients.bulk-delete');
         Route::resource('clients', ClientController::class)->only(['index', 'store', 'update', 'destroy']);
+        
+        Route::post('/products/bulk-delete', [ProductController::class, 'bulkDestroy'])->name('products.bulk-delete');
         Route::resource('products', ProductController::class)->only(['index', 'store', 'update', 'destroy']);
 
         Route::resource('quotations', QuotationController::class);
@@ -120,6 +123,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/settings/data', [\App\Http\Controllers\DataManagementController::class, 'index'])->name('settings.data');
         Route::post('/settings/data/import', [\App\Http\Controllers\DataManagementController::class, 'import'])->name('settings.data.import');
         Route::get('/settings/data/export', [\App\Http\Controllers\DataManagementController::class, 'export'])->name('settings.data.export');
+        Route::delete('/settings/data/reset', [\App\Http\Controllers\DataManagementController::class, 'resetWorkspace'])->name('settings.data.reset');
 
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');

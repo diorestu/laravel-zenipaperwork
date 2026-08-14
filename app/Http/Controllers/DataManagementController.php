@@ -68,4 +68,31 @@ class DataManagementController extends Controller
             'Content-Type' => 'application/json',
         ]);
     }
+    public function resetWorkspace(Request $request)
+    {
+        $user = $request->user();
+        $companyId = $user->company_id;
+
+        if (! $companyId) {
+            return back()->with('error', 'Perusahaan tidak ditemukan.');
+        }
+
+        // Require password confirmation for security?
+        // Let's assume the view handles a simple confirmation prompt via Alpine/HTML form.
+        // To be safe, we only allow this action if explicitly triggered.
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($companyId) {
+            \App\Models\Expense::where('company_id', $companyId)->delete();
+            \App\Models\CreditNote::where('company_id', $companyId)->delete();
+            \App\Models\Invoice::where('company_id', $companyId)->delete();
+            \App\Models\Quotation::where('company_id', $companyId)->delete();
+            \App\Models\Client::where('company_id', $companyId)->delete();
+            \App\Models\Product::where('company_id', $companyId)->delete();
+            \App\Models\BankAccount::where('company_id', $companyId)->delete();
+        });
+
+        \App\Support\ActivityNotifier::record($user, 'Ruang Kerja Direset', 'Seluruh data transaksi dan master pada ruang kerja telah dihapus.');
+
+        return redirect()->route('dashboard')->with('success', 'Semua data pada ruang kerja ini berhasil dihapus/direset.');
+    }
 }

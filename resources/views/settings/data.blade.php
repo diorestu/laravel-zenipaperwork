@@ -84,5 +84,27 @@
             </a>
         </section>
     </div>
+    <div class="mt-8 border-t border-gray-200 dark:border-gray-800 pt-8">
+        <section class="rounded-2xl border border-rose-200 bg-white p-6 shadow-theme-xs dark:border-rose-900/30 dark:bg-rose-950/10">
+            <div class="flex items-start gap-4">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                </div>
+                <div class="flex-1">
+                    <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Reset Ruang Kerja (Milik Sendiri)</h2>
+                    <p class="mt-1 text-xs text-gray-600 dark:text-gray-400 leading-relaxed max-w-3xl">
+                        Aksi ini akan <strong>menghapus seluruh data transaksi dan master secara permanen</strong> pada ruang kerja Anda saat ini (Invoice, Penawaran, Klien, Produk, Pengeluaran, Akun Bank). Data ini hanya milik Anda dan tidak memengaruhi pengguna lain. <strong>Tindakan ini tidak dapat dibatalkan.</strong>
+                    </p>
+                    <form action="{{ route('settings.data.reset') }}" method="POST" class="mt-4 inline-block" onsubmit="return confirm('PERINGATAN: Apakah Anda yakin ingin menghapus seluruh data pada ruang kerja ini secara permanen? Data yang telah dihapus tidak dapat dikembalikan.')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-2.5 text-xs font-semibold text-white shadow-theme-xs hover:bg-rose-700 transition focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                            Ya, Hapus Semua Data Milik Saya
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
 </div>
 @endsection

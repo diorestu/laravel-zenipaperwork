@@ -73,6 +73,7 @@ class ProductController extends Controller
             'recordsTotal' => $recordsTotal,
             'recordsFiltered' => $recordsFiltered,
             'data' => $products->map(fn (Product $product) => [
+                'checkbox' => '<input type="checkbox" name="ids[]" value="'.$product->id.'" class="dt-checkbox rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700">',
                 'product' => view('products.partials.datatable-product', compact('product'))->render(),
                 'price' => '<p class="font-medium text-gray-900 dark:text-white/90">Rp '.number_format((float) $product->price, 0, ',', '.').'</p><p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">per '.e($product->unit).'</p>',
                 'usage' => '<div class="flex flex-wrap gap-2"><span class="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 dark:border-gray-700 dark:bg-white/5 dark:text-gray-300">'.$product->invoice_items_count.' item invoice</span><span class="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 dark:border-gray-700 dark:bg-white/5 dark:text-gray-300">'.$product->quotation_items_count.' item penawaran</span></div>',
@@ -109,5 +110,23 @@ class ProductController extends Controller
         $product->delete();
 
         return back()->with('success', 'Produk dihapus.');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        
+        if (empty($ids) || !is_array($ids)) {
+            return back()->with('error', 'Tidak ada produk yang dipilih.');
+        }
+
+        $products = Product::whereIn('id', $ids)->where('company_id', $request->user()->company_id)->get();
+        
+        foreach ($products as $product) {
+            $this->authorize('delete', $product);
+            $product->delete();
+        }
+
+        return back()->with('success', count($products) . ' produk berhasil dihapus.');
     }
 }

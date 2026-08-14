@@ -33,53 +33,68 @@
     @endif
 
     <section class="rounded-lg border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03]">
-        <div class="border-b border-gray-100 p-5 dark:border-gray-800">
-            <div class="flex justify-end">
-                <div class="relative w-full sm:w-80">
-                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 dark:text-gray-500">
-                        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                            <path d="M9.16667 15.8333C12.8486 15.8333 15.8333 12.8486 15.8333 9.16667C15.8333 5.48477 12.8486 2.5 9.16667 2.5C5.48477 2.5 2.5 5.48477 2.5 9.16667C2.5 12.8486 5.48477 15.8333 9.16667 15.8333Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M17.5 17.5L13.875 13.875" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </span>
-                    <input
-                        id="products-table-search"
-                        type="search"
-                        placeholder="Cari nama, deskripsi, unit"
-                        class="h-11 w-full rounded-lg border border-gray-300 bg-white pr-4 pl-11 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                    >
+        <form method="POST" action="{{ route('products.bulk-delete') }}" x-data="{ hasSelection: false }" @change="hasSelection = document.querySelectorAll('.dt-checkbox:checked').length > 0">
+            @csrf
+            <div class="border-b border-gray-100 p-5 dark:border-gray-800">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-base font-semibold text-gray-900 dark:text-white/90">Katalog Produk</h2>
+                        <template x-if="hasSelection">
+                            <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menghapus produk yang dipilih?')" class="inline-flex items-center justify-center rounded-lg bg-error-500 px-3 py-1.5 text-xs font-medium text-white shadow-theme-xs hover:bg-error-600">
+                                Hapus Terpilih
+                            </button>
+                        </template>
+                    </div>
+                    <div class="relative w-full sm:w-80">
+                        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 dark:text-gray-500">
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                                <path d="M9.16667 15.8333C12.8486 15.8333 15.8333 12.8486 15.8333 9.16667C15.8333 5.48477 12.8486 2.5 9.16667 2.5C5.48477 2.5 2.5 5.48477 2.5 9.16667C2.5 12.8486 5.48477 15.8333 9.16667 15.8333Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M17.5 17.5L13.875 13.875" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                        <input
+                            id="products-table-search"
+                            type="search"
+                            placeholder="Cari nama, deskripsi, unit"
+                            class="h-11 w-full rounded-lg border border-gray-300 bg-white pr-4 pl-11 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                        >
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="overflow-x-auto">
-            <table
-                class="min-w-full text-left text-sm"
-                data-ajax-datatable
-                data-ajax-url="{{ route('products.index', ['datatable' => 1]) }}"
-                data-columns='[
-                    {"data":"product"},
-                    {"data":"price"},
-                    {"data":"usage"},
-                    {"data":"status"},
-                    {"data":"updated"},
-                    {"data":"action","className":"dt-action-cell"}
-                ]'
-                data-page-length="10"
-                data-search-target="#products-table-search">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Produk</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Harga</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Pemakaian</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Diperbarui</th>
-                        <th class="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-transparent"></tbody>
-            </table>
-        </div>
+            <div class="overflow-x-auto">
+                <table
+                    class="min-w-full text-left text-sm"
+                    data-ajax-datatable
+                    data-ajax-url="{{ route('products.index', ['datatable' => 1]) }}"
+                    data-columns='[
+                        {"data":"checkbox","orderable":false,"searchable":false,"className":"w-10"},
+                        {"data":"product"},
+                        {"data":"price"},
+                        {"data":"usage"},
+                        {"data":"status"},
+                        {"data":"updated"},
+                        {"data":"action","className":"dt-action-cell"}
+                    ]'
+                    data-page-length="10"
+                    data-search-target="#products-table-search">
+                    <thead class="bg-gray-50 dark:bg-gray-900">
+                        <tr>
+                            <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                                <input type="checkbox" class="rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700" @change="document.querySelectorAll('.dt-checkbox').forEach(c => c.checked = $event.target.checked); hasSelection = document.querySelectorAll('.dt-checkbox:checked').length > 0">
+                            </th>
+                            <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Produk</th>
+                            <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Harga</th>
+                            <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Pemakaian</th>
+                            <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</th>
+                            <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Diperbarui</th>
+                            <th class="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-transparent"></tbody>
+                </table>
+            </div>
+        </form>
     </section>
 
     <x-ui.modal name="edit-product" class="max-w-2xl p-6">

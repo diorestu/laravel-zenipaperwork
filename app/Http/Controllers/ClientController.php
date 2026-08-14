@@ -78,6 +78,7 @@ class ClientController extends Controller
             'recordsTotal' => $recordsTotal,
             'recordsFiltered' => $recordsFiltered,
             'data' => $clients->map(fn (Client $client) => [
+                'checkbox' => '<input type="checkbox" name="ids[]" value="'.$client->id.'" class="dt-checkbox rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700">',
                 'client' => view('clients.partials.datatable-client', compact('client'))->render(),
                 'contact' => '<div class="space-y-1"><p class="text-gray-700 dark:text-gray-300">'.e($client->email ?: '-').'</p><p class="text-xs text-gray-500 dark:text-gray-400">'.e($client->phone ?: 'Tidak ada telepon').'</p></div>',
                 'documents' => '<div class="flex flex-wrap gap-2"><span class="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 dark:border-gray-700 dark:bg-white/5 dark:text-gray-300">'.$client->invoices_count.' invoice</span><span class="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 dark:border-gray-700 dark:bg-white/5 dark:text-gray-300">'.$client->quotations_count.' penawaran</span></div>',
@@ -131,5 +132,23 @@ class ClientController extends Controller
         $client->delete();
 
         return back()->with('success', 'Klien dihapus.');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        
+        if (empty($ids) || !is_array($ids)) {
+            return back()->with('error', 'Tidak ada klien yang dipilih.');
+        }
+
+        $clients = Client::whereIn('id', $ids)->where('company_id', $request->user()->company_id)->get();
+        
+        foreach ($clients as $client) {
+            $this->authorize('delete', $client);
+            $client->delete();
+        }
+
+        return back()->with('success', count($clients) . ' klien berhasil dihapus.');
     }
 }
