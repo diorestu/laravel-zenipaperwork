@@ -215,6 +215,7 @@ class InvoiceController extends Controller
             'recordsTotal' => $recordsTotal,
             'recordsFiltered' => $recordsFiltered,
             'data' => $invoices->map(fn (Invoice $invoice) => [
+                'checkbox' => '<input type="checkbox" name="ids[]" value="'.$invoice->id.'" class="dt-checkbox rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700">',
                 'number' => '<a href="'.route('invoices.show', $invoice).'" class="font-medium text-brand-600 hover:text-brand-700">'.e($invoice->number).'</a>',
                 'client' => '<div><p class="font-medium text-gray-900 dark:text-white/90">'.e($invoice->client->name).'</p>'.($invoice->client->company_name ? '<p class="text-xs text-gray-500">'.e($invoice->client->company_name).'</p>' : '').'</div>',
                 'total' => '<p class="font-medium text-gray-900 dark:text-white/90">Rp '.number_format((float) $invoice->total, 0, ',', '.').'</p>',
@@ -223,6 +224,24 @@ class InvoiceController extends Controller
                 'action' => view('invoices.partials.datatable-actions', compact('invoice'))->render(),
             ]),
         ]);
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        
+        if (empty($ids) || !is_array($ids)) {
+            return back()->with('error', 'Tidak ada invoice yang dipilih.');
+        }
+
+        $invoices = Invoice::whereIn('id', $ids)->where('company_id', $request->user()->company_id)->get();
+        
+        foreach ($invoices as $invoice) {
+            $this->authorize('delete', $invoice);
+            $invoice->delete();
+        }
+
+        return back()->with('success', count($invoices) . ' invoice berhasil dihapus.');
     }
 
     private function formData(): array

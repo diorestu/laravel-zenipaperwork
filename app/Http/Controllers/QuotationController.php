@@ -176,6 +176,7 @@ class QuotationController extends Controller
             'recordsTotal' => $recordsTotal,
             'recordsFiltered' => $recordsFiltered,
             'data' => $quotations->map(fn (Quotation $quotation) => [
+                'checkbox' => '<input type="checkbox" name="ids[]" value="'.$quotation->id.'" class="dt-checkbox rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700">',
                 'number' => '<a href="'.route('quotations.show', $quotation).'" class="font-medium text-brand-600 hover:text-brand-700">'.e($quotation->number).'</a>',
                 'client' => '<div><p class="font-medium text-gray-900 dark:text-white/90">'.e($quotation->client->name).'</p>'.($quotation->client->company_name ? '<p class="text-xs text-gray-500">'.e($quotation->client->company_name).'</p>' : '').'</div>',
                 'total' => '<p class="font-medium text-gray-900 dark:text-white/90">Rp '.number_format((float) $quotation->total, 0, ',', '.').'</p>',
@@ -184,6 +185,24 @@ class QuotationController extends Controller
                 'action' => view('quotations.partials.datatable-actions', compact('quotation'))->render(),
             ]),
         ]);
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        
+        if (empty($ids) || !is_array($ids)) {
+            return back()->with('error', 'Tidak ada penawaran yang dipilih.');
+        }
+
+        $quotations = Quotation::whereIn('id', $ids)->where('company_id', $request->user()->company_id)->get();
+        
+        foreach ($quotations as $quotation) {
+            $this->authorize('delete', $quotation);
+            $quotation->delete();
+        }
+
+        return back()->with('success', count($quotations) . ' penawaran berhasil dihapus.');
     }
 
     private function formData(): array

@@ -75,6 +75,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/products/bulk-delete', [ProductController::class, 'bulkDestroy'])->name('products.bulk-delete');
         Route::resource('products', ProductController::class)->only(['index', 'store', 'update', 'destroy']);
 
+        Route::post('/quotations/bulk-delete', [QuotationController::class, 'bulkDestroy'])->name('quotations.bulk-delete');
         Route::resource('quotations', QuotationController::class);
         Route::patch('/quotations/{quotation}/status', [QuotationController::class, 'status'])->name('quotations.status');
         Route::post('/quotations/{quotation}/convert', [QuotationController::class, 'convert'])->name('quotations.convert');
@@ -83,6 +84,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
         Route::post('/calendar/sync', [CalendarController::class, 'sync'])->name('calendar.sync');
 
+        Route::post('/invoices/bulk-delete', [InvoiceController::class, 'bulkDestroy'])->name('invoices.bulk-delete');
         Route::resource('invoices', InvoiceController::class);
         Route::patch('/invoices/{invoice}/status', [InvoiceController::class, 'status'])->name('invoices.status');
         Route::post('/invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
