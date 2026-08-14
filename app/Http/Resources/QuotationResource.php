@@ -25,7 +25,7 @@ class QuotationResource extends JsonResource
             'discount_amount' => (float) ($this->discount_amount ?? 0),
             'total' => (float) $this->total,
             'notes' => $this->notes,
-            'pdf_url' => route('quotations.pdf', $this->id),
+            'pdf_url' => route('api.quotations.pdf', $this->id),
             'client' => new ClientResource($this->whenLoaded('client')),
             'items' => $this->whenLoaded('items', fn () => $this->items->map(fn ($item): array => [
                 'id' => $item->id,

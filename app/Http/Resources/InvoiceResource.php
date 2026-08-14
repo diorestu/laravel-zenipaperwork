@@ -34,7 +34,7 @@ class InvoiceResource extends JsonResource
             'is_overdue' => (bool) $this->is_overdue,
             'notes' => $this->notes,
             'public_url' => route('public.invoices.show', $this->public_token),
-            'pdf_url' => route('invoices.pdf', $this->id),
+            'pdf_url' => route('api.invoices.pdf', $this->id),
             'client' => new ClientResource($this->whenLoaded('client')),
             'items' => $this->whenLoaded('items', fn () => $this->items->map(fn ($item): array => [
                 'id' => $item->id,
