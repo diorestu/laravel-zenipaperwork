@@ -35,6 +35,7 @@ Route::post('/webhooks/pakasir', PakasirWebhookController::class)->name('webhook
 Route::post('/webhooks/sumopod', \App\Http\Controllers\SumopodWebhookController::class)->name('webhooks.sumopod');
 Route::view('/privacy-policy', 'pages.privacy-policy')->name('privacy-policy');
 Route::view('/terms-of-service', 'pages.terms-of-service')->name('terms-of-service');
+Route::view('/account-deletion', 'pages.account-deletion')->name('account-deletion');
 Route::view('/mobile', 'pwa.install')->name('pwa.install');
 
 Route::middleware('guest')->group(function () {
