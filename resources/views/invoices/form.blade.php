@@ -222,7 +222,7 @@
                             </template>
                         </div>
                         <div class="mt-2" x-show="!item.product_id">
-                            <input type="text" x-model="item.description" class="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white" placeholder="Ketik uraian / deskripsi item manual...">
+                            <textarea rows="2" x-model="item.description" class="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white resize-y" placeholder="Ketik uraian / deskripsi item manual..."></textarea>
                         </div>
                     </div>
 

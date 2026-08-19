@@ -44,7 +44,7 @@ class StoreInvoiceRequest extends FormRequest
             'payment_terms.*.due_date' => ['nullable', 'date'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['nullable', Rule::exists('products', 'id')->where('company_id', $companyId)],
-            'items.*.description' => ['required', 'string', 'max:255'],
+            'items.*.description' => ['required', 'string', 'max:5000'],
             'items.*.quantity' => ['required', 'numeric', 'min:0.01'],
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
         ];
