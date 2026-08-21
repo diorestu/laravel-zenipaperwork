@@ -359,6 +359,13 @@
                         }
                     }
 
+                    if (!empty($itemDesc)) {
+                        $itemDesc = preg_replace('/ \s*[-–]\s*/', "\n- ", $itemDesc);
+                        if (str_contains($itemDesc, "\n- ") && !preg_match('/^\s*-/', $itemDesc)) {
+                            $itemDesc = '- ' . ltrim($itemDesc);
+                        }
+                    }
+
                     if (empty($itemName)) {
                         $itemName = $item->description ?? 'Item';
                     }

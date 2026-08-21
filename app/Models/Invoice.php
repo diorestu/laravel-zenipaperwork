@@ -85,12 +85,27 @@ class Invoice extends Model
             default => $this->status,
         };
 
+        $oldStatus = $this->status;
+
         $this->updateQuietly([
             'amount_paid' => $paid,
             'credit_note_total' => $credit,
             'balance_due' => $balanceDue,
             'status' => $newStatus,
         ]);
+
+        if ($oldStatus !== $newStatus) {
+            try {
+                $statusMapping = ['draft' => 'Draft', 'sent' => 'Terkirim', 'partial' => 'Dibayar Sebagian', 'paid' => 'Lunas', 'overdue' => 'Jatuh Tempo', 'cancelled' => 'Dibatalkan'];
+                $statusLabel = $statusMapping[$newStatus] ?? $newStatus;
+                app(\App\Services\FirebasePushService::class)->sendToCompany(
+                    $this->company_id,
+                    'Status Invoice Berubah',
+                    "Invoice {$this->number} berstatus {$statusLabel} (Update Otomatis).",
+                    ['type' => 'invoice', 'id' => (string)$this->id]
+                );
+            } catch (\Throwable $e) {}
+        }
     }
 
     public function client(): BelongsTo
