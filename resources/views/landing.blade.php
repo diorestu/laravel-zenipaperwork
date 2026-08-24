@@ -14,8 +14,8 @@
     <!-- Primary Meta Tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Paperwork - Solusi Invoice, Penawaran & Billing Bisnis Otomatis</title>
-    <meta name="title" content="Paperwork - Solusi Invoice, Penawaran & Billing Bisnis Otomatis">
+    <title>Paperwork - Aplikasi Invoice, Penawaran & Billing Bisnis Otomatis</title>
+    <meta name="title" content="Paperwork - Aplikasi Invoice, Penawaran & Billing Bisnis Otomatis">
     <meta name="description" content="Paperwork membantu bisnis Anda membuat invoice profesional, dokumen penawaran harga, mengelola klien, dan mengotomatisasi sistem pembayaran tagihan dengan mudah dan rapi.">
     <meta name="keywords" content="aplikasi invoice, buat invoice online, aplikasi penawaran harga, software billing indonesia, kelola tagihan bisnis, aplikasi kasir & billing, paperwork">
     <meta name="author" content="PT Numa Teknologi Nusantara">
@@ -90,7 +90,7 @@
         <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
             <!-- Header Logo (Logo 1.png) -->
             <a href="/" class="flex items-center">
-                <img src="{{ asset('images/logo/logo-header.png') }}" alt="Paperwork" class="h-8 w-auto">
+                <img src="{{ asset('images/logo/logo-header.png') }}" alt="Paperwork Logo - Aplikasi Invoice & Billing Bisnis" class="h-8 w-auto">
             </a>
 
             <nav class="hidden items-center gap-8 text-sm font-bold md:flex text-gray-600 dark:text-gray-300">
@@ -120,47 +120,50 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32">
-        <div class="absolute inset-0 -z-10 bg-[radial-gradient(45rem_50rem_at_top,theme(colors.brand.100),white)] opacity-60 dark:bg-[radial-gradient(45rem_50rem_at_top,theme(colors.brand.950),theme(colors.gray.950))] dark:opacity-40"></div>
-        
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-            <div class="mx-auto max-w-4xl space-y-6">
-                <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl dark:text-white leading-[1.15]">
-                    Kelola Invoice & Penawaran Bisnis Anda 
-                    <span x-data="{
-                        words: ['Otomatis & Tanpa Ribet', 'Cepat & Serba Praktis', 'Profesional & Terorganisir'],
-                        currentWordIndex: 0,
-                        currentCharIndex: 0,
-                        isDeleting: false,
-                        text: '',
-                        type() {
-                            let currentFullWord = this.words[this.currentWordIndex];
-                            if (this.isDeleting) {
-                                this.text = currentFullWord.substring(0, this.currentCharIndex - 1);
-                                this.currentCharIndex--;
-                            } else {
-                                this.text = currentFullWord.substring(0, this.currentCharIndex + 1);
-                                this.currentCharIndex++;
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32">
+            <div class="absolute inset-0 -z-10 bg-[radial-gradient(45rem_50rem_at_top,theme(colors.brand.100),white)] opacity-60 dark:bg-[radial-gradient(45rem_50rem_at_top,theme(colors.brand.950),theme(colors.gray.950))] dark:opacity-40"></div>
+            
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+                <div class="mx-auto max-w-4xl space-y-6">
+                    <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl dark:text-white leading-[1.15]">
+                        Kelola Invoice & Penawaran Bisnis Anda 
+                        <span x-data="{
+                            words: ['Otomatis & Tanpa Ribet', 'Cepat & Serba Praktis', 'Profesional & Terorganisir'],
+                            currentWordIndex: 0,
+                            currentCharIndex: 0,
+                            isDeleting: false,
+                            text: '',
+                            type() {
+                                let currentFullWord = this.words[this.currentWordIndex];
+                                if (this.isDeleting) {
+                                    this.text = currentFullWord.substring(0, this.currentCharIndex - 1);
+                                    this.currentCharIndex--;
+                                } else {
+                                    this.text = currentFullWord.substring(0, this.currentCharIndex + 1);
+                                    this.currentCharIndex++;
+                                }
+
+                                let typeSpeed = this.isDeleting ? 40 : 80;
+
+                                if (!this.isDeleting && this.currentCharIndex === currentFullWord.length) {
+                                    typeSpeed = 2200;
+                                    this.isDeleting = true;
+                                } else if (this.isDeleting && this.currentCharIndex === 0) {
+                                    this.isDeleting = false;
+                                    this.currentWordIndex = (this.currentWordIndex + 1) % this.words.length;
+                                    typeSpeed = 400;
+                                }
+
+                                setTimeout(() => this.type(), typeSpeed);
                             }
-
-                            let typeSpeed = this.isDeleting ? 40 : 80;
-
-                            if (!this.isDeleting && this.currentCharIndex === currentFullWord.length) {
-                                typeSpeed = 2200;
-                                this.isDeleting = true;
-                            } else if (this.isDeleting && this.currentCharIndex === 0) {
-                                this.isDeleting = false;
-                                this.currentWordIndex = (this.currentWordIndex + 1) % this.words.length;
-                                typeSpeed = 400;
-                            }
-
-                            setTimeout(() => this.type(), typeSpeed);
-                        }
-                    }" x-init="type()" class="text-brand-600 dark:text-brand-400 inline-block min-h-[1.2em]">
-                        <span x-text="text"></span><span class="animate-pulse text-brand-600 dark:text-brand-400">|</span>
-                    </span>
-                </h1>
+                        }" x-init="type()" class="text-brand-600 dark:text-brand-400 inline-block min-h-[1.2em]">
+                            <span class="sr-only">Otomatis & Tanpa Ribet, Cepat & Serba Praktis, Profesional & Terorganisir</span>
+                            <span aria-hidden="true" x-text="text">Otomatis & Tanpa Ribet</span><span class="animate-pulse text-brand-600 dark:text-brand-400" aria-hidden="true">|</span>
+                        </span>
+                    </h1>
 
                 <p class="mx-auto max-w-2xl text-base font-medium text-gray-600 sm:text-lg dark:text-gray-300 leading-relaxed">
                     Tinggalkan pembuatan dokumen manual. Terbitkan invoice profesional, penawaran resmi, terima pembayaran QRIS instan, dan kelola arus kas bisnis Anda secara real-time.
@@ -509,6 +512,7 @@
             </div>
         </div>
     </section>
+    </main>
 
     <!-- Footer -->
     <footer class="border-t border-gray-200 bg-gray-950 text-white py-12 dark:border-gray-800">
@@ -516,7 +520,7 @@
             <!-- Footer Logo (Logo 2.png) -->
             <div class="flex items-center gap-4">
                 <a href="/" class="flex items-center">
-                    <img src="{{ asset('images/logo/logo-footer.png') }}" alt="Paperwork" class="h-7 w-auto">
+                    <img src="{{ asset('images/logo/logo-footer.png') }}" alt="Paperwork Logo Footer - Aplikasi Penawaran Harga & Kasir" class="h-7 w-auto">
                 </a>
                 <span class="font-medium text-gray-400">© {{ date('Y') }} PT Numa Teknologi Nusantara. All rights reserved.</span>
             </div>
