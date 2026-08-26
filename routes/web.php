@@ -29,6 +29,8 @@ if (env('DOCS_DOMAIN')) {
 }
 
 Route::view('/', 'landing')->name('landing');
+Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
 Route::get('/public/invoices/{token}', [PublicInvoiceController::class, 'show'])->name('public.invoices.show');
 Route::post('/public/invoices/{token}/pay', [PublicInvoiceController::class, 'pay'])->name('public.invoices.pay');
 Route::post('/webhooks/pakasir', PakasirWebhookController::class)->name('webhooks.pakasir');
@@ -133,6 +135,7 @@ Route::middleware('auth')->group(function () {
 
         Route::middleware('role:super_admin')->prefix('super-admin')->name('super-admin.')->group(function () {
             Route::get('/', [SuperAdminController::class, 'index'])->name('index');
+            Route::resource('posts', \App\Http\Controllers\SuperAdmin\PostController::class);
             Route::get('/users', [SuperAdminController::class, 'users'])->name('users');
             Route::post('/users/{user}/grant-bypass', [SuperAdminController::class, 'grantBypass'])->name('users.grant-bypass');
             Route::post('/users/{user}/revoke-bypass', [SuperAdminController::class, 'revokeBypass'])->name('users.revoke-bypass');
