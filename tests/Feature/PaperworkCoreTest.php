@@ -955,3 +955,53 @@ it('downloads PDF correctly even when document number contains slash characters'
     $response->assertOk();
     $response->assertHeader('content-disposition', 'attachment; filename=INV-2026-08-0001.pdf');
 });
+
+it('applies soft deletes to models without cascade delete', function () {
+    $user = paperworkUser();
+    $company = $user->company;
+    $client = Client::factory()->create(['company_id' => $company->id]);
+    $product = Product::factory()->create(['company_id' => $company->id]);
+    $invoice = Invoice::factory()->create([
+        'company_id' => $company->id,
+        'client_id' => $client->id,
+        'number' => 'INV-SOFT-001',
+    ]);
+    $invoiceItem = \App\Models\InvoiceItem::create([
+        'invoice_id' => $invoice->id,
+        'product_id' => $product->id,
+        'description' => 'Soft delete item',
+        'quantity' => 1,
+        'unit_price' => 50000,
+        'line_total' => 50000,
+    ]);
+    $expense = \App\Models\Expense::create([
+        'company_id' => $company->id,
+        'invoice_id' => $invoice->id,
+        'category' => 'Operasional',
+        'amount' => 25000,
+        'date' => now()->toDateString(),
+    ]);
+
+    // Deleting client should NOT delete invoice, client is soft deleted
+    $client->delete();
+    expect($client->trashed())->toBeTrue();
+    expect(Client::find($client->id))->toBeNull();
+    expect(Client::withTrashed()->find($client->id))->not->toBeNull();
+
+    // Invoice still exists intact
+    expect(Invoice::find($invoice->id))->not->toBeNull();
+
+    // Deleting invoice should soft delete invoice, child items remain in DB (or soft deleted)
+    $invoice->delete();
+    expect($invoice->trashed())->toBeTrue();
+    expect(Invoice::find($invoice->id))->toBeNull();
+    expect(Invoice::withTrashed()->find($invoice->id))->not->toBeNull();
+
+    // Invoice item is NOT cascade deleted from database
+    expect(\App\Models\InvoiceItem::withTrashed()->find($invoiceItem->id))->not->toBeNull();
+
+    // Expense is also preserved
+    $expense->delete();
+    expect($expense->trashed())->toBeTrue();
+    expect(\App\Models\Expense::withTrashed()->find($expense->id))->not->toBeNull();
+});

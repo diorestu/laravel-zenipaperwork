@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Quotation extends Model
 {
     use BelongsToCompany;
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = ['company_id', 'client_id', 'number', 'issue_date', 'valid_until', 'status', 'subtotal', 'tax_rate', 'tax_total', 'custom_taxes', 'discount_type', 'discount_rate', 'discount_amount', 'total', 'notes'];
 
