@@ -3,8 +3,9 @@
     $planSlug = $company?->getActivePlanSlug();
     $planName = match ($planSlug) {
         'trial' => 'Trial',
-        'starter' => 'Starter',
-        'business' => 'Business',
+        'free' => 'Free',
+        'basic', 'starter' => 'Basic',
+        'plus', 'business' => 'Plus',
         'enterprise' => 'Enterprise',
         default => 'Expired',
     };

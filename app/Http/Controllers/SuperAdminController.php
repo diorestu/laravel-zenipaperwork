@@ -102,8 +102,8 @@ class SuperAdminController extends Controller
             ->sum('amount');
 
         $packageDistribution = [
-            'starter' => Company::where('active_plan', 'starter')->count(),
-            'business' => Company::where('active_plan', 'business')->count(),
+            'basic' => Company::whereIn('active_plan', ['basic', 'starter'])->count(),
+            'plus' => Company::whereIn('active_plan', ['plus', 'business'])->count(),
             'enterprise' => Company::where('active_plan', 'enterprise')->count(),
         ];
 
@@ -113,7 +113,7 @@ class SuperAdminController extends Controller
     public function grantBypass(Request $request, User $user)
     {
         $data = $request->validate([
-            'active_plan' => ['required', 'in:starter,business,enterprise'],
+            'active_plan' => ['required', 'in:basic,plus,enterprise,starter,business'],
             'subscription_ends_at' => ['required', 'date', 'after:today'],
         ]);
 
@@ -226,9 +226,9 @@ class SuperAdminController extends Controller
         $pakasirProject = \App\Models\SystemSetting::get('pakasir_project', config('services.pakasir.project', 'paperwork'));
         $pakasirApiKey = \App\Models\SystemSetting::get('pakasir_api_key', config('services.pakasir.api_key', ''));
 
-        $priceStarter = (int) \App\Models\SystemSetting::get('plan_price_starter', 25000);
-        $priceBusiness = (int) \App\Models\SystemSetting::get('plan_price_business', 99000);
-        $priceEnterprise = (int) \App\Models\SystemSetting::get('plan_price_enterprise', 299000);
+        $priceStarter = (int) \App\Models\SystemSetting::get('plan_price_basic', \App\Models\SystemSetting::get('plan_price_starter', 49000));
+        $priceBusiness = (int) \App\Models\SystemSetting::get('plan_price_plus', \App\Models\SystemSetting::get('plan_price_business', 149000));
+        $priceEnterprise = (int) \App\Models\SystemSetting::get('plan_price_enterprise', 199000);
 
         return view('super-admin.settings', compact(
             'activeGateway',
@@ -253,6 +253,8 @@ class SuperAdminController extends Controller
             'plan_price_starter' => ['nullable', 'numeric', 'min:0'],
             'plan_price_business' => ['nullable', 'numeric', 'min:0'],
             'plan_price_enterprise' => ['nullable', 'numeric', 'min:0'],
+            'plan_price_basic' => ['nullable', 'numeric', 'min:0'],
+            'plan_price_plus' => ['nullable', 'numeric', 'min:0'],
         ]);
 
         \App\Models\SystemSetting::set('active_payment_gateway', $data['active_payment_gateway']);
@@ -261,11 +263,15 @@ class SuperAdminController extends Controller
         \App\Models\SystemSetting::set('pakasir_project', $data['pakasir_project'] ?? '');
         \App\Models\SystemSetting::set('pakasir_api_key', $data['pakasir_api_key'] ?? '');
 
-        if (isset($data['plan_price_starter'])) {
-            \App\Models\SystemSetting::set('plan_price_starter', (int) $data['plan_price_starter']);
+        if (isset($data['plan_price_starter']) || isset($data['plan_price_basic'])) {
+            $val = (int) ($data['plan_price_basic'] ?? $data['plan_price_starter']);
+            \App\Models\SystemSetting::set('plan_price_starter', $val);
+            \App\Models\SystemSetting::set('plan_price_basic', $val);
         }
-        if (isset($data['plan_price_business'])) {
-            \App\Models\SystemSetting::set('plan_price_business', (int) $data['plan_price_business']);
+        if (isset($data['plan_price_business']) || isset($data['plan_price_plus'])) {
+            $val = (int) ($data['plan_price_plus'] ?? $data['plan_price_business']);
+            \App\Models\SystemSetting::set('plan_price_business', $val);
+            \App\Models\SystemSetting::set('plan_price_plus', $val);
         }
         if (isset($data['plan_price_enterprise'])) {
             \App\Models\SystemSetting::set('plan_price_enterprise', (int) $data['plan_price_enterprise']);

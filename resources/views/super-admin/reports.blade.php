@@ -25,8 +25,8 @@
         </div>
 
         <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03]">
-            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Paket Business Aktif</span>
-            <h3 class="mt-1 text-2xl font-bold text-purple-600 dark:text-purple-400">{{ number_format($packageDistribution['business']) }}</h3>
+            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Paket Plus Aktif</span>
+            <h3 class="mt-1 text-2xl font-bold text-purple-600 dark:text-purple-400">{{ number_format($packageDistribution['plus'] ?? $packageDistribution['business'] ?? 0) }}</h3>
             <p class="mt-2 text-[11px] text-gray-400">Perusahaan berlangganan</p>
         </div>
 
@@ -57,8 +57,8 @@
                 class="h-10 rounded-xl border border-gray-200 bg-transparent px-3 text-xs text-gray-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
             >
                 <option value="">Semua Paket</option>
-                <option value="starter" {{ request('package') === 'starter' ? 'selected' : '' }}>Starter</option>
-                <option value="business" {{ request('package') === 'business' ? 'selected' : '' }}>Business</option>
+                <option value="basic" {{ in_array(request('package'), ['basic', 'starter']) ? 'selected' : '' }}>Basic</option>
+                <option value="plus" {{ in_array(request('package'), ['plus', 'business']) ? 'selected' : '' }}>Plus</option>
                 <option value="enterprise" {{ request('package') === 'enterprise' ? 'selected' : '' }}>Enterprise</option>
             </select>
 

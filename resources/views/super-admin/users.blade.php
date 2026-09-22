@@ -243,9 +243,9 @@
                         class="w-full rounded-xl border border-gray-200 bg-transparent px-3 py-2 text-xs text-gray-900 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
                         required
                     >
-                        <option value="starter">Starter (100 Klien, 50 Document/Bln)</option>
-                        <option value="business">Business (500 Klien, 500 Invoice)</option>
-                        <option value="enterprise">Enterprise (Unlimited Klien & Dokumen)</option>
+                        <option value="basic">Basic (50 Datas, 50 Document/Bln)</option>
+                        <option value="plus">Plus (200 Datas, 200 Document/Bln)</option>
+                        <option value="enterprise">Enterprise (Unlimited Datas & Dokumen)</option>
                     </select>
                 </div>
 

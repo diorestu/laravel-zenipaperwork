@@ -23,7 +23,7 @@
                     <span>Masa Uji Coba Gratis</span>
                     <span class="rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold backdrop-blur-xs">30 Hari</span>
                 </div>
-                <h2 class="mt-2 text-xl font-extrabold text-white">Paket Business Aktif</h2>
+                <h2 class="mt-2 text-xl font-extrabold text-white">Paket Plus Aktif</h2>
                 <p class="mt-1 text-xs text-white/80">
                     Berakhir {{ $trialEndsAt?->locale('id')->translatedFormat('d F Y') }} (sisa <strong class="text-amber-200">{{ $trialDaysRemaining }} hari</strong>).
                 </p>
@@ -45,6 +45,52 @@
 
         <!-- Mobile Plans List -->
         <div class="space-y-4">
+            @php($isFreeTier = auth()->user()->company?->getActivePlanSlug() === 'free')
+            <!-- Free Tier Card -->
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white">Free</h3>
+                    @if($isFreeTier)
+                        <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">Paket Aktif</span>
+                    @else
+                        <span class="rounded-full bg-gray-100 px-2.5 py-0.5 text-[10px] font-bold text-gray-600 dark:bg-gray-800 dark:text-gray-400">Gratis</span>
+                    @endif
+                </div>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Paket dasar untuk memulai pembukuan usaha Anda</p>
+
+                <!-- Price Box -->
+                <div class="mt-3.5 rounded-xl bg-gray-50 p-3 dark:bg-gray-800/50">
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-xl font-extrabold text-gray-900 dark:text-white">Rp 0</span>
+                        <span class="text-xs text-gray-500">/ selamanya</span>
+                    </div>
+                </div>
+
+                <!-- Features Checklist -->
+                <ul class="mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-300">
+                    <li class="flex items-center gap-2">
+                        <svg class="h-4 w-4 shrink-0 fill-emerald-500" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        <span>Maksimal 10 klien</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg class="h-4 w-4 shrink-0 fill-emerald-500" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        <span>Maksimal 10 produk atau layanan</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg class="h-4 w-4 shrink-0 fill-emerald-500" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        <span>Maksimal 10 invoice/quote per bulan</span>
+                    </li>
+                    <li class="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                        <svg class="h-4 w-4 shrink-0 fill-amber-500" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        <span>Watermark pada dokumen</span>
+                    </li>
+                </ul>
+
+                <button type="button" disabled class="mt-4 inline-flex h-11 w-full items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-500 dark:border-gray-800 dark:bg-gray-800/40 dark:text-gray-400 cursor-not-allowed">
+                    {{ $isFreeTier ? 'Paket Aktif Saat Ini' : 'Paket Dasar Gratis' }}
+                </button>
+            </div>
+
             @foreach ($plans as $plan)
                 @php($yearlyAmount = (int) round($plan['amount'] * 12 * 0.9))
                 @php($isActive = $activePlan === $plan['slug'])

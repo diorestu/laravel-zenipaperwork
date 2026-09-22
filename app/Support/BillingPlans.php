@@ -10,42 +10,43 @@ class BillingPlans
     {
         return [
             [
-                'slug' => 'starter',
-                'name' => 'Starter',
-                'amount' => (int) SystemSetting::get('plan_price_starter', 25000),
+                'slug' => 'basic',
+                'name' => 'Basic',
+                'amount' => (int) SystemSetting::get('plan_price_basic', SystemSetting::get('plan_price_starter', 49000)),
                 'features' => [
-                    'Kelola hingga 100 klien',
-                    'Kelola hingga 100 produk atau layanan',
-                    'Buat hingga 50 invoice/quotation per bulan',
-                    'Unduh PDF invoice dan penawaran',
-                    'Riwayat pembayaran manual',
+                    'Hingga 50 datas',
+                    'Kelola hingga 50 klien & 50 produk',
+                    'Buat hingga 50 invoice & penawaran/bulan',
+                    'Unduh PDF dokumen tanpa watermark',
+                    'Riwayat pembayaran manual & QRIS',
                 ],
             ],
             [
-                'slug' => 'business',
-                'name' => 'Business',
-                'amount' => (int) SystemSetting::get('plan_price_business', 99000),
+                'slug' => 'plus',
+                'name' => 'Plus',
+                'amount' => (int) SystemSetting::get('plan_price_plus', SystemSetting::get('plan_price_business', 149000)),
                 'features' => [
-                    'Kelola hingga 500 klien',
-                    'Kelola hingga 500 produk atau layanan',
-                    'Buat penawaran tanpa batas',
-                    'Buat hingga 500 invoice',
+                    'Maksimal 200 datas',
+                    'Kelola hingga 200 klien & 200 produk',
+                    'Buat hingga 200 invoice & penawaran/bulan',
                     'Pembayaran bertahap dan catatan termin',
-                    'Riwayat pembayaran dan status pelunasan',
+                    'Riwayat pembayaran dan integrasi QRIS',
                     'Pengaturan rekening bank dan profil perusahaan',
+                    'Unduh PDF dokumen tanpa watermark',
                 ],
             ],
             [
                 'slug' => 'enterprise',
                 'name' => 'Enterprise',
-                'amount' => (int) SystemSetting::get('plan_price_enterprise', 299000),
+                'amount' => (int) SystemSetting::get('plan_price_enterprise', 199000),
                 'features' => [
-                    'Klien, produk, penawaran, dan invoice tanpa batas',
-                    'Semua fitur Business',
+                    'Unlimited datas (klien, produk, & dokumen)',
+                    'Buat invoice & penawaran tanpa batas',
+                    'Semua fitur paket Plus',
                     'Prioritas dukungan operasional',
                     'Pendampingan setup dokumen perusahaan',
-                    'Kebutuhan kapasitas dan workflow khusus',
-                    'Review konfigurasi billing dan pembayaran',
+                    'Review konfigurasi billing khusus',
+                    'Unduh PDF dokumen tanpa watermark',
                 ],
             ],
         ];
@@ -53,7 +54,13 @@ class BillingPlans
 
     public static function find(string $slug): ?array
     {
-        return collect(self::all())->firstWhere('slug', $slug);
+        $aliasMap = [
+            'starter' => 'basic',
+            'business' => 'plus',
+        ];
+        $targetSlug = $aliasMap[$slug] ?? $slug;
+
+        return collect(self::all())->firstWhere('slug', $targetSlug);
     }
 
     public static function amountFor(array $plan, string $period): int

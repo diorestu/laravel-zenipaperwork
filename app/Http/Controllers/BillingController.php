@@ -66,7 +66,7 @@ class BillingController extends Controller
 
         // Check 2: Prevent submissions for same or lower plans unless upgrading or on trial
         $currentPlanSlug = $company->getActivePlanSlug();
-        $levels = ['starter' => 1, 'business' => 2, 'enterprise' => 3];
+        $levels = ['basic' => 1, 'starter' => 1, 'plus' => 2, 'business' => 2, 'enterprise' => 3];
         $newPlanSlug = $data['package'];
 
         if ($currentPlanSlug && $currentPlanSlug !== 'trial') {

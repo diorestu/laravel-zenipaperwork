@@ -65,9 +65,9 @@ class Company extends Model
     {
         $plan = $this->getActivePlanSlug();
         $limit = match ($plan) {
-            'free' => 20,
-            'starter' => 100,
-            'business', 'trial' => 500,
+            'free' => 10,
+            'basic', 'starter' => 50,
+            'plus', 'business', 'trial' => 200,
             default => -1, // Unlimited for enterprise or others
         };
 
@@ -82,9 +82,9 @@ class Company extends Model
     {
         $plan = $this->getActivePlanSlug();
         $limit = match ($plan) {
-            'free' => 20,
-            'starter' => 100,
-            'business', 'trial' => 500,
+            'free' => 10,
+            'basic', 'starter' => 50,
+            'plus', 'business', 'trial' => 200,
             default => -1,
         };
 
@@ -103,10 +103,10 @@ class Company extends Model
             $invoicesCount = $this->invoices()->where('created_at', '>=', $startOfMonth)->count();
             $quotationsCount = $this->quotations()->where('created_at', '>=', $startOfMonth)->count();
 
-            return ($invoicesCount + $quotationsCount) >= 25;
+            return ($invoicesCount + $quotationsCount) >= 10;
         }
 
-        if ($plan === 'starter') {
+        if ($plan === 'basic' || $plan === 'starter') {
             $startOfMonth = now()->startOfMonth();
             $invoicesCount = $this->invoices()->where('created_at', '>=', $startOfMonth)->count();
             $quotationsCount = $this->quotations()->where('created_at', '>=', $startOfMonth)->count();
@@ -114,8 +114,12 @@ class Company extends Model
             return ($invoicesCount + $quotationsCount) >= 50;
         }
 
-        if ($plan === 'business' || $plan === 'trial') {
-            return $this->invoices()->count() >= 500;
+        if ($plan === 'plus' || $plan === 'business' || $plan === 'trial') {
+            $startOfMonth = now()->startOfMonth();
+            $invoicesCount = $this->invoices()->where('created_at', '>=', $startOfMonth)->count();
+            $quotationsCount = $this->quotations()->where('created_at', '>=', $startOfMonth)->count();
+
+            return ($invoicesCount + $quotationsCount) >= 200;
         }
 
         return false;
@@ -129,15 +133,23 @@ class Company extends Model
             $invoicesCount = $this->invoices()->where('created_at', '>=', $startOfMonth)->count();
             $quotationsCount = $this->quotations()->where('created_at', '>=', $startOfMonth)->count();
 
-            return ($invoicesCount + $quotationsCount) >= 25;
+            return ($invoicesCount + $quotationsCount) >= 10;
         }
 
-        if ($plan === 'starter') {
+        if ($plan === 'basic' || $plan === 'starter') {
             $startOfMonth = now()->startOfMonth();
             $invoicesCount = $this->invoices()->where('created_at', '>=', $startOfMonth)->count();
             $quotationsCount = $this->quotations()->where('created_at', '>=', $startOfMonth)->count();
 
             return ($invoicesCount + $quotationsCount) >= 50;
+        }
+
+        if ($plan === 'plus' || $plan === 'business' || $plan === 'trial') {
+            $startOfMonth = now()->startOfMonth();
+            $invoicesCount = $this->invoices()->where('created_at', '>=', $startOfMonth)->count();
+            $quotationsCount = $this->quotations()->where('created_at', '>=', $startOfMonth)->count();
+
+            return ($invoicesCount + $quotationsCount) >= 200;
         }
 
         return false;

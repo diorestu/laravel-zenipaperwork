@@ -374,57 +374,55 @@
                             <span class="text-xs font-medium text-gray-500">/ selamanya</span>
                         </div>
                         <ul class="mt-6 space-y-2.5 text-xs font-medium text-gray-600 dark:text-gray-300">
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Kelola hingga 20 klien</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Kelola hingga 20 produk/layanan</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Buat 25 dokumen/bulan</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Watermark PAPERWORK FREE</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Maks 10 clients</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Maks 10 products</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Maks 10 invoice/quote</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Watermark on documents</li>
                         </ul>
                     </div>
                     <a href="{{ route('register') }}" class="mt-8 block w-full rounded-xl border border-gray-300 bg-white py-2.5 text-center text-xs font-bold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200">Mulai Gratis</a>
                 </div>
 
-                <!-- Starter Plan -->
+                <!-- Basic Plan -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm flex flex-col justify-between dark:border-gray-800 dark:bg-gray-900">
                     <div>
-                        <span class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase">Starter</span>
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">Starter</h3>
+                        <span class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase">Basic</span>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">Basic</h3>
                         <div class="mt-4 flex items-baseline gap-1">
-                            <span class="text-3xl font-bold text-gray-900 dark:text-white" x-show="billingPeriod === 'monthly'">Rp 25.000</span>
-                            <span class="text-3xl font-bold text-gray-900 dark:text-white" x-show="billingPeriod === 'yearly'" style="display: none;">Rp 270.000</span>
+                            <span class="text-3xl font-bold text-gray-900 dark:text-white" x-show="billingPeriod === 'monthly'">Rp 49.000</span>
+                            <span class="text-3xl font-bold text-gray-900 dark:text-white" x-show="billingPeriod === 'yearly'" style="display: none;">Rp 529.200</span>
                             <span class="text-xs font-medium text-gray-500" x-text="billingPeriod === 'monthly' ? '/ bulan' : '/ tahun'">/ bulan</span>
                         </div>
                         <ul class="mt-6 space-y-2.5 text-xs font-medium text-gray-600 dark:text-gray-300">
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Kelola hingga 100 klien</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Kelola hingga 100 produk atau layanan</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Buat hingga 50 invoice/quotation per bulan</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Unduh PDF invoice dan penawaran</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Riwayat pembayaran manual</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 50 datas (klien & produk)</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Buat hingga 50 invoice/quote</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Unduh PDF tanpa watermark</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Riwayat pembayaran manual & QRIS</li>
                         </ul>
                     </div>
-                    <a href="{{ route('register') }}" class="mt-8 block w-full rounded-xl bg-brand-600 py-2.5 text-center text-xs font-bold text-white hover:bg-brand-700">Pilih Starter</a>
+                    <a href="{{ route('register') }}" class="mt-8 block w-full rounded-xl bg-brand-600 py-2.5 text-center text-xs font-bold text-white hover:bg-brand-700">Pilih Basic</a>
                 </div>
 
-                <!-- Business Plan (Featured) -->
+                <!-- Plus Plan (Featured) -->
                 <div class="relative rounded-2xl border-2 border-brand-500 bg-white p-6 shadow-xl flex flex-col justify-between dark:bg-gray-900">
                     <span class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-500 px-3 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">Paling Populer 🔥</span>
                     <div>
-                        <span class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase">Business</span>
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">Business</h3>
+                        <span class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase">Plus</span>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">Plus</h3>
                         <div class="mt-4 flex items-baseline gap-1">
-                            <span class="text-3xl font-bold text-brand-600 dark:text-brand-400" x-show="billingPeriod === 'monthly'">Rp 99.000</span>
-                            <span class="text-3xl font-bold text-brand-600 dark:text-brand-400" x-show="billingPeriod === 'yearly'" style="display: none;">Rp 1.069.200</span>
+                            <span class="text-3xl font-bold text-brand-600 dark:text-brand-400" x-show="billingPeriod === 'monthly'">Rp 149.000</span>
+                            <span class="text-3xl font-bold text-brand-600 dark:text-brand-400" x-show="billingPeriod === 'yearly'" style="display: none;">Rp 1.609.200</span>
                             <span class="text-xs font-medium text-gray-500" x-text="billingPeriod === 'monthly' ? '/ bulan' : '/ tahun'">/ bulan</span>
                         </div>
                         <ul class="mt-6 space-y-2.5 text-xs font-medium text-gray-600 dark:text-gray-300">
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Kelola hingga 500 klien</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Kelola hingga 500 produk atau layanan</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Buat penawaran tanpa batas</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Buat hingga 500 invoice</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Pembayaran bertahap & catatan termin</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Maks. 200 datas</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Buat hingga 200 invoice/quote</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Pembayaran bertahap & termin</li>
                             <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Integrasi Pembayaran QRIS Otomatis</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Unduh PDF tanpa watermark</li>
                         </ul>
                     </div>
-                    <a href="{{ route('register') }}" class="mt-8 block w-full rounded-xl bg-brand-600 py-2.5 text-center text-xs font-bold text-white hover:bg-brand-700 shadow-md">Pilih Business</a>
+                    <a href="{{ route('register') }}" class="mt-8 block w-full rounded-xl bg-brand-600 py-2.5 text-center text-xs font-bold text-white hover:bg-brand-700 shadow-md">Pilih Plus</a>
                 </div>
 
                 <!-- Enterprise Plan -->
@@ -433,19 +431,19 @@
                         <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase">Enterprise</span>
                         <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">Enterprise</h3>
                         <div class="mt-4 flex items-baseline gap-1">
-                            <span class="text-3xl font-bold text-gray-900 dark:text-white" x-show="billingPeriod === 'monthly'">Rp 299.000</span>
-                            <span class="text-3xl font-bold text-gray-900 dark:text-white" x-show="billingPeriod === 'yearly'" style="display: none;">Rp 3.229.200</span>
+                            <span class="text-3xl font-bold text-gray-900 dark:text-white" x-show="billingPeriod === 'monthly'">Rp 199.000</span>
+                            <span class="text-3xl font-bold text-gray-900 dark:text-white" x-show="billingPeriod === 'yearly'" style="display: none;">Rp 2.149.200</span>
                             <span class="text-xs font-medium text-gray-500" x-text="billingPeriod === 'monthly' ? '/ bulan' : '/ tahun'">/ bulan</span>
                         </div>
                         <ul class="mt-6 space-y-2.5 text-xs font-medium text-gray-600 dark:text-gray-300">
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Klien, produk, penawaran & invoice tanpa batas</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Semua fitur Business</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Unlimited datas (klien & produk)</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Invoice & quote tanpa batas</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Semua fitur Plus disertakan</li>
                             <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Prioritas dukungan operasional</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Pendampingan setup dokumen perusahaan</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Review konfigurasi billing khusus</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Unduh PDF tanpa watermark</li>
                         </ul>
                     </div>
-                    <a href="https://wa.me/628811841064?text=Halo%20Paperwork,%20saya%20tertarik%20dengan%20Paket%20Enterprise" target="_blank" rel="noopener noreferrer" class="mt-8 flex items-center justify-center gap-1.5 w-full rounded-xl border border-gray-300 bg-white py-2.5 text-center text-xs font-bold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 transition">Hubungi Kami via WhatsApp</a>
+                    <a href="{{ route('register') }}" class="mt-8 block w-full rounded-xl bg-brand-600 py-2.5 text-center text-xs font-bold text-white hover:bg-brand-700">Pilih Enterprise</a>
                 </div>
             </div>
         </div>
@@ -466,7 +464,7 @@
                         <span class="text-lg font-bold" x-text="open === 1 ? '−' : '+'">+</span>
                     </button>
                     <div x-show="open === 1" class="mt-3 text-xs font-medium text-gray-600 dark:text-gray-400 leading-relaxed" style="display: none;">
-                        Ya, Paket Gratis berlaku selamanya tanpa batas waktu uji coba! Anda dapat mengelola hingga 20 klien, 20 produk, dan 25 dokumen per bulan tanpa biaya sama sekali.
+                        Ya, Paket Gratis berlaku selamanya tanpa batas waktu uji coba! Anda dapat mengelola hingga 10 klien, 10 produk, dan 10 invoice/quote per bulan dengan watermark pada dokumen tanpa biaya sama sekali.
                     </div>
                 </div>
 

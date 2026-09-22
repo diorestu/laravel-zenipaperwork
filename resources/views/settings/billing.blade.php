@@ -25,7 +25,7 @@
                 <div>
                     <h2 class="text-base font-bold text-gray-900 dark:text-white">Masa Uji Coba Gratis 30 Hari Aktif</h2>
                     <p class="mt-1 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-                        Anda sedang menikmati akses uji coba gratis fitur paket <strong class="text-brand-600 dark:text-brand-400">Business</strong>. 
+                        Anda sedang menikmati akses uji coba gratis fitur paket <strong class="text-brand-600 dark:text-brand-400">Plus</strong>. 
                         Masa uji coba gratis Anda akan berakhir pada <strong class="text-gray-800 dark:text-white">{{ $trialEndsAt->locale('id')->translatedFormat('d F Y') }}</strong> 
                         (<span class="font-semibold text-brand-600 dark:text-brand-400">{{ $trialDaysRemaining }} hari lagi</span>). 
                         Anda dapat memilih dan meningkatkan paket langganan Anda kapan saja di bawah ini.
@@ -37,8 +37,9 @@
 
     @php
         $pendingSubmission = $submissions->where('status', 'pending')->first();
-        $planLevels = ['starter' => 1, 'business' => 2, 'enterprise' => 3];
+        $planLevels = ['basic' => 1, 'starter' => 1, 'plus' => 2, 'business' => 2, 'enterprise' => 3];
         $currentLevel = ($activePlan && isset($planLevels[$activePlan])) ? $planLevels[$activePlan] : 0;
+        $isFreeTier = auth()->user()->company?->getActivePlanSlug() === 'free';
     @endphp
 
     @if ($pendingSubmission)
@@ -73,10 +74,83 @@
         </div>
     </div>
 
-    <section class="grid gap-4 lg:grid-cols-3">
+    <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Free Tier Card -->
+        <article @class([
+            'flex h-full flex-col rounded-lg border bg-white p-5 shadow-theme-xs dark:bg-white/[0.03]',
+            'border-brand-500 ring-2 ring-brand-500/15 dark:border-brand-400 dark:ring-brand-400/20' => $isFreeTier,
+            'border-gray-200 dark:border-gray-800' => ! $isFreeTier,
+        ])>
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <h2 class="text-base font-semibold text-gray-900 dark:text-white/90">Free</h2>
+                    <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90">
+                        Rp 0
+                    </p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        selamanya
+                    </p>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                    <span class="rounded-full border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-600 dark:border-gray-700 dark:text-gray-300">Gratis</span>
+                    @if ($isFreeTier)
+                        <span class="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">Paket Aktif</span>
+                    @endif
+                </div>
+            </div>
+
+            <div class="mt-5 flex-1 border-t border-gray-100 pt-4 pb-6 dark:border-gray-800">
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Layanan yang didapat</p>
+                <ul class="mt-3 space-y-1.5 text-xs leading-5 text-gray-600 dark:text-gray-300">
+                    <li class="flex gap-2">
+                        <span class="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-400">
+                            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <path d="M3.5 8.2L6.4 11L12.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                        <span>Maksimal 10 klien</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-400">
+                            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <path d="M3.5 8.2L6.4 11L12.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                        <span>Maksimal 10 produk/layanan</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-400">
+                            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <path d="M3.5 8.2L6.4 11L12.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                        <span>Maksimal 10 invoice/quote per bulan</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
+                            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <path d="M8 3v6M8 12h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                        </span>
+                        <span>Watermark pada dokumen</span>
+                    </li>
+                </ul>
+            </div>
+
+            @if ($isFreeTier)
+                <button type="button" disabled class="mt-auto w-full rounded-lg border border-brand-200 bg-brand-50 px-4 py-2.5 text-sm font-semibold text-brand-700 cursor-not-allowed dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-300">
+                    Paket Aktif Saat Ini
+                </button>
+            @else
+                <button type="button" disabled class="mt-auto w-full rounded-lg border border-gray-200 bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-400 cursor-not-allowed dark:border-gray-800 dark:bg-gray-800/50 dark:text-gray-500">
+                    Paket Dasar Gratis
+                </button>
+            @endif
+        </article>
+
         @foreach ($plans as $plan)
             @php($isActive = $activePlan === $plan['slug'])
-            @php($isTrialActive = $onTrial && $plan['slug'] === 'business' && !$activePlan)
+            @php($isTrialActive = $onTrial && in_array($plan['slug'], ['plus', 'business']) && !$activePlan)
             @php($isHighlighted = $isActive || $isTrialActive)
             @php($yearlyAmount = (int) round($plan['amount'] * 12 * 0.9))
             @php($targetLevel = $planLevels[$plan['slug']] ?? 0)

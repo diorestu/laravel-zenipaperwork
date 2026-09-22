@@ -257,13 +257,14 @@ it('renders billing pricing cards and creates a Pakasir payment detail page', fu
 
     $this->actingAs($user)->get(route('settings.billing'))
         ->assertOk()
-        ->assertSee('Starter')
-        ->assertSee('Business')
+        ->assertSee('Free')
+        ->assertSee('Basic')
+        ->assertSee('Plus')
         ->assertSee('Enterprise')
-        ->assertSee('confirm-payment-starter');
+        ->assertSee('confirm-payment-basic');
 
     $this->actingAs($user)->post(route('billing.store'), [
-        'package' => 'business',
+        'package' => 'plus',
         'billing_period' => 'monthly',
         'amount' => 149000,
         'payment_method' => 'qris',
@@ -275,7 +276,7 @@ it('renders billing pricing cards and creates a Pakasir payment detail page', fu
 
     $this->actingAs($user)->get(route('settings.billing.show', $submission))
         ->assertOk()
-        ->assertSee('Business')
+        ->assertSee('Plus')
         ->assertSee('QRIS-ORDER-001')
         ->assertSee('https://app.pakasir.com/pay/QRIS-ORDER-001');
 });
@@ -1004,4 +1005,62 @@ it('applies soft deletes to models without cascade delete', function () {
     $expense->delete();
     expect($expense->trashed())->toBeTrue();
     expect(\App\Models\Expense::withTrashed()->find($expense->id))->not->toBeNull();
+});
+
+it('displays the updated pricing on landing and billing pages and enforces updated limits', function () {
+    $response = $this->get('/');
+    $response->assertOk()
+        ->assertSee('Free Tier')
+        ->assertSee('Maks 10 clients')
+        ->assertSee('Maks 10 products')
+        ->assertSee('Maks 10 invoice/quote')
+        ->assertSee('Watermark on documents')
+        ->assertSee('Basic')
+        ->assertSee('49.000')
+        ->assertSee('50 datas')
+        ->assertSee('Plus')
+        ->assertSee('149.000')
+        ->assertSee('200 datas')
+        ->assertSee('Enterprise')
+        ->assertSee('199.000')
+        ->assertSee('Unlimited datas');
+
+    $user = paperworkUser();
+    $company = $user->company;
+
+    // Test billing page (desktop)
+    $this->actingAs($user)->get(route('settings.billing'))
+        ->assertOk()
+        ->assertSee('Free')
+        ->assertSee('Basic')
+        ->assertSee('Plus')
+        ->assertSee('Enterprise')
+        ->assertSee('49.000')
+        ->assertSee('149.000')
+        ->assertSee('199.000');
+
+    // Test mobile billing page
+    $this->actingAs($user)->get(route('mobile.billing'))
+        ->assertOk()
+        ->assertSee('Free')
+        ->assertSee('Basic')
+        ->assertSee('Plus')
+        ->assertSee('Enterprise');
+
+    // Test limits on Company
+    $company->update(['active_plan' => 'free', 'trial_ends_at' => now()->subDay()]);
+    Client::factory()->count(10)->create(['company_id' => $company->id]);
+    expect($company->hasReachedClientLimit())->toBeTrue();
+
+    $company->update(['active_plan' => 'basic', 'subscription_ends_at' => now()->addMonth()]);
+    expect($company->hasReachedClientLimit())->toBeFalse();
+
+    Client::factory()->count(40)->create(['company_id' => $company->id]);
+    expect($company->hasReachedClientLimit())->toBeTrue();
+
+    $company->update(['active_plan' => 'plus', 'subscription_ends_at' => now()->addMonth()]);
+    expect($company->hasReachedClientLimit())->toBeFalse();
+
+    $company->update(['active_plan' => 'enterprise', 'subscription_ends_at' => now()->addMonth()]);
+    expect($company->hasReachedClientLimit())->toBeFalse();
 });
