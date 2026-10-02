@@ -168,7 +168,7 @@
                     </h1>
 
                 <p class="mx-auto max-w-2xl text-base font-medium text-gray-600 sm:text-lg dark:text-gray-300 leading-relaxed">
-                    Tinggalkan pembuatan dokumen manual. Terbitkan invoice profesional, penawaran resmi, terima pembayaran QRIS instan, dan kelola arus kas bisnis Anda secara real-time.
+                    Tinggalkan pembuatan dokumen manual. Terbitkan invoice profesional, penawaran resmi, dan kelola arus kas bisnis Anda secara real-time.
                 </p>
 
                 <!-- CTA Buttons -->
@@ -414,7 +414,7 @@
                             <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 50 datas (klien & produk)</li>
                             <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Buat hingga 50 invoice/quote</li>
                             <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Unduh PDF tanpa watermark</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Riwayat pembayaran manual & QRIS</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Riwayat pencatatan pembayaran</li>
                         </ul>
                     </div>
                     <a href="{{ route('register') }}" class="mt-8 block w-full rounded-xl bg-brand-600 py-2.5 text-center text-xs font-bold text-white hover:bg-brand-700">Pilih Basic</a>
@@ -435,7 +435,7 @@
                             <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Maks. 200 datas</li>
                             <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Buat hingga 200 invoice/quote</li>
                             <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Pembayaran bertahap & termin</li>
-                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Integrasi Pembayaran QRIS Otomatis</li>
+                            <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Pengaturan rekening bank & termin</li>
                             <li class="flex items-center gap-2"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Unduh PDF tanpa watermark</li>
                         </ul>
                     </div>
@@ -487,11 +487,11 @@
 
                 <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-gray-950/50">
                     <button @click="open = open === 2 ? null : 2" class="flex w-full items-center justify-between text-left text-sm font-bold text-gray-900 dark:text-white">
-                        <span>Bagaimana cara kerja verifikasi pembayaran QRIS?</span>
+                        <span>Bagaimana cara mencatat pembayaran dari pelanggan?</span>
                         <span class="text-lg font-bold" x-text="open === 2 ? '−' : '+'">+</span>
                     </button>
                     <div x-show="open === 2" class="mt-3 text-xs font-medium text-gray-600 dark:text-gray-400 leading-relaxed" style="display: none;">
-                        Saat pelanggan memindai QRIS dan menyelesaikan pembayaran dari aplikasi e-wallet / mobile banking, sistem pembayaran akan mengirimkan sinyal Webhook otomatis ke sistem kami untuk mengonfirmasi transaksi secara instan tanpa perlu cek mutasi manual.
+                        Anda dapat mencatat riwayat pembayaran secara bertahap atau langsung lunas pada setiap invoice, mencantumkan rekening tujuan transfer bank, dan memantau sisa tagihan secara real-time.
                     </div>
                 </div>
 
@@ -541,7 +541,7 @@
                         Kerja & Pantau Invoice Bisnis Langsung dari HP
                     </h2>
                     <p class="text-sm sm:text-base text-gray-300 leading-relaxed font-normal">
-                        Dapatkan kemudahan menerbitkan invoice profesional, mengirim penawaran, dan cek status pembayaran QRIS kapan saja. Download Paperwork sekarang di Google Play Store.
+                        Dapatkan kemudahan menerbitkan invoice profesional, mengirim penawaran, dan memantau status pembayaran tagihan kapan saja. Download Paperwork sekarang di Google Play Store.
                     </p>
                 </div>
                 <div class="flex flex-col sm:flex-row items-center gap-4 shrink-0">

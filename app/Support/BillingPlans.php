@@ -18,7 +18,7 @@ class BillingPlans
                     'Kelola hingga 50 klien & 50 produk',
                     'Buat hingga 50 invoice & penawaran/bulan',
                     'Unduh PDF dokumen tanpa watermark',
-                    'Riwayat pembayaran manual & QRIS',
+                    'Riwayat pencatatan pembayaran',
                 ],
             ],
             [
@@ -30,7 +30,6 @@ class BillingPlans
                     'Kelola hingga 200 klien & 200 produk',
                     'Buat hingga 200 invoice & penawaran/bulan',
                     'Pembayaran bertahap dan catatan termin',
-                    'Riwayat pembayaran dan integrasi QRIS',
                     'Pengaturan rekening bank dan profil perusahaan',
                     'Unduh PDF dokumen tanpa watermark',
                 ],
