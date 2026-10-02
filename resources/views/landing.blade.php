@@ -11,6 +11,8 @@
       gtag('config', 'G-H0Z5FQGY0E');
     </script>
 
+    <x-meta-pixel />
+
     <!-- Primary Meta Tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -192,12 +194,20 @@
                             <span>Hubungi Kami</span>
                         </a>
                     @endauth
+
+                    <a href="https://play.google.com/store/apps/details?id=com.zeni.paperwork" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="inline-flex items-center justify-center transition hover:opacity-90 hover:scale-[1.03] active:scale-[0.98] duration-200" 
+                       title="Download Paperwork di Google Play Store">
+                        <img src="{{ asset('images/google-play-badge.svg') }}" alt="Temukan di Google Play" class="h-12 w-auto object-contain">
+                    </a>
                 </div>
 
-                <div class="flex items-center justify-center gap-6 pt-4 text-xs font-bold text-gray-500 dark:text-gray-400">
+                <div class="flex flex-wrap items-center justify-center gap-6 pt-4 text-xs font-bold text-gray-500 dark:text-gray-400">
                     <span class="flex items-center gap-1.5"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Tanpa Kartu Kredit</span>
                     <span class="flex items-center gap-1.5"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Gratis Selamanya (Free Tier)</span>
-                    <span class="flex items-center gap-1.5"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Setup 1 Menit</span>
+                    <span class="flex items-center gap-1.5"><svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Tersedia di Google Play</span>
                 </div>
             </div>
 
@@ -320,13 +330,20 @@
                     <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">Simpan data klien dan katalog produk secara terorganisir. Sistem memantau limit kuota secara cerdas sesuai paket Anda.</p>
                 </div>
 
-                <!-- 5. PWA Mobile Workspace -->
-                <div class="rounded-2xl border border-gray-200 bg-gray-50/50 p-6 transition hover:border-brand-500 hover:shadow-theme-md dark:border-gray-800 dark:bg-gray-950/50">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400 mb-4">
-                        <x-heroicon-o-device-phone-mobile class="h-6 w-6" />
+                <!-- 5. Aplikasi Android & Mobile Workspace -->
+                <div class="rounded-2xl border border-gray-200 bg-gray-50/50 p-6 transition hover:border-brand-500 hover:shadow-theme-md dark:border-gray-800 dark:bg-gray-950/50 flex flex-col justify-between">
+                    <div>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400 mb-4">
+                            <x-heroicon-o-device-phone-mobile class="h-6 w-6" />
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Aplikasi Android & Mobile</h3>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">Kelola dokumen invoice dan tagihan langsung dari smartphone Anda. Unduh aplikasi resmi Paperwork di Google Play Store atau pasang langsung sebagai PWA.</p>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">PWA Mobile Workspace</h3>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">Install Paperwork sebagai aplikasi mobile di HP Android/iOS Anda tanpa perlu mengunduh di Play Store/App Store.</p>
+                    <div class="mt-4 pt-3 border-t border-gray-200/60 dark:border-gray-800/80">
+                        <a href="https://play.google.com/store/apps/details?id=com.zeni.paperwork" target="_blank" rel="noopener noreferrer" class="inline-flex items-center transition hover:opacity-90 hover:scale-105 active:scale-95 duration-200" title="Unduh Paperwork di Google Play Store">
+                            <img src="{{ asset('images/google-play-badge.svg') }}" alt="Temukan di Google Play" class="h-9 w-auto">
+                        </a>
+                    </div>
                 </div>
 
                 <!-- 6. Kalender & Jatuh Tempo -->
@@ -504,8 +521,37 @@
                         <span class="text-lg font-bold" x-text="open === 5 ? '−' : '+'">+</span>
                     </button>
                     <div x-show="open === 5" class="mt-3 text-xs font-medium text-gray-600 dark:text-gray-400 leading-relaxed" style="display: none;">
-                        Ya! Paperwork telah mendukung teknologi Progressive Web App (PWA), sehingga Anda dapat meng-install dan mengakses aplikasi secara langsung melalui HP Android maupun iOS tanpa perlu mengunduh dari toko aplikasi.
+                        Ya! Paperwork kini resmi tersedia di <a href="https://play.google.com/store/apps/details?id=com.zeni.paperwork" target="_blank" rel="noopener noreferrer" class="font-bold text-brand-600 hover:underline dark:text-brand-400">Google Play Store (com.zeni.paperwork)</a> untuk perangkat Android. Anda juga dapat menggunakan dan memasangnya sebagai Progressive Web App (PWA) di HP Android maupun iOS tanpa hambatan.
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Google Play Store CTA Banner Section -->
+    <section class="py-16 bg-gradient-to-r from-gray-900 via-brand-950 to-gray-900 text-white relative overflow-hidden border-t border-gray-800">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-8 rounded-3xl bg-white/[0.04] border border-white/10 p-8 sm:p-12 backdrop-blur-xl">
+                <div class="max-w-2xl space-y-3 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 rounded-full bg-brand-500/20 px-3.5 py-1 text-xs font-bold text-brand-300 border border-brand-500/30">
+                        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="m12.954 11.616 2.957-2.957L6.36 3.291c-.633-.342-1.226-.39-1.746-.016l8.34 8.341zm3.461 3.462 3.074-1.729c.6-.336.929-.812.929-1.34 0-.527-.329-1.004-.928-1.34l-2.783-1.563-3.133 3.132 2.841 2.84zM4.1 4.002c-.064.197-.1.417-.1.658v14.705c0 .381.084.709.236.97l8.097-8.098L4.1 4.002zm8.854 8.855L4.902 20.91c.154.059.32.09.495.09.312 0 .637-.092.968-.276l9.255-5.197-2.666-2.67z"/></svg>
+                        <span>Aplikasi Android Resmi</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                        Kerja & Pantau Invoice Bisnis Langsung dari HP
+                    </h2>
+                    <p class="text-sm sm:text-base text-gray-300 leading-relaxed font-normal">
+                        Dapatkan kemudahan menerbitkan invoice profesional, mengirim penawaran, dan cek status pembayaran QRIS kapan saja. Download Paperwork sekarang di Google Play Store.
+                    </p>
+                </div>
+                <div class="flex flex-col sm:flex-row items-center gap-4 shrink-0">
+                    <a href="https://play.google.com/store/apps/details?id=com.zeni.paperwork" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="inline-flex items-center transition hover:opacity-90 hover:scale-105 active:scale-95 duration-200" 
+                       title="Download di Google Play Store">
+                        <img src="{{ asset('images/google-play-badge.svg') }}" alt="Temukan di Google Play" class="h-14 w-auto drop-shadow-md">
+                    </a>
                 </div>
             </div>
         </div>
@@ -547,7 +593,14 @@
                 </a>
             </div>
 
-            <div class="flex items-center gap-6 font-medium">
+            <div class="flex flex-wrap items-center gap-5 font-medium">
+                <a href="https://play.google.com/store/apps/details?id=com.zeni.paperwork" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="inline-flex items-center transition hover:opacity-90 hover:scale-105 active:scale-95 duration-200" 
+                   title="Unduh Paperwork di Google Play Store">
+                    <img src="{{ asset('images/google-play-badge.svg') }}" alt="Temukan di Google Play" class="h-8 w-auto">
+                </a>
                 <a href="{{ route('privacy-policy') }}" class="hover:text-white transition">Kebijakan Privasi</a>
                 <a href="{{ route('terms-of-service') }}" class="hover:text-white transition">Syarat & Ketentuan</a>
                 <a href="{{ route('pwa.install') }}" class="hover:text-white transition">Install Mobile App</a>

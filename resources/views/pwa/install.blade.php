@@ -36,6 +36,9 @@
                 <a class="mobile-pwa__button mobile-pwa__button--ghost" href="{{ route('login') }}">
                     Login Web
                 </a>
+                <a href="https://play.google.com/store/apps/details?id=com.zeni.paperwork" target="_blank" rel="noopener noreferrer" class="inline-flex items-center transition hover:opacity-90" title="Unduh Paperwork di Google Play Store">
+                    <img src="{{ asset('images/google-play-badge.svg') }}" alt="Temukan di Google Play" class="h-10 w-auto">
+                </a>
             </div>
         </div>
 

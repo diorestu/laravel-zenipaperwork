@@ -70,4 +70,8 @@ return [
         'measurement_id' => env('FIREBASE_MEASUREMENT_ID'),
     ],
 
+    'meta' => [
+        'pixel_id' => env('META_PIXEL_ID', '2021932778520715'),
+    ],
+
 ];
