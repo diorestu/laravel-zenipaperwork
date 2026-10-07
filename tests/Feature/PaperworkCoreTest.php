@@ -1064,3 +1064,22 @@ it('displays the updated pricing on landing and billing pages and enforces updat
     $company->update(['active_plan' => 'enterprise', 'subscription_ends_at' => now()->addMonth()]);
     expect($company->hasReachedClientLimit())->toBeFalse();
 });
+
+it('rejects invalid client email syntax and safely skips invalid invoice email delivery', function () {
+    $user = paperworkUser();
+
+    $response = $this->actingAs($user)->post(route('clients.store'), [
+        'name' => 'Bad Email Client',
+        'email' => '-@gmai.com',
+    ]);
+    $response->assertSessionHasErrors('email');
+
+    $client = Client::factory()->for($user->company)->create(['email' => '-@gmai.com']);
+    $invoice = Invoice::factory()->for($user->company)->for($client)->create();
+
+    \Illuminate\Support\Facades\Mail::fake();
+
+    (new \App\Jobs\SendInvoiceEmail($invoice))->handle();
+
+    \Illuminate\Support\Facades\Mail::assertNothingSent();
+});

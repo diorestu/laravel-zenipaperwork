@@ -77,7 +77,8 @@ class DataImportService
                     }
 
                     $companyName = ! empty($item['company']) && $item['company'] !== '-' ? trim($item['company']) : null;
-                    $email = ! empty($item['email']) && filter_var($item['email'], FILTER_VALIDATE_EMAIL) ? trim($item['email']) : null;
+                    $rawEmail = ! empty($item['email']) ? trim($item['email']) : null;
+                    $email = $rawEmail && filter_var($rawEmail, FILTER_VALIDATE_EMAIL) && preg_match('/^[a-zA-Z0-9][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', $rawEmail) ? $rawEmail : null;
 
                     $client = Client::firstOrCreate(
                         [
