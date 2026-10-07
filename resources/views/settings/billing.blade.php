@@ -336,6 +336,28 @@
     </section>
     </div>
 
+    <!-- CS Support Banner -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Butuh bantuan terkait paket atau faktur pembayaran?</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Tim Customer Support kami siap membantu pertanyaan dan aktivasi langganan Anda.</p>
+            </div>
+        </div>
+        <a href="mailto:support@paperwork.biz.id?subject=Bantuan%20Layanan%20Billing%20Paperwork" 
+           class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-xs font-semibold text-white shadow-theme-xs transition hover:bg-brand-700">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            <span>Bantuan CS via Email</span>
+        </a>
+    </div>
+
     <section class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03]">
         <div class="p-5">
             <h2 class="text-base font-semibold text-gray-900 dark:text-white/90">Riwayat Pembayaran</h2>

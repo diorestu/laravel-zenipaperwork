@@ -50,6 +50,14 @@
                 <img src="{{ asset('images/logo/logo-footer.png') }}" alt="Paperwork" class="h-7 w-auto">
                 <span>© {{ date('Y') }} PT Numa Teknologi Nusantara. All rights reserved.</span>
             </div>
+            <div>
+                <a href="mailto:support@paperwork.biz.id?subject=Bantuan%20Layanan%20Paperwork" class="inline-flex items-center gap-1.5 text-brand-400 hover:text-white transition" title="Bantuan Customer Service">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    <span>Bantuan CS: support@paperwork.biz.id</span>
+                </a>
+            </div>
         </div>
     </footer>
 </body>

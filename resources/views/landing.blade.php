@@ -100,6 +100,7 @@
                 <a href="#keunggulan" class="hover:text-brand-600 dark:hover:text-white transition">Keunggulan</a>
                 <a href="#harga" class="hover:text-brand-600 dark:hover:text-white transition">Harga Paket</a>
                 <a href="#faq" class="hover:text-brand-600 dark:hover:text-white transition">FAQ</a>
+                <a href="mailto:support@paperwork.biz.id?subject=Bantuan%20Layanan%20Paperwork" class="hover:text-brand-600 dark:hover:text-white transition" title="Hubungi CS via Email">Bantuan CS</a>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -525,6 +526,23 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Customer Support Email Assistance Box -->
+            <div class="mt-10 rounded-2xl border border-brand-200 bg-brand-50/70 p-6 text-center sm:flex sm:items-center sm:justify-between sm:text-left dark:border-brand-900/50 dark:bg-brand-950/40">
+                <div>
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white">Masih Butuh Bantuan Layanan atau Informasi Tambahan?</h3>
+                    <p class="mt-1 text-xs font-medium text-gray-600 dark:text-gray-400">Tim Customer Support kami siap membantu kendala teknis, pertanyaan paket, dan kebutuhan bisnis Anda.</p>
+                </div>
+                <div class="mt-4 sm:mt-0 sm:shrink-0">
+                    <a href="mailto:support@paperwork.biz.id?subject=Bantuan%20Layanan%20Paperwork" 
+                       class="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-3 text-xs font-bold text-white shadow-theme-xs transition hover:bg-brand-700 active:scale-[0.98]">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Hubungi CS via Email</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -594,6 +612,12 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-5 font-medium">
+                <a href="mailto:support@paperwork.biz.id?subject=Bantuan%20Layanan%20Paperwork" class="inline-flex items-center gap-1.5 text-brand-400 hover:text-white transition" title="Bantuan Customer Service Paperwork">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    <span>Bantuan CS: support@paperwork.biz.id</span>
+                </a>
                 <a href="https://play.google.com/store/apps/details?id=com.zeni.paperwork" 
                    target="_blank" 
                    rel="noopener noreferrer" 
@@ -608,14 +632,28 @@
         </div>
     </footer>
 
-    <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/628811841064?text=Halo%20Paperwork,%20saya%20ingin%20bertanya%20mengenai%20layanan%20Paperwork." 
-       target="_blank" 
-       rel="noopener noreferrer"
-       class="fixed bottom-6 right-6 z-50 flex items-center justify-center rounded-full bg-[#25D366] px-4 py-3 text-white shadow-2xl shadow-emerald-500/40 animate-bounce transition-all duration-300 hover:animate-none hover:scale-110 hover:bg-[#20ba5a] hover:shadow-emerald-500/60 group"
-       title="Hubungi Kami via WhatsApp (+628811841064)"
-    >
-        <img src="{{ asset('images/whatsapp-badge.svg') }}" alt="WhatsApp" class="h-6 w-auto object-contain drop-shadow-md">
-    </a>
+    <!-- Floating Support Buttons -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2.5">
+        <!-- Floating Email CS Button -->
+        <a href="mailto:support@paperwork.biz.id?subject=Bantuan%20Layanan%20Paperwork" 
+           class="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-xs font-bold text-gray-800 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-gray-50 hover:text-brand-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:text-brand-400 group"
+           title="Bantuan Layanan via Email (support@paperwork.biz.id)"
+        >
+            <svg class="h-4 w-4 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            <span class="hidden sm:inline">Bantuan CS</span>
+        </a>
+
+        <!-- Floating WhatsApp Button -->
+        <a href="https://wa.me/628811841064?text=Halo%20Paperwork,%20saya%20ingin%20bertanya%20mengenai%20layanan%20Paperwork." 
+           target="_blank" 
+           rel="noopener noreferrer"
+           class="flex items-center justify-center rounded-full bg-[#25D366] px-4 py-3 text-white shadow-2xl shadow-emerald-500/40 animate-bounce transition-all duration-300 hover:animate-none hover:scale-110 hover:bg-[#20ba5a] hover:shadow-emerald-500/60 group"
+           title="Hubungi Kami via WhatsApp (+628811841064)"
+        >
+            <img src="{{ asset('images/whatsapp-badge.svg') }}" alt="WhatsApp" class="h-6 w-auto object-contain drop-shadow-md">
+        </a>
+    </div>
 </body>
 </html>

@@ -70,7 +70,7 @@
 
                     <section class="space-y-3">
                         <h2 class="text-xl font-semibold text-gray-950 dark:text-white">6. Hubungi Kami</h2>
-                        <p>Jika Anda memiliki pertanyaan atau kekhawatiran mengenai Kebijakan Privasi ini, silakan hubungi kami melalui email di: <a href="mailto:support@paperwork.id" class="font-medium text-gray-950 underline dark:text-white">support@paperwork.id</a>.</p>
+                        <p>Jika Anda memiliki pertanyaan atau kekhawatiran mengenai Kebijakan Privasi ini, silakan hubungi kami melalui email di: <a href="mailto:support@paperwork.biz.id" class="font-medium text-gray-950 underline dark:text-white">support@paperwork.biz.id</a>.</p>
                     </section>
                 </div>
             </article>

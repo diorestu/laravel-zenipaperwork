@@ -147,6 +147,15 @@
                 </form>
             </div>
         </section>
+
+        <div class="text-center pt-1 pb-4">
+            <a href="mailto:support@paperwork.biz.id?subject=Bantuan%20Layanan%20Paperwork" class="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
+                <svg class="h-3.5 w-3.5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <span>Butuh bantuan? Hubungi CS: support@paperwork.biz.id</span>
+            </a>
+        </div>
     </main>
 </div>
 @endsection
