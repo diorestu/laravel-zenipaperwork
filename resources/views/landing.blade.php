@@ -16,7 +16,7 @@
     <!-- Primary Meta Tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="facebook-domain-verification" content="1x5kaefq0oylo800h9ial0aixbgzsd" />
+    <meta name="facebook-domain-verification" content="xumkq0xugx6d41p04hqo0ud8o8kt4g" />
     <title>Paperwork - Aplikasi Invoice, Penawaran & Billing Bisnis Otomatis</title>
     <meta name="title" content="Paperwork - Aplikasi Invoice, Penawaran & Billing Bisnis Otomatis">
     <meta name="description" content="Paperwork membantu bisnis Anda membuat invoice profesional, dokumen penawaran harga, mengelola klien, dan mengotomatisasi sistem pembayaran tagihan dengan mudah dan rapi.">
